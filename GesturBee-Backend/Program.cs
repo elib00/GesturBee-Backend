@@ -1,7 +1,3 @@
-<<<<<<< HEAD
-var builder = WebApplication.CreateBuilder(args);
-
-=======
 using GesturBee_Backend;
 using GesturBee_Backend.Repository;
 using GesturBee_Backend.Repository.Interfaces;
@@ -31,7 +27,6 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 <<<<<<< HEAD
-=======
 // Add JSON serialization settings for enum conversion to string
 builder.Services.AddControllers()
     .AddJsonOptions(options =>
