@@ -78,7 +78,7 @@ namespace GesturBee_Backend.Controllers
         {
             if (!User.Identity.IsAuthenticated)
             {
-                return Unauthorized(new { message = "Access denied: You must log in first." });
+                return Unauthorized(new { message = "Access denied: You mus t log in first." });
             }
 
             return Ok("You are authenticated!");
