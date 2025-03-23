@@ -4,6 +4,8 @@ namespace GesturBee_Backend.DTO
 {
     public class UserRegistrationDTO
     {
+        //TODO: Implement Role
+
         [Required(ErrorMessage = "Email is required.")]
         [EmailAddress(ErrorMessage = "Invalid email format.")]
         public string? Email { get; set; }
@@ -11,6 +13,7 @@ namespace GesturBee_Backend.DTO
         [Required(ErrorMessage = "Password is required.")]
         [StringLength(100, MinimumLength = 8, ErrorMessage = "Password must be between 6 and 100 characters.")]
         public string? Password { get; set; }
+
 
 
         //for the profile

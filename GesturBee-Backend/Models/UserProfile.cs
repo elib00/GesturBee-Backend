@@ -25,7 +25,7 @@ namespace GesturBee_Backend.Models
         [ForeignKey("UserId")]
         [Required]
         public int UserId { get; set; }  // Foreign key for User
-
+         
         // Navigation property to access the associated User
         [JsonIgnore]
         public User? User { get; set; }
