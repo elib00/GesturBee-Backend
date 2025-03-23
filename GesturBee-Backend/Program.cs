@@ -18,7 +18,6 @@ builder.Services.AddDbContext<BackendDbContext>(
 );
 
 
->>>>>>> setup/initialize
 // Add services to the container.
 
 builder.Services.AddControllers();
@@ -26,7 +25,6 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-<<<<<<< HEAD
 // Add JSON serialization settings for enum conversion to string
 builder.Services.AddControllers()
     .AddJsonOptions(options =>
@@ -36,7 +34,7 @@ builder.Services.AddControllers()
 
 // Add dependencies
 builder.Services.AddTransient<IAuthService, AuthService>();
-builder.Services.AddScoped<IAuthRepository, AuthRepository>(); 
+builder.Services.AddScoped<IAuthRepository, AuthRepository>();
 
 builder.Services.AddScoped<IJwtService, JwtService>();
 
@@ -50,20 +48,20 @@ builder.Services.AddAuthentication(options =>
 })
 .AddCookie() // Required for OAuth callbacks
 .AddJwtBearer(options =>
- {
-     options.RequireHttpsMetadata = false; // Set to true in production
-     options.SaveToken = true;
-     options.TokenValidationParameters = new TokenValidationParameters
-     {
-         ValidateIssuer = true,
-         ValidateAudience = true,
-         ValidateLifetime = true,
-         ValidateIssuerSigningKey = true,
-         ValidIssuer = builder.Configuration["Jwt:Issuer"],
-         ValidAudience = builder.Configuration["Jwt:Audience"],
-         IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Secret"]))
-     };
- })
+{
+    options.RequireHttpsMetadata = false; // Set to true in production
+    options.SaveToken = true;
+    options.TokenValidationParameters = new TokenValidationParameters
+    {
+        ValidateIssuer = true,
+        ValidateAudience = true,
+        ValidateLifetime = true,
+        ValidateIssuerSigningKey = true,
+        ValidIssuer = builder.Configuration["Jwt:Issuer"],
+        ValidAudience = builder.Configuration["Jwt:Audience"],
+        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Secret"]))
+    };
+})
 .AddGoogle(GoogleDefaults.AuthenticationScheme, googleOptions =>
 {
     googleOptions.ClientId = builder.Configuration["Authentication:Google:ClientId"];
@@ -104,7 +102,6 @@ if (app.Environment.IsDevelopment())
 app.UseAuthentication();
 app.UseAuthorization();
 
->>>>>>> setup/initialize
 app.UseHttpsRedirection();
 
 app.UseAuthorization();
