@@ -96,7 +96,6 @@ builder.Services.AddCors(options =>
 // Add authorization
 builder.Services.AddAuthorization();
 
->>>>>>> setup/initialize
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -106,8 +105,6 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
-<<<<<<< HEAD
-=======
 // Use authentication
 app.UseAuthentication();
 app.UseAuthorization();
