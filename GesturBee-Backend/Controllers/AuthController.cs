@@ -2,6 +2,7 @@
 using GesturBee_Backend.Services.Interfaces;
 using GesturBee_Backend.Enums;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Authorization;
 
 namespace GesturBee_Backend.Controllers
 {
@@ -18,6 +19,7 @@ namespace GesturBee_Backend.Controllers
             _jwtService = jwtService;
         }
 
+        [AllowAnonymous]
         [HttpPost]
         [Route("register/")]
         public async Task<IActionResult> RegisterUser([FromBody] UserRegistrationDTO user)
@@ -59,10 +61,27 @@ namespace GesturBee_Backend.Controllers
             string token = _jwtService.GenerateToken(new AuthTokenRequestDTO
             {
                 Email = response?.Data.Email,
-                Role = response.Data.Role
+                Role = "User"
             });
 
-            return Ok(response);
+            return Ok(new
+            {
+                Token = token,
+                Response = response
+            });
+        }
+
+        [Authorize] // Only users with "Admin" role can access this
+        [HttpGet]
+        [Route("admin-only/")]
+        public IActionResult AdminOnlyEndpoint()
+        {
+            if (!User.Identity.IsAuthenticated)
+            {
+                return Unauthorized(new { message = "Access denied: You must log in first." });
+            }
+
+            return Ok("You are authenticated!");
         }
 
         [HttpPost]

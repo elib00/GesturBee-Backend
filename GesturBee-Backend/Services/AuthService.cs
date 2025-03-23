@@ -127,6 +127,12 @@ namespace GesturBee_Backend.Services
             };
         }
 
+        // TODO: Implement this function
+        public Task<ApiResponseDTO<UserDetailsDTO>> FetchUserUsingEmail(string email)
+        {
+            throw new NotImplementedException();
+        }
+
         private bool ValidatePassword(string password, string pwFromDb)
         {
             return BCrypt.Net.BCrypt.Verify(password, pwFromDb);
