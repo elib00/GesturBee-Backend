@@ -36,5 +36,16 @@ namespace GesturBee_Backend.Repository
             await _backendDbContext.Users.AddAsync(user);
             await _backendDbContext.SaveChangesAsync();
         }
+
+
+        public async Task<bool> IsUserAStudent(int userId)
+        {
+            return await _backendDbContext.Students.AsNoTracking().AnyAsync(student => student.UserId == userId);
+        }
+
+        public async Task<bool> IsUserATeacher(int userId)
+        {
+            return await _backendDbContext.Teachers.AsNoTracking().AnyAsync(teacher => teacher.UserId == userId);
+        }
     }
 }

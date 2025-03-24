@@ -5,6 +5,7 @@
         ValidUser,
         InvalidUser,
         UserAlreadyExists,
+        SuccessfulRetrievalOfResource,
         UserCreated,
         MissingInput,
         UserNotFound,
