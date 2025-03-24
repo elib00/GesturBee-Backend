@@ -3,6 +3,7 @@ using GesturBee_Backend.Repository.Interfaces;
 using GesturBee_Backend.Services.Interfaces;
 using GesturBee_Backend.Enums;
 using GesturBee_Backend.Models;
+using GesturBee_Backend.Repository;
 
 namespace GesturBee_Backend.Services
 {
@@ -69,7 +70,8 @@ namespace GesturBee_Backend.Services
                     ContactNumber = newUser.Profile.ContactNumber,
                     Gender = newUser.Profile.Gender,
                     BirthDate = newUser.Profile.BirthDate,
-                    LastLogin = newUser.LastLogin
+                    LastLogin = newUser.LastLogin,
+                    Roles = newUser.Roles
                 }
             };
 
@@ -109,6 +111,8 @@ namespace GesturBee_Backend.Services
                 };
             }
 
+            userFromDb.Roles = await GetUserRoles(userFromDb.Id);
+
             return new ApiResponseDTO<UserDetailsDTO>
             {
                 Success = true,
@@ -122,9 +126,40 @@ namespace GesturBee_Backend.Services
                     ContactNumber = userFromDb.Profile.ContactNumber,
                     Gender = userFromDb.Profile.Gender,
                     BirthDate = userFromDb.Profile.BirthDate,
-                    LastLogin = userFromDb.LastLogin
+                    LastLogin = userFromDb.LastLogin,
+                    Roles = userFromDb.Roles
                 }
             };
+        }
+
+        private async Task<List<string>> GetUserRoles(int userId)
+        {
+            bool isUserAStudent = await _authRepository.IsUserAStudent(userId);
+            bool isUserATeacher = await _authRepository.IsUserATeacher(userId);
+
+            List<string> userRoles = new List<string>();
+
+            if (isUserAStudent)
+            {
+                userRoles.Add("Student");
+            }
+
+            if (isUserATeacher)
+            {
+                userRoles.Add("Teacher");
+            }
+
+            //return new ApiResponseDTO<object>
+            //{
+            //    Success = true,
+            //    ResponseType = ResponseType.SuccessfulRetrievalOfResource,
+            //    Data = new
+            //    {
+            //        UserRoles = userRoles
+            //    }
+            //};
+
+            return userRoles;
         }
 
         // TODO: Implement this function

@@ -9,7 +9,7 @@ namespace GesturBee_Backend.Models
         public int Id { get; set; }
 
         [NotMapped] //i store ra nako diri later on ang mga roless
-        public string[] Roles { get; set; }
+        public List<string> Roles { get; set; } = new List<string> { "User" };
 
         [Required] //para needed sha for creation
         public required UserAccount Account { get; set; }
