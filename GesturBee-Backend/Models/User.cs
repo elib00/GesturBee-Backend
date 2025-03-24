@@ -1,5 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
-using Microsoft.AspNetCore.Identity;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace GesturBee_Backend.Models
 {
@@ -7,6 +7,9 @@ namespace GesturBee_Backend.Models
     {
         [Key]
         public int Id { get; set; }
+
+        [NotMapped] //i store ra nako diri later on ang mga roless
+        public string[] Roles { get; set; }
 
         [Required] //para needed sha for creation
         public required UserAccount Account { get; set; }

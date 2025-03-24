@@ -61,7 +61,7 @@ namespace GesturBee_Backend.Controllers
             string token = _jwtService.GenerateToken(new AuthTokenRequestDTO
             {
                 Email = response?.Data.Email,
-                Role = "User"
+                Role = response?.Data.Role
             });
 
             return Ok(new
