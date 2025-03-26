@@ -6,11 +6,13 @@ using GesturBee_Backend.Services.Interfaces;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.Google;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using System.Text.Json.Serialization;
+using System.Threading.RateLimiting;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -89,6 +91,18 @@ builder.Services.AddCors(options =>
 //rate limiter
 builder.Services.AddRateLimiter(options =>
 {
+    options.GlobalLimiter = PartitionedRateLimiter.Create<HttpContext, string>(httpContext =>
+       RateLimitPartition.GetFixedWindowLimiter(
+           partitionKey: httpContext.User.Identity?.Name
+               ?? httpContext.Connection.RemoteIpAddress?.ToString()
+               ?? "unknown",
+           factory: _ => new FixedWindowRateLimiterOptions
+           {
+               PermitLimit = 20,  // Allow 20 requests per user per minute per ip
+               Window = TimeSpan.FromMinutes(1),
+               QueueLimit = 5
+           }));
+
     options.AddFixedWindowLimiter("fixed", limiterOptions =>
     {
         limiterOptions.PermitLimit = 5; // Allow 5 requests
