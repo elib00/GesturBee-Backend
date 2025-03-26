@@ -6,6 +6,7 @@ using GesturBee_Backend.Services.Interfaces;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.Google;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
@@ -84,6 +85,19 @@ builder.Services.AddCors(options =>
               .AllowCredentials();
     });
 });
+
+//rate limiter
+builder.Services.AddRateLimiter(options =>
+{
+    options.AddFixedWindowLimiter("fixed", limiterOptions =>
+    {
+        limiterOptions.PermitLimit = 5; // Allow 5 requests
+        limiterOptions.Window = TimeSpan.FromSeconds(10); // Every 10 seconds
+        limiterOptions.QueueProcessingOrder = QueueProcessingOrder.OldestFirst;
+        limiterOptions.QueueLimit = 2; // Allow 2 extra requests in queue
+    });
+});
+
 
 
 // Add authorization

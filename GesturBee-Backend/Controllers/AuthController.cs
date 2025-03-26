@@ -40,6 +40,7 @@ namespace GesturBee_Backend.Controllers
         }
 
         //[HttpPost("login/")] //shorter ni sha
+        [AllowAnonymous]
         [HttpPost]
         [Route("login/")]
         public async Task<IActionResult> ValidateUser([FromBody] UserValidationDTO credentials)
