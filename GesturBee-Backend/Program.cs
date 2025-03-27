@@ -98,9 +98,9 @@ builder.Services.AddRateLimiter(options =>
                ?? "unknown",
            factory: _ => new FixedWindowRateLimiterOptions
            {
-               PermitLimit = 20,  // Allow 20 requests per user per minute per ip
+               PermitLimit = 5,  // Allow 20 requests per user per minute per ip
                Window = TimeSpan.FromMinutes(1),
-               QueueLimit = 5
+               QueueLimit = 0
            }));
 
     options.AddFixedWindowLimiter("fixed", limiterOptions =>
@@ -110,6 +110,24 @@ builder.Services.AddRateLimiter(options =>
         limiterOptions.QueueProcessingOrder = QueueProcessingOrder.OldestFirst;
         limiterOptions.QueueLimit = 2; // Allow 2 extra requests in queue
     });
+
+    //options.RejectionStatusCode = StatusCodes.Status429TooManyRequests;
+
+    options.OnRejected = async (context, token) =>
+    {
+        context.HttpContext.Response.StatusCode = StatusCodes.Status429TooManyRequests;
+        context.HttpContext.Response.ContentType = "application/json";
+
+        var response = new
+        {
+            message = "Too many requests. Please try again later.",
+            retryAfter = context.Lease.TryGetMetadata(MetadataName.RetryAfter, out var retryAfter)
+                ? retryAfter.TotalSeconds
+                : (double?) null
+        };
+
+        await context.HttpContext.Response.WriteAsJsonAsync(response, cancellationToken: token);
+    };
 });
 
 
@@ -129,6 +147,9 @@ if (app.Environment.IsDevelopment())
 // Use authentication
 app.UseAuthentication();
 app.UseAuthorization();
+
+//rate limiter
+app.UseRateLimiter();
 
 app.UseHttpsRedirection();
 

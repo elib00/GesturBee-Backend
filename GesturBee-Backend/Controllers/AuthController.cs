@@ -72,15 +72,15 @@ namespace GesturBee_Backend.Controllers
                 Response = response
             });
         }
-
-        [Authorize] // Only users with "Admin" role can access this
+        
+        // Only users with "Admin" role can access this
         [HttpGet]
         [Route("admin-only/")]
         public IActionResult AdminOnlyEndpoint()
         {
             if (!User.Identity.IsAuthenticated)
             {
-                return Unauthorized(new { message = "Access denied: You mus t log in first." });
+                return Unauthorized(new { message = "Access denied: You must log in first." });
             }
 
             return Ok("You are authenticated!");
