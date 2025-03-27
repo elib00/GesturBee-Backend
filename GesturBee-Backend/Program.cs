@@ -6,10 +6,13 @@ using GesturBee_Backend.Services.Interfaces;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.Google;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using System.Text.Json.Serialization;
+using System.Threading.RateLimiting;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -85,6 +88,49 @@ builder.Services.AddCors(options =>
     });
 });
 
+//rate limiter
+builder.Services.AddRateLimiter(options =>
+{
+    options.GlobalLimiter = PartitionedRateLimiter.Create<HttpContext, string>(httpContext =>
+       RateLimitPartition.GetFixedWindowLimiter(
+           partitionKey: httpContext.User.Identity?.Name
+               ?? httpContext.Connection.RemoteIpAddress?.ToString()
+               ?? "unknown",
+           factory: _ => new FixedWindowRateLimiterOptions
+           {
+               PermitLimit = 5,  // Allow 20 requests per user per minute per ip
+               Window = TimeSpan.FromMinutes(1),
+               QueueLimit = 0
+           }));
+
+    options.AddFixedWindowLimiter("fixed", limiterOptions =>
+    {
+        limiterOptions.PermitLimit = 5; // Allow 5 requests
+        limiterOptions.Window = TimeSpan.FromSeconds(10); // Every 10 seconds
+        limiterOptions.QueueProcessingOrder = QueueProcessingOrder.OldestFirst;
+        limiterOptions.QueueLimit = 2; // Allow 2 extra requests in queue
+    });
+
+    //options.RejectionStatusCode = StatusCodes.Status429TooManyRequests;
+
+    options.OnRejected = async (context, token) =>
+    {
+        context.HttpContext.Response.StatusCode = StatusCodes.Status429TooManyRequests;
+        context.HttpContext.Response.ContentType = "application/json";
+
+        var response = new
+        {
+            message = "Too many requests. Please try again later.",
+            retryAfter = context.Lease.TryGetMetadata(MetadataName.RetryAfter, out var retryAfter)
+                ? retryAfter.TotalSeconds
+                : (double?) null
+        };
+
+        await context.HttpContext.Response.WriteAsJsonAsync(response, cancellationToken: token);
+    };
+});
+
+
 
 // Add authorization
 builder.Services.AddAuthorization();
@@ -101,6 +147,9 @@ if (app.Environment.IsDevelopment())
 // Use authentication
 app.UseAuthentication();
 app.UseAuthorization();
+
+//rate limiter
+app.UseRateLimiter();
 
 app.UseHttpsRedirection();
 
