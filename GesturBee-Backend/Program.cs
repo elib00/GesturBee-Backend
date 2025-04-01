@@ -8,9 +8,11 @@ using Microsoft.AspNetCore.Authentication.Google;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using System.Text.Json.Serialization;
+using System.Threading.RateLimiting;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -34,20 +36,27 @@ builder.Services.AddControllers()
     });
 
 // Add dependencies
-builder.Services.AddTransient<IAuthService, AuthService>();
+builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IAuthRepository, AuthRepository>();
 
 builder.Services.AddScoped<IJwtService, JwtService>();
+builder.Services.AddScoped<IGoogleAuthService, GoogleAuthService>();
 
 
 // Add authentication
 builder.Services.AddAuthentication(options =>
 {
-    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-    options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
-    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme; // Change for other providers
+    options.DefaultAuthenticateScheme = CookieAuthenticationDefaults.AuthenticationScheme;
+    options.DefaultScheme = CookieAuthenticationDefaults.AuthenticationScheme;
+    options.DefaultChallengeScheme = GoogleDefaults.AuthenticationScheme; // Change for other providers
 })
-.AddCookie() // Required for OAuth callbacks
+.AddCookie(CookieAuthenticationDefaults.AuthenticationScheme, options =>
+{
+    options.Cookie.SameSite = SameSiteMode.Lax; // Or SameSiteMode.None for cross-origin
+    options.Cookie.SecurePolicy = CookieSecurePolicy.SameAsRequest; // Only secure if HTTPS
+    options.Cookie.HttpOnly = true; // Make the cookie inaccessible to JavaScript
+    options.LoginPath = "/login";
+}) // Required for OAuth callbacks
 .AddJwtBearer(options =>
 {
     options.RequireHttpsMetadata = false; // Set to true in production
@@ -67,6 +76,9 @@ builder.Services.AddAuthentication(options =>
 {
     googleOptions.ClientId = builder.Configuration["Authentication:Google:ClientId"];
     googleOptions.ClientSecret = builder.Configuration["Authentication:Google:ClientSecret"];
+    //googleOptions.SignInScheme = "External";
+    //googleOptions.CallbackPath = "/api/auth/signin-google/";
+    googleOptions.CallbackPath = "/api/auth/signin-google/";
 });
 //.AddFacebook(facebookOptions =>
 //{
@@ -77,7 +89,12 @@ builder.Services.AddAuthentication(options =>
 //cors policy
 builder.Services.AddCors(options =>
 {
-    options.AddPolicy("AllowAny", policy =>
+    options.AddPolicy("DevelopmentPolicy", policy =>
+     policy.AllowAnyOrigin()
+           .AllowAnyHeader()
+           .AllowAnyMethod());
+
+    options.AddPolicy("AllowFrontend", policy =>
     {
         policy.WithOrigins("http://localhost:3000")
               .AllowAnyMethod()
@@ -112,13 +129,19 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
+
+//use cors
+app.UseCors("DevelopmentPolicy");
+
 // Use authentication
 app.UseAuthentication();
+
+//authorization
 app.UseAuthorization();
 
 app.UseHttpsRedirection();
 
-app.UseAuthorization();
+
 
 app.MapControllers();
 
