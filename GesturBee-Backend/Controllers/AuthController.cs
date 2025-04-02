@@ -7,6 +7,8 @@ using Microsoft.AspNetCore.Authentication.Google;
 using Microsoft.AspNetCore.Authentication;
 using System.Security.Authentication;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using GesturBee_Backend.Models;
+using Azure;
 
 namespace GesturBee_Backend.Controllers
 {
@@ -31,7 +33,7 @@ namespace GesturBee_Backend.Controllers
         [Route("register/")]
         public async Task<IActionResult> RegisterUser([FromBody] UserRegistrationDTO user)
         {
-            ApiResponseDTO<UserDetailsDTO> response = await _authService.RegisterUser(user);
+            ApiResponseDTO<UserDetailsDTO> response = await _authService.RegisterUser(user, AuthType.LocalAuth);
             if (!response.Success)
             {
                 switch (response.ResponseType)
@@ -126,10 +128,46 @@ namespace GesturBee_Backend.Controllers
                     Roles = new List<string> { "User" }
                 });
 
+                //check if the user has a local account
+                ApiResponseDTO<UserDetailsDTO> fetchUserByEmailResponse = await _authService.FetchUserUsingEmail(userInfo["Email"]);
+
+                //meaning the user doesn't have a local account, create an account
+                if(!fetchUserByEmailResponse.Success && fetchUserByEmailResponse.ResponseType == ResponseType.UserNotFound)
+                {
+                    //destructure the name of the user
+                    string fullName = userInfo["Name"];
+                    string[] nameParts = fullName.Split(' ', StringSplitOptions.RemoveEmptyEntries);
+
+                    ApiResponseDTO<UserDetailsDTO> responseForRegister = await _authService.RegisterUser(new UserRegistrationDTO
+                    {
+                        Email = userInfo["Email"],
+                        FirstName = nameParts.Length > 1 ? string.Join(" ", nameParts.Take(nameParts.Length - 1)) : nameParts[0],
+                        LastName = nameParts.Length > 1 ? nameParts[^1] : "",
+                    }, AuthType.GoogleAuth);
+
+                    if (!responseForRegister.Success)
+                    {
+                        switch (responseForRegister.ResponseType)
+                        {
+                            case ResponseType.MissingInput:
+                                return BadRequest(responseForRegister);
+                            case ResponseType.UserAlreadyExists:
+                                return Conflict(responseForRegister);
+                        }
+                    }
+
+                    return Ok(new
+                    {
+                        Message = "Google authentication successful",
+                        Response = responseForRegister,
+                        Token = token
+                    });
+                }
+
                 return Ok(new
                 {
                     Message = "Google authentication successful",
-                    User = userInfo,
+                    Response = fetchUserByEmailResponse,
                     Token = token
                 });
             }

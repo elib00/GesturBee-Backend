@@ -10,20 +10,21 @@ namespace GesturBee_Backend.DTO
         [EmailAddress(ErrorMessage = "Invalid email format.")]
         public string? Email { get; set; }
 
-        [Required(ErrorMessage = "Password is required.")]
+        //[Required(ErrorMessage = "Password is required.")]
+        //for not required for people who logged in using third-party services
         [StringLength(100, MinimumLength = 8, ErrorMessage = "Password must be between 6 and 100 characters.")]
         public string? Password { get; set; }
 
 
 
         //for the profile
-        [Required(ErrorMessage = "First Name is required.")]
+        //[Required(ErrorMessage = "First Name is required.")]
         public string? FirstName { get; set; }
 
-        [Required(ErrorMessage = "Last Name is required.")]
+        //[Required(ErrorMessage = "Last Name is required.")]
         public string? LastName { get; set; }
 
-        [Required(ErrorMessage = "Contact Number is required.")]
+        //[Required(ErrorMessage = "Contact Number is required.")]
         public string? ContactNumber { get; set; }
 
         public string? Gender { get; set; }
