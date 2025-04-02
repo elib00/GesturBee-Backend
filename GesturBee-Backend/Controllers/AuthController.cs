@@ -3,6 +3,12 @@ using GesturBee_Backend.Services.Interfaces;
 using GesturBee_Backend.Enums;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Authentication.Google;
+using Microsoft.AspNetCore.Authentication;
+using System.Security.Authentication;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using GesturBee_Backend.Models;
+using Azure;
 
 namespace GesturBee_Backend.Controllers
 {
@@ -12,11 +18,14 @@ namespace GesturBee_Backend.Controllers
     {
         private readonly IAuthService _authService;
         private readonly IJwtService _jwtService;
+        private readonly IGoogleAuthService _googleAuthService;
 
-        public AuthController(IAuthService authService, IJwtService jwtService)
+
+        public AuthController(IAuthService authService, IJwtService jwtService, IGoogleAuthService googleAuthService)
         {
             _authService = authService;
             _jwtService = jwtService;
+            _googleAuthService = googleAuthService;
         }
 
         [AllowAnonymous]
@@ -24,7 +33,7 @@ namespace GesturBee_Backend.Controllers
         [Route("register/")]
         public async Task<IActionResult> RegisterUser([FromBody] UserRegistrationDTO user)
         {
-            ApiResponseDTO<UserDetailsDTO> response = await _authService.RegisterUser(user);
+            ApiResponseDTO<UserDetailsDTO> response = await _authService.RegisterUser(user, AuthType.LocalAuth);
             if (!response.Success)
             {
                 switch (response.ResponseType)
@@ -72,8 +81,8 @@ namespace GesturBee_Backend.Controllers
                 Response = response
             });
         }
-        
-        // Only users with "Admin" role can access this
+
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)] // Only users with "Admin" role can access this
         [HttpGet]
         [Route("admin-only/")]
         public IActionResult AdminOnlyEndpoint()
@@ -86,11 +95,117 @@ namespace GesturBee_Backend.Controllers
             return Ok("You are authenticated!");
         }
 
-        [HttpPost]
+        [AllowAnonymous]
+        [HttpGet]
         [Route("login-google/")]
-        public async Task<IActionResult> ValidateUserWithGoogle([FromBody] string token)
+        public async Task<IActionResult> ValidateUserWithGoogle()
         {
-            return Ok();
+            var properties = _googleAuthService.GetAuthProperties();
+            return Challenge(properties, GoogleDefaults.AuthenticationScheme);
+        }
+
+        [AllowAnonymous]
+        [HttpGet]
+        [Route("callback")]
+        public async Task<IActionResult> GoogleCallback()
+        {
+            try
+            {
+                var userInfo = await _googleAuthService.GetUserInfoAsync(HttpContext);
+
+                if (userInfo == null || !userInfo.ContainsKey("Email"))
+                {
+                    return BadRequest(new
+                    {
+                        Message = "Google authentication failed: No user information retrieved.",
+                        Details = "Ensure the user has granted access and Google API is returning valid user data."
+                    });
+                }
+
+                var token = _jwtService.GenerateToken(new AuthTokenRequestDTO
+                {
+                    Email = userInfo["Email"],
+                    Roles = new List<string> { "User" }
+                });
+
+                //check if the user has a local account
+                ApiResponseDTO<UserDetailsDTO> fetchUserByEmailResponse = await _authService.FetchUserUsingEmail(userInfo["Email"]);
+
+                //meaning the user doesn't have a local account, create an account
+                if(!fetchUserByEmailResponse.Success && fetchUserByEmailResponse.ResponseType == ResponseType.UserNotFound)
+                {
+                    //destructure the name of the user
+                    string fullName = userInfo["Name"];
+                    string[] nameParts = fullName.Split(' ', StringSplitOptions.RemoveEmptyEntries);
+
+                    ApiResponseDTO<UserDetailsDTO> responseForRegister = await _authService.RegisterUser(new UserRegistrationDTO
+                    {
+                        Email = userInfo["Email"],
+                        FirstName = nameParts.Length > 1 ? string.Join(" ", nameParts.Take(nameParts.Length - 1)) : nameParts[0],
+                        LastName = nameParts.Length > 1 ? nameParts[^1] : "",
+                    }, AuthType.GoogleAuth);
+
+                    if (!responseForRegister.Success)
+                    {
+                        switch (responseForRegister.ResponseType)
+                        {
+                            case ResponseType.MissingInput:
+                                return BadRequest(responseForRegister);
+                            case ResponseType.UserAlreadyExists:
+                                return Conflict(responseForRegister);
+                        }
+                    }
+
+                    return Ok(new
+                    {
+                        Message = "Google authentication successful",
+                        Response = responseForRegister,
+                        Token = token
+                    });
+                }
+
+                return Ok(new
+                {
+                    Message = "Google authentication successful",
+                    Response = fetchUserByEmailResponse,
+                    Token = token
+                });
+            }
+            catch (InvalidOperationException ex)
+            {
+                return Unauthorized(new
+                {
+                    Message = "Authentication process failed.",
+                    Details = "Possible causes: Invalid token, expired session, or incorrect authentication flow.",
+                    Error = ex.Message
+                });
+            }
+            catch (HttpRequestException ex)
+            {
+                return StatusCode(503, new
+                {
+                    Message = "External authentication service unreachable.",
+                    Details = "Google's authentication service might be down, or there may be a network issue.",
+                    Error = ex.Message
+                });
+            }
+            catch (AuthenticationException ex)
+            {
+                return StatusCode(500, new
+                {
+                    Message = ex.Message,
+                    Details = "Check server logs for more information.",
+                    Error = ex.Message
+                });
+            }
+        }
+
+
+        [HttpGet("logout")]
+        public async Task<IActionResult> Logout()
+        {
+            await HttpContext.SignOutAsync();
+            return Ok(new { Message = "Logged out successfully" });
         }
 
     }

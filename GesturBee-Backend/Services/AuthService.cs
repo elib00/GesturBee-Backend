@@ -16,7 +16,7 @@ namespace GesturBee_Backend.Services
             _authRepository = authRepository;
         }
 
-        public async Task<ApiResponseDTO<UserDetailsDTO>> RegisterUser(UserRegistrationDTO userDetails)
+        public async Task<ApiResponseDTO<UserDetailsDTO>> RegisterUser(UserRegistrationDTO userDetails, AuthType authType)
         {
             string newUserEmail = userDetails.Email;
 
@@ -44,8 +44,12 @@ namespace GesturBee_Backend.Services
             UserAccount account = new UserAccount
             {
                 Email = newUserEmail,
-                Password = BCrypt.Net.BCrypt.HashPassword(userDetails.Password)
             };
+
+            if(authType == AuthType.LocalAuth)
+            {
+                account.Password = BCrypt.Net.BCrypt.HashPassword(userDetails.Password);
+            }
 
             //bind sa user
             User newUser = new User
@@ -163,9 +167,39 @@ namespace GesturBee_Backend.Services
         }
 
         // TODO: Implement this function
-        public Task<ApiResponseDTO<UserDetailsDTO>> FetchUserUsingEmail(string email)
+        public async Task<ApiResponseDTO<UserDetailsDTO>> FetchUserUsingEmail(string email)
         {
-            throw new NotImplementedException();
+            User? userFromDb = await _authRepository.GetUserByEmail(email);
+            if(userFromDb == null)
+            {
+                return new ApiResponseDTO<UserDetailsDTO>
+                {
+                    Success = false,
+                    ResponseType = ResponseType.UserNotFound,
+                    Data = null
+                };
+            }
+
+            userFromDb.Roles = await GetUserRoles(userFromDb.Id);
+
+            return new ApiResponseDTO<UserDetailsDTO>
+            {
+                Success = true,
+                ResponseType = ResponseType.SuccessfulRetrievalOfResource,
+                Data = new UserDetailsDTO
+                {
+                    Id = userFromDb.Id,
+                    Email = userFromDb.Account.Email,
+                    FirstName = userFromDb.Profile.FirstName,
+                    LastName = userFromDb.Profile.LastName,
+                    ContactNumber = userFromDb.Profile.ContactNumber,
+                    Gender = userFromDb.Profile.Gender,
+                    BirthDate = userFromDb.Profile.BirthDate,
+                    LastLogin = userFromDb.LastLogin,
+                    Roles = userFromDb.Roles
+                }
+            };
+           
         }
 
         private bool ValidatePassword(string password, string pwFromDb)

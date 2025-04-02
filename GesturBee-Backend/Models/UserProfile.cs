@@ -10,13 +10,13 @@ namespace GesturBee_Backend.Models
         [Key]
         public int Id { get; set; }
 
-        [Required(ErrorMessage = "Lacking credentials. First name must be provided.")]
+        //[Required(ErrorMessage = "Lacking credentials. First name must be provided.")]
         public string? FirstName { get; set; }
 
-        [Required(ErrorMessage = "Lacking credentials. Last name must be provided.")]
+        //[Required(ErrorMessage = "Lacking credentials. Last name must be provided.")]
         public string? LastName { get; set; }
 
-        [Required(ErrorMessage = "Lacking credentials. Contact number must be provided.")]
+        //[Required(ErrorMessage = "Lacking credentials. Contact number must be provided.")]
         public string? ContactNumber { get; set; }
 
         public string? Gender { get; set; }
