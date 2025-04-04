@@ -2,7 +2,7 @@
 
 namespace GesturBee_Backend.Services.Interfaces
 {
-    public interface IGoogleAuthService
+    public interface IExternalAuthService
     {
         AuthenticationProperties GetAuthProperties();
         Task<Dictionary<string, string>> GetUserInfoAsync(HttpContext httpContext);

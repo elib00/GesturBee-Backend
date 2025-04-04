@@ -4,11 +4,11 @@ using System.Security.Claims;
 
 namespace GesturBee_Backend.Services
 {
-    public class GoogleAuthService : IExternalAuthService
+    public class FacebookAuthService : IExternalAuthService
     {
         public AuthenticationProperties GetAuthProperties()
         {
-            return new AuthenticationProperties { RedirectUri = "https://localhost:7152/api/auth/google-callback/" };
+            return new AuthenticationProperties { RedirectUri = "https://localhost:7152/api/auth/facebook-callback/" };
         }
 
         public async Task<Dictionary<string, string>> GetUserInfoAsync(HttpContext httpContext)
@@ -17,7 +17,7 @@ namespace GesturBee_Backend.Services
 
             if (!authenticateResult.Succeeded)
             {
-                throw new Exception("Authentication failed");   
+                throw new Exception("Authentication failed");
             }
 
             var claims = authenticateResult.Principal.Identities.FirstOrDefault()?.Claims;
