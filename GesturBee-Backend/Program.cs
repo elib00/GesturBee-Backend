@@ -2,13 +2,13 @@ using GesturBee_Backend;
 using GesturBee_Backend.Repository;
 using GesturBee_Backend.Repository.Interfaces;
 using GesturBee_Backend.Services;
+using GesturBee_Backend.Services.Factory;
 using GesturBee_Backend.Services.Interfaces;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.Google;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
@@ -41,7 +41,10 @@ builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IAuthRepository, AuthRepository>();
 
 builder.Services.AddScoped<IJwtService, JwtService>();
-builder.Services.AddScoped<IGoogleAuthService, GoogleAuthService>();
+builder.Services.AddScoped<GoogleAuthService>();
+builder.Services.AddScoped<FacebookAuthService>();
+builder.Services.AddScoped<IExternalAuthServiceFactory, ExternalAuthServiceFactory>();
+
 
 
 // Add authentication
@@ -56,7 +59,7 @@ builder.Services.AddAuthentication(options =>
     options.Cookie.SameSite = SameSiteMode.Lax; // Or SameSiteMode.None for cross-origin
     options.Cookie.SecurePolicy = CookieSecurePolicy.SameAsRequest; // Only secure if HTTPS
     options.Cookie.HttpOnly = true; // Make the cookie inaccessible to JavaScript
-    options.LoginPath = "/login";
+    //options.LoginPath = "/login";
 }) // Required for OAuth callbacks
 .AddJwtBearer(options =>
 {
@@ -79,13 +82,19 @@ builder.Services.AddAuthentication(options =>
     googleOptions.ClientSecret = builder.Configuration["Authentication:Google:ClientSecret"];
     //googleOptions.SignInScheme = "External";
     //googleOptions.CallbackPath = "/api/auth/signin-google/";
-    googleOptions.CallbackPath = "/api/auth/signin-google/";
+    googleOptions.CallbackPath = "/signin-google";
+})
+.AddFacebook(facebookOptions =>
+{
+    facebookOptions.AppId = builder.Configuration["Authentication:Facebook:AppId"];
+    facebookOptions.AppSecret = builder.Configuration["Authentication:Facebook:AppSecret"];
+    facebookOptions.CallbackPath = "/signin-facebook";
+
+    facebookOptions.Scope.Add("email");          // Access to the user's email address
+    facebookOptions.Scope.Add("public_profile"); // Access to basic profile info (name, profile picture, etc.)
+    facebookOptions.Scope.Add("user_birthday");  // Access to the user's birthdate
+    facebookOptions.Scope.Add("user_gender");    // Access to the user's gender
 });
-//.AddFacebook(facebookOptions =>
-//{
-//    facebookOptions.AppId = builder.Configuration["Authentication:Facebook:AppId"];
-//    facebookOptions.AppSecret = builder.Configuration["Authentication:Facebook:AppSecret"];
-//});
 
 //cors policy
 builder.Services.AddCors(options =>
