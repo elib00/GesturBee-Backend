@@ -21,13 +21,15 @@ namespace GesturBee_Backend.Controllers
         private readonly IAuthService _authService;
         private readonly IJwtService _jwtService;
         private readonly IExternalAuthServiceFactory _externalAuthServiceFactory;
+        private readonly IEmailService _emailService;
 
 
-        public AuthController(IAuthService authService, IJwtService jwtService, IExternalAuthServiceFactory externalAuthServiceFactory)
+        public AuthController(IAuthService authService, IJwtService jwtService, IExternalAuthServiceFactory externalAuthServiceFactory, IEmailService emailService)
         {
             _authService = authService;
             _jwtService = jwtService;
             _externalAuthServiceFactory = externalAuthServiceFactory;
+            _emailService = emailService;
         }
 
         [AllowAnonymous]
@@ -324,6 +326,86 @@ namespace GesturBee_Backend.Controllers
         {
             await HttpContext.SignOutAsync();
             return Ok(new { Message = "Logged out successfully" });
+        }
+
+
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+        [HttpPost("change-password-verification")]
+        public async Task<IActionResult> VerifyChangePassword([FromBody] VerifyChangePasswordDTO details)
+        {
+            string userEmail = details.Email;
+            string userPassword = details.Password;
+
+            if (string.IsNullOrEmpty(userEmail) || string.IsNullOrEmpty(userPassword))
+            {
+                return BadRequest(new
+                {
+                    Message = "Password and email are required"
+                });
+            }
+
+            //check if user exists (just double checking)
+            ApiResponseDTO<UserDetailsDTO> response = await _authService.ValidateUser(new UserValidationDTO
+            {
+                Email = userEmail,
+                Password = userPassword
+            });
+
+            if (!response.Success)
+            {
+                switch (response.ResponseType)
+                {
+                    case ResponseType.MissingInput:
+                        return BadRequest(response);
+                    case ResponseType.UserNotFound:
+                        return NotFound(response);
+                    case ResponseType.InvalidUser:
+                        return Unauthorized(response);
+                }
+            }
+
+
+            string token = _jwtService.GenerateToken(new AuthTokenRequestDTO
+            {
+                Email = response?.Data.Email,
+                Roles = response?.Data.Roles,
+                Type = "password-reset"
+            });
+
+            //return Ok(new
+            //{
+            //    Token = token,
+            //    Response = response
+            //});
+
+            string toEmail = userEmail;
+            string subject = "testing";
+            string body = $"https://localhost:7152/reset-password?token={token}";
+
+            await _emailService.SendEmailAsync(toEmail, subject, body);
+
+            return Ok(new
+            {
+                Token = token,
+                Response = response
+            });
+        }
+
+
+        [HttpGet("reset-password")]
+        public async Task<IActionResult> ResetPassword([FromQuery] string token)
+        {
+            if (string.IsNullOrEmpty(token))
+            {
+                return BadRequest("Token is required.");
+            }
+
+            // Validate token, show password reset form, etc.
+            return Ok(new { message = "Token received", token });
+            
+
+            //change password
+
         }
     }
 }

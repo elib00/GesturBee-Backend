@@ -28,6 +28,8 @@ namespace GesturBee_Backend.Services
                 new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
             };
 
+
+
             //add each role manually
             foreach (var role in details.Roles)
             {
@@ -43,6 +45,37 @@ namespace GesturBee_Backend.Services
             );
 
             return new JwtSecurityTokenHandler().WriteToken(token);
+        }
+
+        public string ValidatePasswordResetToken(string token)
+        {
+            try
+            {
+                var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes("your_secret_key"));
+                var tokenHandler = new JwtSecurityTokenHandler();
+                var claimsPrincipal = tokenHandler.ValidateToken(token, new TokenValidationParameters
+                {
+                    ValidateIssuer = true,
+                    ValidIssuer = "yourdomain.com",
+                    ValidateAudience = true,
+                    ValidAudience = "yourdomain.com",
+                    ValidateLifetime = true,
+                    IssuerSigningKey = key,
+                }, out var validatedToken);
+
+                // Check if token has the "password-reset" claim and it's not expired
+                var tokenType = claimsPrincipal.FindFirst("type")?.Value;
+                if (tokenType == "password-reset")
+                {
+                    return claimsPrincipal.Identity.Name; // return user ID or similar claim
+                }
+
+                return null; // Invalid token
+            }
+            catch (Exception)
+            {
+                return null; // Invalid token
+            }
         }
     }
 }

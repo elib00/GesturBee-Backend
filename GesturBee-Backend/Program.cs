@@ -45,6 +45,7 @@ builder.Services.AddScoped<GoogleAuthService>();
 builder.Services.AddScoped<FacebookAuthService>();
 builder.Services.AddScoped<IExternalAuthServiceFactory, ExternalAuthServiceFactory>();
 
+builder.Services.AddScoped<IEmailService, EmailService>();
 
 
 // Add authentication
