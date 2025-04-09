@@ -47,5 +47,12 @@ namespace GesturBee_Backend.Repository
         {
             return await _backendDbContext.Teachers.AsNoTracking().AnyAsync(teacher => teacher.UserId == userId);
         }
+
+        public async Task ResetPassword(string email, string newPassword)
+        {
+            await _backendDbContext.UserAccounts
+                .Where(userAccount => userAccount.Email == email)
+                .ExecuteUpdateAsync(setter => setter.SetProperty(userAccount => userAccount.Password, newPassword));
+        }
     }
 }

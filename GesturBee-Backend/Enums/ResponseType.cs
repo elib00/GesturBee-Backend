@@ -9,5 +9,14 @@
         UserCreated,
         MissingInput,
         UserNotFound,
+
+        //for pw reset token
+        ValidToken,
+        InvalidToken,
+        TokenMissingRequiredClaim,
+
+        //for pw
+        PasswordResetSuccessful,
+        ResetPasswordMismatch
     }
 }

@@ -46,6 +46,8 @@ namespace GesturBee_Backend.Services
                 Email = newUserEmail,
             };
 
+
+            //only for locally created nga accounts, maghimo tag password for them
             if(authType == AuthType.LocalAuth)
             {
                 account.Password = BCrypt.Net.BCrypt.HashPassword(userDetails.Password);
@@ -141,7 +143,7 @@ namespace GesturBee_Backend.Services
             bool isUserAStudent = await _authRepository.IsUserAStudent(userId);
             bool isUserATeacher = await _authRepository.IsUserATeacher(userId);
 
-            List<string> userRoles = new List<string>();
+            List<string> userRoles = new List<string>(["User"]);
 
             if (isUserAStudent)
             {
@@ -201,6 +203,44 @@ namespace GesturBee_Backend.Services
             };
            
         }
+
+        public async Task<ApiResponseDTO<object>> ResetPassword(ResetPasswordDTO resetDetails)
+        {
+            string email = resetDetails.Email;
+            string newPassword = resetDetails.NewPassword;
+            string confirmPassword = resetDetails.NewPassword;
+
+            if (string.IsNullOrWhiteSpace(email) || string.IsNullOrWhiteSpace(newPassword) || string.IsNullOrWhiteSpace(confirmPassword))
+                return new ApiResponseDTO<object>
+                {
+                    Success = false,
+                    ResponseType = ResponseType.MissingInput,
+                    Data = null
+                };
+
+            if(newPassword != confirmPassword)
+            {
+                return new ApiResponseDTO<object>
+                {
+                    Success = false,
+                    ResponseType = ResponseType.ResetPasswordMismatch
+                };
+            }
+
+
+            //hash the password
+            string hashedPassword = BCrypt.Net.BCrypt.HashPassword(newPassword);
+
+            await _authRepository.ResetPassword(email, hashedPassword);
+
+            return new ApiResponseDTO<object>
+            {
+                Success = true,
+                ResponseType = ResponseType.PasswordResetSuccessful
+            };
+        }
+
+
 
         private bool ValidatePassword(string password, string pwFromDb)
         {

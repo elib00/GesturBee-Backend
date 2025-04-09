@@ -21,13 +21,15 @@ namespace GesturBee_Backend.Controllers
         private readonly IAuthService _authService;
         private readonly IJwtService _jwtService;
         private readonly IExternalAuthServiceFactory _externalAuthServiceFactory;
+        private readonly IEmailService _emailService;
 
 
-        public AuthController(IAuthService authService, IJwtService jwtService, IExternalAuthServiceFactory externalAuthServiceFactory)
+        public AuthController(IAuthService authService, IJwtService jwtService, IExternalAuthServiceFactory externalAuthServiceFactory, IEmailService emailService)
         {
             _authService = authService;
             _jwtService = jwtService;
             _externalAuthServiceFactory = externalAuthServiceFactory;
+            _emailService = emailService;
         }
 
         [AllowAnonymous]
@@ -324,6 +326,129 @@ namespace GesturBee_Backend.Controllers
         {
             await HttpContext.SignOutAsync();
             return Ok(new { Message = "Logged out successfully" });
+        }
+
+
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+        [HttpPost("verify-reset-password")]
+        public async Task<IActionResult> VerifyUserBeforeResetPassword([FromBody] VerifyChangePasswordDTO details)
+        {
+            string userEmail = details.Email;
+            string userPassword = details.Password;
+
+            if (string.IsNullOrEmpty(userEmail) || string.IsNullOrEmpty(userPassword))
+            {
+                return BadRequest(new ApiResponseDTO<object>
+                {
+                    Success = false,
+                    ResponseType = ResponseType.MissingInput
+                });
+            }
+
+            //check if user exists (just double checking)
+            ApiResponseDTO<UserDetailsDTO> response = await _authService.ValidateUser(new UserValidationDTO
+            {
+                Email = userEmail,
+                Password = userPassword
+            });
+
+            if (!response.Success)
+            {
+                switch (response.ResponseType)
+                {
+                    case ResponseType.MissingInput:
+                        return BadRequest(response);
+                    case ResponseType.UserNotFound:
+                        return NotFound(response);
+                    case ResponseType.InvalidUser:
+                        return Unauthorized(response);
+                }
+            }
+
+
+            string token = _jwtService.GenerateToken(new AuthTokenRequestDTO
+            {
+                Email = response?.Data.Email,
+                Roles = response?.Data.Roles,
+                Type = "password-reset"
+            });
+
+            //return Ok(new
+            //{
+            //    Token = token,
+            //    Response = response
+            //});
+
+            string toEmail = userEmail;
+            string subject = "testing";
+            string body = $"https://localhost:7152/api/auth/verify-reset-password-token?token={token}";
+
+            bool emailSent = await _emailService.SendEmailAsync(toEmail, subject, body);
+
+            return Ok(new
+            {
+                Token = token
+            });
+        }
+
+
+        [HttpGet("verify-reset-password-token")]
+        public async Task<IActionResult> VerifyResetPasswordToken([FromQuery] string token)
+        {
+            if (string.IsNullOrEmpty(token))
+            {
+                return BadRequest("Token is required.");
+            }
+
+            // Validate token, show password reset form, etc.
+            // return Ok(new { message = "Token received", token });
+
+            ResponseType isPasswordResetTokenValid = _jwtService.ValidatePasswordResetToken(token);
+
+            switch(isPasswordResetTokenValid)
+            {
+                case ResponseType.InvalidToken:
+                    return BadRequest(new ApiResponseDTO<object>
+                    {
+                        Success = false,
+                        ResponseType = ResponseType.InvalidToken
+                    });
+                case ResponseType.TokenMissingRequiredClaim:
+                    return BadRequest(new ApiResponseDTO<object>
+                    {
+                        Success = false,
+                        ResponseType = ResponseType.TokenMissingRequiredClaim
+                    });
+            }
+
+            return Ok(new ApiResponseDTO<object>
+            {
+                Success = true,
+                ResponseType = ResponseType.ValidToken
+            });
+        }
+
+
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+        [HttpPost("reset-password")]
+        public async Task<IActionResult> ResetPassword([FromBody] ResetPasswordDTO details)
+        {
+            //reset the pw
+            ApiResponseDTO<object> response = await _authService.ResetPassword(details);
+
+            if (!response.Success)
+            {
+                if(response.ResponseType == ResponseType.MissingInput || response.ResponseType == ResponseType.ResetPasswordMismatch)
+                {
+                    return BadRequest(response);
+                }
+            }
+
+            return Ok(new ApiResponseDTO<object>
+            {
+                Success = true,
+                ResponseType = ResponseType.PasswordResetSuccessful
+            });
         }
     }
 }
