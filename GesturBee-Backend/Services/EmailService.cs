@@ -23,7 +23,7 @@ namespace GesturBee_Backend.Services
             _fromEmail = configuration["EmailSettings:FromEmail"];
         }
 
-        public async Task SendEmailAsync(string toEmail, string subject, string body)
+        public async Task<bool> SendEmailAsync(string toEmail, string subject, string body)
         {
             var message = new MimeMessage();
             message.From.Add(new MailboxAddress("GesturBee", _fromEmail));
@@ -31,18 +31,32 @@ namespace GesturBee_Backend.Services
             message.Subject = subject;
 
             var bodyBuilder = new BodyBuilder
-            {
+            {   
                 TextBody = body
             };
 
             message.Body = bodyBuilder.ToMessageBody();
 
-            using (var client = new SmtpClient())
+
+            try
             {
-                await client.ConnectAsync(_smtpHost, _smtpPort, false);
-                await client.AuthenticateAsync(_smtpUsername, _smtpPassword);
-                await client.SendAsync(message);
-                await client.DisconnectAsync(true);
+                using (var client = new SmtpClient())
+                {
+                    await client.ConnectAsync(_smtpHost, _smtpPort, false);
+                    await client.AuthenticateAsync(_smtpUsername, _smtpPassword);
+                    await client.SendAsync(message);
+                    await client.DisconnectAsync(true);
+                }
+
+                // If no exception was thrown, email was sent successfully
+                return true;
+            }
+            catch (Exception ex)
+            {
+                // Log or handle the error as necessary
+                Console.WriteLine($"Error sending email: {ex.Message}");
+                throw new InvalidOperationException("Failed to send email. Please try again later.");
+                return false;
             }
         }
     }

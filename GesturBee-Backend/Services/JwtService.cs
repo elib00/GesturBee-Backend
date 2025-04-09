@@ -1,4 +1,5 @@
 ﻿using GesturBee_Backend.DTO;
+using GesturBee_Backend.Enums;
 using GesturBee_Backend.Services.Interfaces;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
@@ -28,7 +29,10 @@ namespace GesturBee_Backend.Services
                 new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
             };
 
-
+            if(details.Type == "password-reset")
+            {
+                claims.Add(new Claim("type", "password-reset"));
+            }
 
             //add each role manually
             foreach (var role in details.Roles)
@@ -47,34 +51,36 @@ namespace GesturBee_Backend.Services
             return new JwtSecurityTokenHandler().WriteToken(token);
         }
 
-        public string ValidatePasswordResetToken(string token)
+        public ResponseType ValidatePasswordResetToken(string token)
         {
             try
             {
-                var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes("your_secret_key"));
+                var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["Jwt:Secret"]));
                 var tokenHandler = new JwtSecurityTokenHandler();
                 var claimsPrincipal = tokenHandler.ValidateToken(token, new TokenValidationParameters
                 {
                     ValidateIssuer = true,
-                    ValidIssuer = "yourdomain.com",
+                    ValidIssuer = _configuration["Jwt:Issuer"],
                     ValidateAudience = true,
-                    ValidAudience = "yourdomain.com",
+                    ValidAudience = _configuration["Jwt:Audience"],
                     ValidateLifetime = true,
                     IssuerSigningKey = key,
                 }, out var validatedToken);
+
+                Console.WriteLine($"Token validated: {validatedToken}");
 
                 // Check if token has the "password-reset" claim and it's not expired
                 var tokenType = claimsPrincipal.FindFirst("type")?.Value;
                 if (tokenType == "password-reset")
                 {
-                    return claimsPrincipal.Identity.Name; // return user ID or similar claim
+                    return ResponseType.ValidToken;
                 }
 
-                return null; // Invalid token
+                return ResponseType.TokenMissingRequiredClaim; //not a password reset token
             }
             catch (Exception)
             {
-                return null; // Invalid token
+                return ResponseType.InvalidToken; //invalid token
             }
         }
     }

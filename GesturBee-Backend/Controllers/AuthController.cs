@@ -330,17 +330,18 @@ namespace GesturBee_Backend.Controllers
 
 
         [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
-        [HttpPost("change-password-verification")]
-        public async Task<IActionResult> VerifyChangePassword([FromBody] VerifyChangePasswordDTO details)
+        [HttpPost("verify-reset-password")]
+        public async Task<IActionResult> VerifyUserBeforeResetPassword([FromBody] VerifyChangePasswordDTO details)
         {
             string userEmail = details.Email;
             string userPassword = details.Password;
 
             if (string.IsNullOrEmpty(userEmail) || string.IsNullOrEmpty(userPassword))
             {
-                return BadRequest(new
+                return BadRequest(new ApiResponseDTO<object>
                 {
-                    Message = "Password and email are required"
+                    Success = false,
+                    ResponseType = ResponseType.MissingInput
                 });
             }
 
@@ -380,20 +381,19 @@ namespace GesturBee_Backend.Controllers
 
             string toEmail = userEmail;
             string subject = "testing";
-            string body = $"https://localhost:7152/reset-password?token={token}";
+            string body = $"https://localhost:7152/api/auth/verify-reset-password-token?token={token}";
 
-            await _emailService.SendEmailAsync(toEmail, subject, body);
+            bool emailSent = await _emailService.SendEmailAsync(toEmail, subject, body);
 
             return Ok(new
             {
-                Token = token,
-                Response = response
+                Token = token
             });
         }
 
 
-        [HttpGet("reset-password")]
-        public async Task<IActionResult> ResetPassword([FromQuery] string token)
+        [HttpGet("verify-reset-password-token")]
+        public async Task<IActionResult> VerifyResetPasswordToken([FromQuery] string token)
         {
             if (string.IsNullOrEmpty(token))
             {
@@ -401,11 +401,54 @@ namespace GesturBee_Backend.Controllers
             }
 
             // Validate token, show password reset form, etc.
-            return Ok(new { message = "Token received", token });
-            
+            // return Ok(new { message = "Token received", token });
 
-            //change password
+            ResponseType isPasswordResetTokenValid = _jwtService.ValidatePasswordResetToken(token);
 
+            switch(isPasswordResetTokenValid)
+            {
+                case ResponseType.InvalidToken:
+                    return BadRequest(new ApiResponseDTO<object>
+                    {
+                        Success = false,
+                        ResponseType = ResponseType.InvalidToken
+                    });
+                case ResponseType.TokenMissingRequiredClaim:
+                    return BadRequest(new ApiResponseDTO<object>
+                    {
+                        Success = false,
+                        ResponseType = ResponseType.TokenMissingRequiredClaim
+                    });
+            }
+
+            return Ok(new ApiResponseDTO<object>
+            {
+                Success = true,
+                ResponseType = ResponseType.ValidToken
+            });
+        }
+
+
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+        [HttpPost("reset-password")]
+        public async Task<IActionResult> ResetPassword([FromBody] ResetPasswordDTO details)
+        {
+            //reset the pw
+            ApiResponseDTO<object> response = await _authService.ResetPassword(details);
+
+            if (!response.Success)
+            {
+                if(response.ResponseType == ResponseType.MissingInput || response.ResponseType == ResponseType.ResetPasswordMismatch)
+                {
+                    return BadRequest(response);
+                }
+            }
+
+            return Ok(new ApiResponseDTO<object>
+            {
+                Success = true,
+                ResponseType = ResponseType.PasswordResetSuccessful
+            });
         }
     }
 }
