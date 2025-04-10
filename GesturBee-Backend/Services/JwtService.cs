@@ -67,7 +67,7 @@ namespace GesturBee_Backend.Services
                     IssuerSigningKey = key,
                 }, out var validatedToken);
 
-                Console.WriteLine($"Token validated: {validatedToken}");
+                //Console.WriteLine($"Token validated: {validatedToken}");
 
                 // Check if token has the "password-reset" claim and it's not expired
                 var tokenType = claimsPrincipal.FindFirst("type")?.Value;

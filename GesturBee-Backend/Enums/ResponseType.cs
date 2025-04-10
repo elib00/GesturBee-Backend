@@ -17,6 +17,10 @@
 
         //for pw
         PasswordResetSuccessful,
-        ResetPasswordMismatch
+        ResetPasswordMismatch,
+        
+        //for profile
+        ProfileNotFound,
+        ProfileUpdated,
     }
 }

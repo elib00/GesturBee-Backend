@@ -7,9 +7,6 @@ using Microsoft.AspNetCore.Authentication.Google;
 using Microsoft.AspNetCore.Authentication;
 using System.Security.Authentication;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
-using GesturBee_Backend.Models;
-using Azure;
-using GesturBee_Backend.Services;
 using Microsoft.AspNetCore.Authentication.Facebook;
 
 namespace GesturBee_Backend.Controllers
