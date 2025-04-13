@@ -54,5 +54,11 @@ namespace GesturBee_Backend.Repository
                 .Where(userAccount => userAccount.Email == email)
                 .ExecuteUpdateAsync(setter => setter.SetProperty(userAccount => userAccount.Password, newPassword));
         }
+
+        public async Task UpdateLastLogin(User user)
+        {
+            user.LastLogin = DateTime.Now;
+            await _backendDbContext.SaveChangesAsync();
+        }
     }
 }

@@ -7,9 +7,6 @@ using Microsoft.AspNetCore.Authentication.Google;
 using Microsoft.AspNetCore.Authentication;
 using System.Security.Authentication;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
-using GesturBee_Backend.Models;
-using Azure;
-using GesturBee_Backend.Services;
 using Microsoft.AspNetCore.Authentication.Facebook;
 
 namespace GesturBee_Backend.Controllers
@@ -33,11 +30,10 @@ namespace GesturBee_Backend.Controllers
         }
 
         [AllowAnonymous]
-        [HttpPost]
-        [Route("register/")]
+        [HttpPost("register/")]
         public async Task<IActionResult> RegisterUser([FromBody] UserRegistrationDTO user)
         {
-            ApiResponseDTO<UserDetailsDTO> response = await _authService.RegisterUser(user, AuthType.LocalAuth);
+            ApiResponseDTO<UserDetailsDTO> response = await _authService.RegisterUser(user);
             if (!response.Success)
             {
                 switch (response.ResponseType)
@@ -54,8 +50,7 @@ namespace GesturBee_Backend.Controllers
 
         //[HttpPost("login/")] //shorter ni sha
         [AllowAnonymous]
-        [HttpPost]
-        [Route("login/")]
+        [HttpPost("login/")]
         public async Task<IActionResult> ValidateUser([FromBody] UserValidationDTO credentials)
         {
             ApiResponseDTO<UserDetailsDTO> response = await _authService.ValidateUser(credentials);
@@ -86,35 +81,20 @@ namespace GesturBee_Backend.Controllers
             });
         }
 
-        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)] // Only users with "Admin" role can access this
-        [HttpGet]
-        [Route("admin-only/")]
-        public IActionResult AdminOnlyEndpoint()
-        {
-            if (!User.Identity.IsAuthenticated)
-            {
-                return Unauthorized(new { message = "Access denied: You must log in first." });
-            }
-
-            return Ok("You are authenticated!");
-        }
-
         [AllowAnonymous]
-        [HttpGet]
-        [Route("login-google/")]
+        [HttpGet("login-google/")]
         public async Task<IActionResult> ValidateUserWithGoogle()
         {
-            var externalAuthService = _externalAuthServiceFactory.GetAuthService("Google");
+            var externalAuthService = _externalAuthServiceFactory.GetAuthService(AuthType.GoogleAuth);
             var properties = externalAuthService.GetAuthProperties();
             return Challenge(properties, GoogleDefaults.AuthenticationScheme);
         }
 
         [AllowAnonymous]
-        [HttpGet]
-        [Route("google-callback")]
+        [HttpGet("google-callback")]
         public async Task<IActionResult> GoogleCallback()
         {
-            var externalAuthService = _externalAuthServiceFactory.GetAuthService("Google");
+            var externalAuthService = _externalAuthServiceFactory.GetAuthService(AuthType.GoogleAuth);
             try
             {
                 var userInfo = await externalAuthService.GetUserInfoAsync(HttpContext);
@@ -134,48 +114,16 @@ namespace GesturBee_Backend.Controllers
                     Roles = new List<string> { "User" }
                 });
 
-                //check if the user has a local account
-                ApiResponseDTO<UserDetailsDTO> fetchUserByEmailResponse = await _authService.FetchUserUsingEmail(userInfo["Email"]);
+                //destructure the name of the user
 
-                //meaning the user doesn't have a local account, create an account
-                if(!fetchUserByEmailResponse.Success && fetchUserByEmailResponse.ResponseType == ResponseType.UserNotFound)
-                {
-                    //destructure the name of the user
-                    string fullName = userInfo["Name"];
-                    string[] nameParts = fullName.Split(' ', StringSplitOptions.RemoveEmptyEntries);
-
-                    ApiResponseDTO<UserDetailsDTO> responseForRegister = await _authService.RegisterUser(new UserRegistrationDTO
-                    {
-                        Email = userInfo["Email"],
-                        FirstName = nameParts.Length > 1 ? string.Join(" ", nameParts.Take(nameParts.Length - 1)) : nameParts[0],
-                        LastName = nameParts.Length > 1 ? nameParts[^1] : "",
-                    }, AuthType.GoogleAuth);
-
-                    if (!responseForRegister.Success)
-                    {
-                        switch (responseForRegister.ResponseType)
-                        {
-                            case ResponseType.MissingInput:
-                                return BadRequest(responseForRegister);
-                            case ResponseType.UserAlreadyExists:
-                                return Conflict(responseForRegister);
-                        }
-                    }
-
-                    return Ok(new
-                    {
-                        Message = "Google authentication successful",
-                        Response = responseForRegister,
-                        Token = token
-                    });
-                }
+                ApiResponseDTO<UserDetailsDTO> response = await _authService.ProcessExternalAuth(userInfo);
 
                 return Ok(new
                 {
-                    Message = "Google authentication successful",
-                    Response = fetchUserByEmailResponse,
+                    Response = response, 
                     Token = token
                 });
+               
             }
             catch (InvalidOperationException ex)
             {
@@ -207,21 +155,19 @@ namespace GesturBee_Backend.Controllers
         }
 
         [AllowAnonymous]
-        [HttpGet]
-        [Route("login-facebook/")]
+        [HttpGet("login-facebook/")]
         public async Task<IActionResult> ValidateUserWithFacebook()
         {
-            var externalAuthService = _externalAuthServiceFactory.GetAuthService("Facebook");
+            var externalAuthService = _externalAuthServiceFactory.GetAuthService(AuthType.FacebookAuth);
             var properties = externalAuthService.GetAuthProperties();
             return Challenge(properties, FacebookDefaults.AuthenticationScheme);
         }
 
         [AllowAnonymous]
-        [HttpGet]
-        [Route("facebook-callback")]
+        [HttpGet("facebook-callback")]
         public async Task<IActionResult> FacebookCallback()
         {
-            var externalAuthService = _externalAuthServiceFactory.GetAuthService("Facebook");
+            var externalAuthService = _externalAuthServiceFactory.GetAuthService(AuthType.FacebookAuth);
             try
             {
                 var userInfo = await externalAuthService.GetUserInfoAsync(HttpContext);
@@ -241,46 +187,11 @@ namespace GesturBee_Backend.Controllers
                     Roles = new List<string> { "User" }
                 });
 
-                //check if the user has a local account
-                ApiResponseDTO<UserDetailsDTO> fetchUserByEmailResponse = await _authService.FetchUserUsingEmail(userInfo["Email"]);
-
-                //meaning the user doesn't have a local account, create an account
-                if (!fetchUserByEmailResponse.Success && fetchUserByEmailResponse.ResponseType == ResponseType.UserNotFound)
-                {
-                    //destructure the name of the user
-                    string fullName = userInfo["Name"];
-                    string[] nameParts = fullName.Split(' ', StringSplitOptions.RemoveEmptyEntries);
-
-                    ApiResponseDTO<UserDetailsDTO> responseForRegister = await _authService.RegisterUser(new UserRegistrationDTO
-                    {
-                        Email = userInfo["Email"],
-                        FirstName = nameParts.Length > 1 ? string.Join(" ", nameParts.Take(nameParts.Length - 1)) : nameParts[0],
-                        LastName = nameParts.Length > 1 ? nameParts[^1] : "",
-                    }, AuthType.GoogleAuth);
-
-                    if (!responseForRegister.Success)
-                    {
-                        switch (responseForRegister.ResponseType)
-                        {
-                            case ResponseType.MissingInput:
-                                return BadRequest(responseForRegister);
-                            case ResponseType.UserAlreadyExists:
-                                return Conflict(responseForRegister);
-                        }
-                    }
-
-                    return Ok(new
-                    {
-                        Message = "Facebook authentication successful",
-                        Response = responseForRegister,
-                        Token = token
-                    });
-                }
+                ApiResponseDTO<UserDetailsDTO> response = await _authService.ProcessExternalAuth(userInfo);
 
                 return Ok(new
                 {
-                    Message = "Facebook authentication successful",
-                    Response = fetchUserByEmailResponse,
+                    Response = response,
                     Token = token
                 });
             }

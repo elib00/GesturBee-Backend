@@ -10,5 +10,6 @@ namespace GesturBee_Backend.Repository.Interfaces
         Task<bool> IsUserAStudent(int userId);
         Task<bool> IsUserATeacher(int userId);
         Task ResetPassword(string email, string newPassword);
+        Task UpdateLastLogin(User user);
     }
 }

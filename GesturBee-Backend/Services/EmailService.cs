@@ -54,8 +54,6 @@ namespace GesturBee_Backend.Services
             catch (Exception ex)
             {
                 // Log or handle the error as necessary
-                Console.WriteLine($"Error sending email: {ex.Message}");
-                throw new InvalidOperationException("Failed to send email. Please try again later.");
                 return false;
             }
         }
