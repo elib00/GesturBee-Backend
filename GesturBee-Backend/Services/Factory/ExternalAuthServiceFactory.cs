@@ -1,4 +1,5 @@
-﻿using GesturBee_Backend.Services.Interfaces;
+﻿using GesturBee_Backend.Enums;
+using GesturBee_Backend.Services.Interfaces;
 
 namespace GesturBee_Backend.Services.Factory
 {
@@ -11,13 +12,13 @@ namespace GesturBee_Backend.Services.Factory
             _serviceProvider = serviceProvider;
         }
 
-        public IExternalAuthService GetAuthService(string provider)
+        public IExternalAuthService GetAuthService(AuthType providerType)
         {
-            return provider switch
+            return providerType switch
             {
-                "Google" => _serviceProvider.GetRequiredService<GoogleAuthService>(),
-                "Facebook" => _serviceProvider.GetRequiredService<FacebookAuthService>(),
-                _ => throw new ArgumentException($"No service found for {provider}")
+                AuthType.GoogleAuth => _serviceProvider.GetRequiredService<GoogleAuthService>(),
+                AuthType.FacebookAuth => _serviceProvider.GetRequiredService<FacebookAuthService>(),
+                _ => throw new ArgumentException($"No service found for {providerType}")
             };
         }
     }

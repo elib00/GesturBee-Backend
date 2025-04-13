@@ -4,6 +4,7 @@ using GesturBee_Backend.Services.Interfaces;
 using GesturBee_Backend.Enums;
 using GesturBee_Backend.Models;
 using GesturBee_Backend.Repository;
+using Microsoft.Identity.Client;
 
 namespace GesturBee_Backend.Services
 {
@@ -16,7 +17,7 @@ namespace GesturBee_Backend.Services
             _authRepository = authRepository;
         }
 
-        public async Task<ApiResponseDTO<UserDetailsDTO>> RegisterUser(UserRegistrationDTO userDetails, AuthType authType)
+        public async Task<ApiResponseDTO<UserDetailsDTO>> RegisterUser(UserRegistrationDTO userDetails)
         {
             string newUserEmail = userDetails.Email;
 
@@ -30,7 +31,31 @@ namespace GesturBee_Backend.Services
                     Data = null
                 };
 
-            //the user profile
+            //construct ang user nga object
+            User newUser = ConstructUser(userDetails);
+            await _authRepository.CreateUser(newUser);
+
+            return new ApiResponseDTO<UserDetailsDTO>
+            {
+                Success = true,
+                ResponseType = ResponseType.UserCreated,
+                Data = new UserDetailsDTO
+                {
+                    Id = newUser.Id,
+                    Email = newUser.Account.Email,
+                    FirstName = newUser.Profile.FirstName,
+                    LastName = newUser.Profile.LastName,
+                    ContactNumber = newUser.Profile.ContactNumber,
+                    Gender = newUser.Profile.Gender,
+                    BirthDate = newUser.Profile.BirthDate,
+                    LastLogin = newUser.LastLogin,
+                    Roles = newUser.Roles
+                }
+            };
+        }
+
+        private User ConstructUser(UserRegistrationDTO userDetails)
+        {
             UserProfile profile = new UserProfile
             {
                 FirstName = userDetails.FirstName,
@@ -43,12 +68,12 @@ namespace GesturBee_Backend.Services
             //the user account
             UserAccount account = new UserAccount
             {
-                Email = newUserEmail,
+                Email = userDetails.Email,
             };
 
 
-            //only for locally created nga accounts, maghimo tag password for them
-            if(authType == AuthType.LocalAuth)
+            //only for locally created nga accounts, mng hash tag password for them
+            if (userDetails.Password != null)
             {
                 account.Password = BCrypt.Net.BCrypt.HashPassword(userDetails.Password);
             }
@@ -57,9 +82,55 @@ namespace GesturBee_Backend.Services
             User newUser = new User
             {
                 Account = account,
-                Profile = profile
+                Profile = profile,
+                LastLogin = userDetails.LastLogin
             };
-            
+
+            return newUser;
+        }
+
+        public async Task<ApiResponseDTO<UserDetailsDTO>> ProcessExternalAuth(Dictionary<string, string> userInfo)
+        {
+            string newUserEmail = userInfo["Email"];
+
+            User existingUser = await _authRepository.GetUserByEmail(newUserEmail);
+
+            // if the user already has a local account
+            if (existingUser != null)
+            {
+                // update the last login of the existing user
+                await _authRepository.UpdateLastLogin(existingUser);
+
+                return new ApiResponseDTO<UserDetailsDTO>
+                {
+                    Success = true,
+                    ResponseType = ResponseType.ValidUser,
+                    Data = new UserDetailsDTO
+                    {
+                        Id = existingUser.Id,
+                        Email = existingUser.Account.Email,
+                        FirstName = existingUser.Profile.FirstName,
+                        LastName = existingUser.Profile.LastName,
+                        ContactNumber = existingUser.Profile.ContactNumber,
+                        Gender = existingUser.Profile.Gender,
+                        BirthDate = existingUser.Profile.BirthDate,
+                        LastLogin = existingUser.LastLogin,
+                        Roles = existingUser.Roles
+                    }
+                };
+            }
+
+            // if email isn't tied to a local account yet,
+            // construct the new user object
+            string fullName = userInfo["Name"];
+            string[] nameParts = fullName.Split(' ', StringSplitOptions.RemoveEmptyEntries);
+            User newUser = ConstructUser(new UserRegistrationDTO
+            {
+                Email = userInfo["Email"],
+                FirstName = nameParts.Length > 1 ? string.Join(" ", nameParts.Take(nameParts.Length - 1)) : nameParts[0],
+                LastName = nameParts.Length > 1 ? nameParts[^1] : "",
+                LastLogin = DateTime.UtcNow // set the last login to the current date time 
+            });
 
             await _authRepository.CreateUser(newUser);
 
@@ -80,7 +151,6 @@ namespace GesturBee_Backend.Services
                     Roles = newUser.Roles
                 }
             };
-
         }
 
         public async Task<ApiResponseDTO<UserDetailsDTO>> ValidateUser(UserValidationDTO credentials)
@@ -118,6 +188,9 @@ namespace GesturBee_Backend.Services
             }
 
             userFromDb.Roles = await GetUserRoles(userFromDb.Id);
+
+            //update the last login of the user
+            await _authRepository.UpdateLastLogin(userFromDb);
 
             return new ApiResponseDTO<UserDetailsDTO>
             {
@@ -168,42 +241,6 @@ namespace GesturBee_Backend.Services
             return userRoles;
         }
 
-        // TODO: Implement this function
-        public async Task<ApiResponseDTO<UserDetailsDTO>> FetchUserUsingEmail(string email)
-        {
-            User? userFromDb = await _authRepository.GetUserByEmail(email);
-            if(userFromDb == null)
-            {
-                return new ApiResponseDTO<UserDetailsDTO>
-                {
-                    Success = false,
-                    ResponseType = ResponseType.UserNotFound,
-                    Data = null
-                };
-            }
-
-            userFromDb.Roles = await GetUserRoles(userFromDb.Id);
-
-            return new ApiResponseDTO<UserDetailsDTO>
-            {
-                Success = true,
-                ResponseType = ResponseType.SuccessfulRetrievalOfResource,
-                Data = new UserDetailsDTO
-                {
-                    Id = userFromDb.Id,
-                    Email = userFromDb.Account.Email,
-                    FirstName = userFromDb.Profile.FirstName,
-                    LastName = userFromDb.Profile.LastName,
-                    ContactNumber = userFromDb.Profile.ContactNumber,
-                    Gender = userFromDb.Profile.Gender,
-                    BirthDate = userFromDb.Profile.BirthDate,
-                    LastLogin = userFromDb.LastLogin,
-                    Roles = userFromDb.Roles
-                }
-            };
-           
-        }
-
         public async Task<ApiResponseDTO<object>> ResetPassword(ResetPasswordDTO resetDetails)
         {
             string email = resetDetails.Email;
@@ -239,9 +276,6 @@ namespace GesturBee_Backend.Services
                 ResponseType = ResponseType.PasswordResetSuccessful
             };
         }
-
-
-
         private bool ValidatePassword(string password, string pwFromDb)
         {
             return BCrypt.Net.BCrypt.Verify(password, pwFromDb);

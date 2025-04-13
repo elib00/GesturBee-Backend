@@ -6,8 +6,8 @@ namespace GesturBee_Backend.Services.Interfaces
     public interface IAuthService
     {
         Task<ApiResponseDTO<UserDetailsDTO>> ValidateUser(UserValidationDTO credentials);
-        Task<ApiResponseDTO<UserDetailsDTO>> RegisterUser(UserRegistrationDTO userDetails, AuthType authType);
-        Task<ApiResponseDTO<UserDetailsDTO>> FetchUserUsingEmail(string email);
+        Task<ApiResponseDTO<UserDetailsDTO>> RegisterUser(UserRegistrationDTO userDetails);
+        Task<ApiResponseDTO<UserDetailsDTO>> ProcessExternalAuth(Dictionary<string, string> userInfo);
         Task<ApiResponseDTO<object>> ResetPassword(ResetPasswordDTO resetDetails);
     }
 }

@@ -2,6 +2,6 @@
 {
     public enum AuthType
     {
-        GoogleAuth, LocalAuth
+        GoogleAuth, LocalAuth, FacebookAuth
     }
 }

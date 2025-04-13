@@ -19,6 +19,7 @@ namespace GesturBee_Backend.Controllers
         }
 
         [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+        [HttpPost("edit-profile")]
         public async Task<IActionResult> EditProfile([FromBody] UserProfileDTO profile)
         {
             ApiResponseDTO<UserProfileDTO> response = await _profileService.EditUserProfile(profile);
