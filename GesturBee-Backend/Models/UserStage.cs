@@ -15,7 +15,7 @@ namespace GesturBee_Backend.Models
         public int StageId { get; set; }
 
         [ForeignKey("UserId")]
-        public int UserId { get; set }
+        public int UserId { get; set; }
 
         public string Status { get; set; }
 
