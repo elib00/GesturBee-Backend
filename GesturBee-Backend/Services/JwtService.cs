@@ -29,10 +29,9 @@ namespace GesturBee_Backend.Services
                 new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
             };
 
-            if(details.Type == "password-reset")
-            {
-                claims.Add(new Claim("type", "password-reset"));
-            }
+
+             //add the type of token
+             claims.Add(new Claim("type", details.Type));
 
             //add each role manually
             foreach (var role in details.Roles)
