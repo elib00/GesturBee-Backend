@@ -89,15 +89,20 @@ namespace GesturBee_Backend.Services
             return newUser;
         }
 
-        public async Task<ApiResponseDTO<UserDetailsDTO>> ProcessExternalAuth(Dictionary<string, string> userInfo)
+        public async Task<ApiResponseDTO<UserDetailsDTO>> ProcessGoogleAuth(Dictionary<string, string> userInfo)
         {
-            string newUserEmail = userInfo["Email"];
+            string userEmail = userInfo["Email"];
+            string userFirstName = userInfo["GivenName"];
+            string userLastName = userInfo["FamilyName"];
 
-            User existingUser = await _authRepository.GetUserByEmail(newUserEmail);
+            User existingUser = await _authRepository.GetUserByEmail(userEmail);
 
-            // if the user already has a local account
-            if (existingUser != null)
+            //log in immediately
+            // user already has a local account
+            if(existingUser != null)
             {
+                existingUser.Roles = await GetUserRoles(existingUser.Id);
+
                 // update the last login of the existing user
                 await _authRepository.UpdateLastLogin(existingUser);
 
@@ -120,15 +125,12 @@ namespace GesturBee_Backend.Services
                 };
             }
 
-            // if email isn't tied to a local account yet,
-            // construct the new user object
-            string fullName = userInfo["Name"];
-            string[] nameParts = fullName.Split(' ', StringSplitOptions.RemoveEmptyEntries);
+            //no local acc, we create one
             User newUser = ConstructUser(new UserRegistrationDTO
             {
-                Email = userInfo["Email"],
-                FirstName = nameParts.Length > 1 ? string.Join(" ", nameParts.Take(nameParts.Length - 1)) : nameParts[0],
-                LastName = nameParts.Length > 1 ? nameParts[^1] : "",
+                Email = userEmail,
+                FirstName = userFirstName,
+                LastName = userLastName,
                 LastLogin = DateTime.UtcNow // set the last login to the current date time 
             });
 
