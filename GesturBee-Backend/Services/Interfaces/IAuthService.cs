@@ -8,6 +8,8 @@ namespace GesturBee_Backend.Services.Interfaces
         Task<ApiResponseDTO<UserDetailsDTO>> ValidateUser(UserValidationDTO credentials);
         Task<ApiResponseDTO<UserDetailsDTO>> RegisterUser(UserRegistrationDTO userDetails);
         Task<ApiResponseDTO<UserDetailsDTO>> ProcessGoogleAuth(Dictionary<string, string> userInfo);
+        Task<ApiResponseDTO<UserDetailsDTO>> ProcessFacebookAuth();
+        Task<ApiResponseDTO<UserDetailsDTO>> ProcessFacebookAuth(FacebookUserInfoDTO userInfo);
         Task<ApiResponseDTO<object>> ResetPassword(ResetPasswordDTO resetDetails);
     }
 }

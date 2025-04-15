@@ -3,13 +3,9 @@ using GesturBee_Backend.Services.Interfaces;
 using GesturBee_Backend.Enums;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Authentication.Google;
-using Microsoft.AspNetCore.Authentication;
-using System.Security.Authentication;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.AspNetCore.Authentication.Facebook;
+using Google.Apis.Auth;
 using GesturBee_Backend.Validators;
-using Microsoft.AspNetCore.Mvc.RazorPages.Infrastructure;
 
 namespace GesturBee_Backend.Controllers
 {
@@ -19,16 +15,18 @@ namespace GesturBee_Backend.Controllers
     {
         private readonly IAuthService _authService;
         private readonly IJwtService _jwtService;
-        //private readonly IExternalAuthServiceFactory _externalAuthServiceFactory;
         private readonly GoogleTokenValidator _googleTokenValidator;
+        private readonly FacebookTokenValidator _facebookTokenValidator;
         private readonly IEmailService _emailService;
 
 
-        public AuthController(IAuthService authService, IJwtService jwtService, GoogleTokenValidator googleTokenValidator, IEmailService emailService)
+        public AuthController(IAuthService authService, IJwtService jwtService, GoogleTokenValidator googleTokenValidator, 
+            FacebookTokenValidator facebookTokenValidator, IEmailService emailService)
         {
             _authService = authService;
             _jwtService = jwtService;
             _googleTokenValidator = googleTokenValidator;
+            _facebookTokenValidator = facebookTokenValidator;
             _emailService = emailService;
         }
 
@@ -85,15 +83,19 @@ namespace GesturBee_Backend.Controllers
         }
 
         [AllowAnonymous]
-        [HttpPost("login-google")]
-        public async Task<IActionResult> ExternalLoginWithGoogle([FromBody] ExternalAuthDTO authCredentials)
+        [HttpPost("external-login/google/")]
+        public async Task<IActionResult> ExternalLoginWithGoogle([FromBody] GoogleAuthDTO authCredentials)
         {
-            var payload = await _googleTokenValidator.ValidateAsync(authCredentials.IdToken);
-            
+            GoogleJsonWebSignature.Payload payload = await _googleTokenValidator.ValidateAsync(authCredentials.IdToken);
+           
 
             if(payload == null || string.IsNullOrEmpty(payload.Email))
             {
-                return Unauthorized(new { Message = "Invalid Google token" });
+                return Unauthorized(new ApiResponseDTO<object>
+                {
+                    Success = false,
+                    ResponseType = ResponseType.InvalidGoogleToken
+                }); 
             }
 
             //check if the user has a local account
@@ -120,8 +122,39 @@ namespace GesturBee_Backend.Controllers
 
         }
 
+        [AllowAnonymous]
+        [HttpPost("external-login/facebook/")]
+        public async Task<IActionResult> ExternalLoginWithFacebook([FromBody] GoogleAuthDTO authCredentials)
+        {
+            FacebookUserInfoDTO userInfo = await _facebookTokenValidator.ValidateTokenAsync(authCredentials.IdToken);
+            if(userInfo == null)
+            {
+                return Unauthorized(new ApiResponseDTO<object>
+                {
+                    Success = false,
+                    ResponseType = ResponseType.InvalidFacebookToken,
+                });
+            }
+
+            ApiResponseDTO<UserDetailsDTO> response = await _authService.ProcessFacebookAuth(userInfo);
+
+            string token = _jwtService.GenerateToken(new AuthTokenRequestDTO
+            {
+                Email = response?.Data.Email,
+                Roles = response?.Data.Roles,
+                Type = "facebook-auth"
+            });
+
+            return Ok(new
+            {
+                Token = token,
+                Response = response
+            });
+        }
+
+
         [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
-        [HttpPost("verify-reset-password")]
+        [HttpPost("verify-reset-password/")]
         public async Task<IActionResult> VerifyUserBeforeResetPassword([FromBody] VerifyChangePasswordDTO details)
         {
             string userEmail = details.Email;

@@ -4,6 +4,7 @@ using GesturBee_Backend.Repository.Interfaces;
 using GesturBee_Backend.Services;
 using GesturBee_Backend.Services.Factory;
 using GesturBee_Backend.Services.Interfaces;
+using GesturBee_Backend.Validators;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.Google;
 using Microsoft.AspNetCore.RateLimiting;
@@ -46,6 +47,8 @@ builder.Services.AddScoped<FacebookAuthService>();
 builder.Services.AddScoped<IExternalAuthServiceFactory, ExternalAuthServiceFactory>();
 
 builder.Services.AddScoped<IEmailService, EmailService>();
+
+builder.Services.AddScoped<GoogleTokenValidator>();
 
 
 // Add authentication
