@@ -7,8 +7,7 @@ namespace GesturBee_Backend.Services.Interfaces
     {
         Task<ApiResponseDTO<UserDetailsDTO>> ValidateUser(UserValidationDTO credentials);
         Task<ApiResponseDTO<UserDetailsDTO>> RegisterUser(UserRegistrationDTO userDetails);
-        Task<ApiResponseDTO<UserDetailsDTO>> ProcessExternalAuth(Dictionary<string, string> userInfo);
-        Task<ApiResponseDTO<UserDetailsDTO>> ProcessGoogleAuth(Dictionary<string, string> userInfo)
+        Task<ApiResponseDTO<UserDetailsDTO>> ProcessGoogleAuth(Dictionary<string, string> userInfo);
         Task<ApiResponseDTO<object>> ResetPassword(ResetPasswordDTO resetDetails);
     }
 }
