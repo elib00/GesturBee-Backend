@@ -22,5 +22,10 @@
         //for profile
         ProfileNotFound,
         ProfileUpdated,
+        
+        //for external auth
+        InvalidGoogleToken,
+        InvalidFacebookToken
+
     }
 }
