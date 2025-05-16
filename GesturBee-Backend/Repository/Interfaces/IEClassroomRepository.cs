@@ -1,4 +1,5 @@
-﻿using GesturBee_Backend.Models;
+﻿using GesturBee_Backend.DTO;
+using GesturBee_Backend.Models;
 
 namespace GesturBee_Backend.Repository.Interfaces
 {
@@ -12,5 +13,8 @@ namespace GesturBee_Backend.Repository.Interfaces
         Task AddStudentToClass(Student student, Class cls);
         Task InviteStudentToClass(Student student, Class cls);
         Task<bool> StudentAlreadyInvited(int studentId, int classId);
+        Task CreateClass(CreateClassDTO info);
+        Task<Teacher> GetTeacherById(int teacherId);
+        Task<bool> ClassNameAlreadyTaken(string className);
     }
 }

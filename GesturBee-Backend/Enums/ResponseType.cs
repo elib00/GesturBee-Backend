@@ -30,8 +30,11 @@
         //for classroom
         StudentNotFound, 
         ClassroomNotFound,
+        TeacherNotFound,
+        ClassNameAlreadyTaken,
         StudentAddedToClassroom,
         StudentAlreadyInvited,
         StudentInviteSuccessful,
+        ClassCreated,
     }
 }
