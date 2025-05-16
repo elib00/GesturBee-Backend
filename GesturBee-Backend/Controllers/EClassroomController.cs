@@ -135,7 +135,25 @@ namespace GesturBee_Backend.Controllers
             }
 
             return StatusCode(StatusCodes.Status201Created, response);
-
         }
+
+        public async Task<IActionResult> ProcessEnrollmentRequest(ClassAdmissionDTO classAdmissionDetails)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
+            ApiResponseDTO<object> response = await _eClassroomService.ProcessEnrollmentRequest(classAdmissionDetails);
+
+            if (!response.Success)
+            {
+                return NotFound(response);
+            }
+
+            return StatusCode(StatusCodes.Status204NoContent, response);
+        }
+
+        
     }
 }

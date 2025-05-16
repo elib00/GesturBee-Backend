@@ -4,6 +4,7 @@ using GesturBee_Backend.Repository.Interfaces;
 using GesturBee_Backend.Models;
 using MimeKit.Tnef;
 using GesturBee_Backend.DTO;
+using System.Threading.Tasks;
 
 namespace GesturBee_Backend.Repository
 {
@@ -67,23 +68,23 @@ namespace GesturBee_Backend.Repository
                 .ToListAsync();
         }
 
-        public async Task AddStudentToClass(Student student, Class cls)
+        public async Task AddStudentToClass(int studentId, int classId)
         {
             await _backendDbContext.StudentClasses.AddAsync(new StudentClass
             {
-                Student = student,
-                Class = cls
+                StudentId = studentId,
+                ClassId = classId
             });
 
             await _backendDbContext.SaveChangesAsync();
         }
 
-        public async Task InviteStudentToClass(Student student, Class cls)
+        public async Task InviteStudentToClass(int studentId, int classId)
         {
             await _backendDbContext.ClassInvitations.AddAsync(new ClassInvitation
             {
-                Student = student,
-                Class = cls,
+                StudentId = studentId,
+                ClassId = classId,
                 InvitedAt = DateTime.UtcNow
             });
 
@@ -103,6 +104,7 @@ namespace GesturBee_Backend.Repository
                 TeacherId = info.TeacherId,
                 ClassName = info.ClassName,
                 ClassDescription = info.ClassDescription,
+                ClassCode = "GB-",
                 CreatedAt = DateTime.UtcNow,
             };
 
@@ -115,12 +117,12 @@ namespace GesturBee_Backend.Repository
             return await _backendDbContext.Classes.AnyAsync(c => c.ClassName == className);
         }
 
-        public async Task RequestClassEnrollment(Student student, Class cls)
+        public async Task RequestClassEnrollment(int studentId, int classId)
         {
             await _backendDbContext.EnrollmentRequests.AddAsync(new EnrollmentRequest
             {
-                Student = student,
-                Class = cls,
+                StudentId = studentId,
+                ClassId = classId,
                 RequestedAt = DateTime.UtcNow
             });
 
@@ -131,6 +133,72 @@ namespace GesturBee_Backend.Repository
         {
             return await _backendDbContext.EnrollmentRequests
                 .AnyAsync(enrollmentRequest => enrollmentRequest.StudentId == studentId && enrollmentRequest.ClassId == classId);
+        }
+
+        private async Task RemoveEnrollmentRequest(EnrollmentRequest enrollmentRequest)
+        {
+            _backendDbContext.EnrollmentRequests.Remove(enrollmentRequest);
+            await _backendDbContext.SaveChangesAsync();
+        }
+
+        private async Task RemoveClassInvitation(ClassInvitation classInvitation)
+        {
+            _backendDbContext.ClassInvitations.Remove(classInvitation)  ;
+            await _backendDbContext.SaveChangesAsync();
+        }
+
+        public async Task AcceptEnrollmentRequest(EnrollmentRequest enrollmentRequest)
+        {
+            Student student = enrollmentRequest.Student;
+            Class cls = enrollmentRequest.Class;
+
+            //add the student to the class
+            StudentClass studentClass = new StudentClass
+            {
+                StudentId = student.Id,
+                ClassId = cls.Id
+            };
+
+            await _backendDbContext.StudentClasses.AddAsync(studentClass);
+            await RemoveEnrollmentRequest(enrollmentRequest);
+        }
+
+        public async Task RejectEnrollmentRequest(EnrollmentRequest enrollmentRequest)
+        {
+            await RemoveEnrollmentRequest(enrollmentRequest);
+        }
+
+        public async Task AcceptInvitationRequest(ClassInvitation invitation)
+        {
+            Student student = invitation.Student;
+            Class cls = invitation.Class;
+
+            //add the student to the class
+            StudentClass studentClass = new StudentClass
+            {
+                StudentId = student.Id,
+                ClassId = cls.Id
+            };
+
+            await _backendDbContext.StudentClasses.AddAsync(studentClass);
+            await RemoveClassInvitation(invitation);
+        }
+
+        public async Task RejectInvitationRequest(ClassInvitation invitation)
+        {
+            await RemoveClassInvitation(invitation);
+        }
+
+        public async Task<EnrollmentRequest> GetEnrollmentRequest(int studentId, int classId)
+        {
+            return await _backendDbContext.EnrollmentRequests
+                .FirstOrDefaultAsync(enrollmentRequest => enrollmentRequest.StudentId == studentId && enrollmentRequest.ClassId == classId);
+        }
+
+        public async Task<ClassInvitation> GetClassInvitation(int studentId, int classId)
+        {
+            return await _backendDbContext.ClassInvitations
+               .FirstOrDefaultAsync(enrollmentRequest => enrollmentRequest.StudentId == studentId && enrollmentRequest.ClassId == classId);
         }
     }
 }
