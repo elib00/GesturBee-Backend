@@ -37,6 +37,8 @@ builder.Services.AddControllers()
         options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
     });
 
+builder.Services.AddHttpClient();
+
 // Add dependencies
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IAuthRepository, AuthRepository>();
@@ -49,6 +51,7 @@ builder.Services.AddScoped<IExternalAuthServiceFactory, ExternalAuthServiceFacto
 builder.Services.AddScoped<IEmailService, EmailService>();
 
 builder.Services.AddScoped<GoogleTokenValidator>();
+builder.Services.AddScoped<FacebookTokenValidator>();
 
 
 // Add authentication
