@@ -124,9 +124,9 @@ namespace GesturBee_Backend.Controllers
 
         [AllowAnonymous]
         [HttpPost("external-login/facebook/")]
-        public async Task<IActionResult> ExternalLoginWithFacebook([FromBody] GoogleAuthDTO authCredentials)
+        public async Task<IActionResult> ExternalLoginWithFacebook([FromBody] FacebookAuthDTO authCredentials)
         {
-            FacebookUserInfoDTO userInfo = await _facebookTokenValidator.ValidateTokenAsync(authCredentials.IdToken);
+            FacebookUserInfoDTO userInfo = await _facebookTokenValidator.ValidateTokenAsync(authCredentials.AccessToken);
             if(userInfo == null)
             {
                 return Unauthorized(new ApiResponseDTO<object>

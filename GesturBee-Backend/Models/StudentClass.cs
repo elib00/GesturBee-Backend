@@ -6,6 +6,7 @@ namespace GesturBee_Backend.Models
 {
     public class StudentClass
     {
+        //MANY-TO-MANY RELATIONSHIP BETWEEN STUDENT AND CLASS
         [Key]
         public int Id { get; set; }
 
@@ -15,10 +16,8 @@ namespace GesturBee_Backend.Models
         [ForeignKey("ClassId")]
         public int ClassId { get; set; }
 
-        [JsonIgnore]
+        //nav props
         public Student Student { get; set; }
-
-        [JsonIgnore]
         public Class Class { get; set; }
     }
 }
