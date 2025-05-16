@@ -16,6 +16,6 @@ namespace GesturBee_Backend.Models
         public string? ExerciseTitle {  get; set; }
 
         [JsonIgnore]
-        public Teacher? Teacher { get; set }
+        public Teacher? Teacher { get; set; }
     }
 }

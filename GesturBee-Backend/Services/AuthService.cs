@@ -92,14 +92,82 @@ namespace GesturBee_Backend.Services
         public async Task<ApiResponseDTO<UserDetailsDTO>> ProcessGoogleAuth(Dictionary<string, string> userInfo)
         {
             string userEmail = userInfo["Email"];
-            string userFirstName = userInfo["GivenName"];
-            string userLastName = userInfo["FamilyName"];
+            string userFirstName = userInfo["FirstName"];
+            string userLastName = userInfo["LastName"];
 
             User existingUser = await _authRepository.GetUserByEmail(userEmail);
 
             //log in immediately
             // user already has a local account
             if(existingUser != null)
+            {
+                existingUser.Roles = await GetUserRoles(existingUser.Id);
+
+                // update the last login of the existing user
+                await _authRepository.UpdateLastLogin(existingUser);
+
+                return new ApiResponseDTO<UserDetailsDTO>
+                {
+                    Success = true,
+                    ResponseType = ResponseType.ValidUser,
+                    Data = new UserDetailsDTO
+                    {
+                        Id = existingUser.Id,
+                        Email = existingUser.Account.Email,
+                        FirstName = existingUser.Profile.FirstName,
+                        LastName = existingUser.Profile.LastName,
+                        ContactNumber = existingUser.Profile.ContactNumber,
+                        Gender = existingUser.Profile.Gender,
+                        BirthDate = existingUser.Profile.BirthDate,
+                        LastLogin = existingUser.LastLogin,
+                        Roles = existingUser.Roles
+                    }
+                };
+            }
+
+            //no local acc, we create one
+            User newUser = ConstructUser(new UserRegistrationDTO
+            {
+                Email = userEmail,
+                FirstName = userFirstName,
+                LastName = userLastName,
+                LastLogin = DateTime.UtcNow // set the last login to the current date time 
+            });
+
+            await _authRepository.CreateUser(newUser);
+
+            return new ApiResponseDTO<UserDetailsDTO>
+            {
+                Success = true,
+                ResponseType = ResponseType.UserCreated,
+                Data = new UserDetailsDTO
+                {
+                    Id = newUser.Id,
+                    Email = newUser.Account.Email,
+                    FirstName = newUser.Profile.FirstName,
+                    LastName = newUser.Profile.LastName,
+                    ContactNumber = newUser.Profile.ContactNumber,
+                    Gender = newUser.Profile.Gender,
+                    BirthDate = newUser.Profile.BirthDate,
+                    LastLogin = newUser.LastLogin,
+                    Roles = newUser.Roles
+                }
+            };
+        }
+
+        public async Task<ApiResponseDTO<UserDetailsDTO>> ProcessFacebookAuth(FacebookUserInfoDTO userInfo)
+        {
+            string userEmail = userInfo.Email;
+            string[] nameParts = userInfo.Name.Split(' ', StringSplitOptions.RemoveEmptyEntries);
+
+            string userFirstName = nameParts.Length > 1 ? string.Join(" ", nameParts.Take(nameParts.Length - 1)) : nameParts.FirstOrDefault() ?? "";
+            string userLastName = nameParts.Length > 1 ? nameParts.Last() : "";
+
+            User existingUser = await _authRepository.GetUserByEmail(userEmail);
+
+            //log in immediately
+            // user already has a local account
+            if (existingUser != null)
             {
                 existingUser.Roles = await GetUserRoles(existingUser.Id);
 

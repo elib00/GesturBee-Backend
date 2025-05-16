@@ -12,13 +12,15 @@ namespace GesturBee_Backend.Models
         public string? ClassName { get; set; }
         public string? ClassDescription { get; set; }
 
+        [JsonIgnore] //hide this because class code is a secret hehez
+        public string? ClassCode { get; set; }
+
 
         [ForeignKey("TeacherId")]
         public int TeacherId { get; set; }
 
-            
-        [JsonIgnore]
-        public Teacher? Teacher { get; set; }
 
+        //[JsonIgnore]
+        public Teacher? Teacher { get; set; }
     }
 }

@@ -24,6 +24,6 @@ namespace GesturBee_Backend.Models
         public string CorrectAnswer { get; set; }
 
         [JsonIgnore]
-        public Exercise Exercise { get; set }
+        public Exercise Exercise { get; set; }
     }
 }
