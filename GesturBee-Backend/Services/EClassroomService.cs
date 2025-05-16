@@ -74,7 +74,7 @@ namespace GesturBee_Backend.Services
 
             if (cls == null)
             {
-                return new ApiResponseDTO<object> { Success = false, ResponseType = ResponseType.StudentNotFound };
+                return new ApiResponseDTO<object> { Success = false, ResponseType = ResponseType.ClassroomNotFound };
             }
 
             await _eClassroomRepository.AddStudentToClass(student, cls);
@@ -83,6 +83,44 @@ namespace GesturBee_Backend.Services
             {
                 Success = true,
                 ResponseType = ResponseType.StudentAddedToClassroom
+            };
+        }
+
+        public async Task<ApiResponseDTO<object>> InviteStudentToClass(int studentId, int classId)
+        {
+            Student student = await _eClassroomRepository.GetStudentById(studentId);
+
+            if (student == null)
+            {
+                return new ApiResponseDTO<object> { Success = false, ResponseType = ResponseType.StudentNotFound };
+            }
+
+
+            Class cls = await _eClassroomRepository.GetClassById(classId);
+
+            if (cls == null)
+            {
+                return new ApiResponseDTO<object> { Success = false, ResponseType = ResponseType.StudentNotFound };
+            }
+
+            //check if invitation is already present
+
+            bool isAlreadyInvited = await _eClassroomRepository.StudentAlreadyInvited(studentId, classId);
+
+            if(isAlreadyInvited)
+            {
+                return new ApiResponseDTO<object>
+                {
+                    Success = false,
+                    ResponseType = ResponseType.StudentAlreadyInvited
+                };
+            }
+
+            await _eClassroomRepository.InviteStudentToClass(student, cls);
+            return new ApiResponseDTO<object>
+            {
+                Success = true,
+                ResponseType = ResponseType.StudentInviteSuccessful
             };
         }
 

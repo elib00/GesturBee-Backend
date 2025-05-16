@@ -10,5 +10,7 @@ namespace GesturBee_Backend.Repository.Interfaces
         Task<List<Class>> GetTeacherClasses(int teacherId);
         Task<List<Student>> GetClassStudents(int classId);
         Task AddStudentToClass(Student student, Class cls);
+        Task InviteStudentToClass(Student student, Class cls);
+        Task<bool> StudentAlreadyInvited(int studentId, int classId);
     }
 }

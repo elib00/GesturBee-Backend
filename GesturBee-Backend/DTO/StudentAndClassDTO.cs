@@ -2,7 +2,8 @@
 
 namespace GesturBee_Backend.DTO
 {
-    public class AddStudentToClassDTO
+    //DTO for endpoints that need class id and student id
+    public class StudentAndClassDTO
     {
         [Required]
         public int? StudentId { get; set; }
