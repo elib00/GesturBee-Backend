@@ -2,6 +2,8 @@
 using GesturBee_Backend.Enums;
 using GesturBee_Backend.Models;
 using GesturBee_Backend.Services.Interfaces;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace GesturBee_Backend.Controllers
@@ -18,29 +20,43 @@ namespace GesturBee_Backend.Controllers
             _eClassroomService = eClassroomService;
         }
 
-        public async Task<IActionResult> GetStudentClasses([FromQuery] int studentId)
+
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+        [HttpGet( "student/{studentId}/classes/")]
+        public async Task<IActionResult> GetStudentClasses([FromRoute] int studentId)
         {
             ApiResponseDTO<List<Class>> response = await _eClassroomService.GetStudentClasses(studentId);
             return Ok(response);
         }
 
-        public async Task<IActionResult> GetClassById([FromQuery] int classId)
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+        [HttpGet("class/{classId}/")]
+
+        public async Task<IActionResult> GetClassById([FromRoute] int classId)
         {
             ApiResponseDTO<Class> response = await _eClassroomService.GetClassById(classId);
             return Ok(response);
         }
 
-        public async Task<IActionResult> GetTeacherClasses([FromQuery] int teacherId)
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+        [HttpGet("teacher/{teacherId}/classes/")]
+
+        public async Task<IActionResult> GetTeacherClasses([FromRoute] int teacherId)
         {
             ApiResponseDTO<List<Class>> response = await _eClassroomService.GetTeacherClasses(teacherId);
             return Ok(response);
         }
 
-        public async Task<IActionResult> GetClassStudents([FromQuery] int classId)
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+        [HttpGet("class/{classId}/students/")]
+        public async Task<IActionResult> GetClassStudents([FromRoute] int classId)
         {
             ApiResponseDTO<List<Student>> response = await _eClassroomService.GetClassStudents(classId);
             return Ok(response);
         }
+
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+        [HttpPost("add-student/")]
 
         public async Task<IActionResult> AddStudentToClass([FromBody] StudentAndClassDTO request)
         {
@@ -52,7 +68,7 @@ namespace GesturBee_Backend.Controllers
             int studentId = (int) request.StudentId;
             int classId = (int) request.ClassId;
 
-            ApiResponseDTO<object> response = await _eClassroomService.AddStudentToClass(studentId, classId);
+            ApiResponseDTO<object> response = await _eClassroomService.AddStudentToClass(request);
 
             if (!response.Success)
             {
@@ -62,6 +78,8 @@ namespace GesturBee_Backend.Controllers
             return StatusCode(StatusCodes.Status201Created, response);
         }
 
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+        [HttpPost("invite-student/")]
         public async Task<IActionResult> InviteStudentToClass([FromBody] StudentAndClassDTO request)
         {
             if (!ModelState.IsValid)
@@ -69,10 +87,7 @@ namespace GesturBee_Backend.Controllers
                 return BadRequest(ModelState);
             }
 
-            int studentId = (int)request.StudentId;
-            int classId = (int)request.ClassId;
-
-            ApiResponseDTO<object> response = await _eClassroomService.InviteStudentToClass(studentId, classId);
+            ApiResponseDTO<object> response = await _eClassroomService.InviteStudentToClass(request);
 
             if (!response.Success)
             {
@@ -89,6 +104,8 @@ namespace GesturBee_Backend.Controllers
             return StatusCode(StatusCodes.Status201Created, response);
         }
 
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+        [HttpPost("create-class/")]
         public async Task<IActionResult> CreateClass([FromBody] CreateClassDTO info)
         {
             if (!ModelState.IsValid)
@@ -113,7 +130,9 @@ namespace GesturBee_Backend.Controllers
             return StatusCode(StatusCodes.Status201Created, response);
         }
 
-        public async Task<IActionResult> RequestClassEnrollment(StudentAndClassDTO info)
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+        [HttpPost("request-enrollment/")]
+        public async Task<IActionResult> RequestClassEnrollment([FromBody] StudentAndClassDTO info)
         {
             if (!ModelState.IsValid)
             {
@@ -137,7 +156,9 @@ namespace GesturBee_Backend.Controllers
             return StatusCode(StatusCodes.Status201Created, response);
         }
 
-        public async Task<IActionResult> ProcessEnrollmentRequest(ClassAdmissionDTO classAdmissionDetails)
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+        [HttpPost("process-enrollment/")]
+        public async Task<IActionResult> ProcessEnrollmentRequest([FromBody] ClassAdmissionDTO classAdmissionDetails)
         {
             if (!ModelState.IsValid)
             {
@@ -154,6 +175,26 @@ namespace GesturBee_Backend.Controllers
             return StatusCode(StatusCodes.Status204NoContent, response);
         }
 
-        
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+        [HttpPost("process-invitation/")]
+        public async Task<IActionResult> ProcessInvitationRequest([FromBody] ClassAdmissionDTO classAdmissionDetails)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
+            ApiResponseDTO<object> response = await _eClassroomService.ProcessInvitationRequest(classAdmissionDetails);
+
+            if (!response.Success)
+            {
+                return NotFound(response);
+            }
+
+            return StatusCode(StatusCodes.Status204NoContent, response);
+        }
+
+
+
     }
 }
