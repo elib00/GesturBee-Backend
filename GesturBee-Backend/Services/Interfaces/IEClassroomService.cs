@@ -13,5 +13,8 @@ namespace GesturBee_Backend.Services.Interfaces
         Task<ApiResponseDTO<object>> InviteStudentToClass(StudentAndClassDTO info);
         Task<ApiResponseDTO<object>> CreateClass(CreateClassDTO info);
         Task<ApiResponseDTO<object>> RequestClassEnrollment(StudentAndClassDTO info);
+        Task<ApiResponseDTO<object>> ProcessEnrollmentRequest(ClassAdmissionDTO classAdmissionDetails);
+        Task<ApiResponseDTO<object>> ProcessInvitationRequest(ClassAdmissionDTO classAdmissionDetails);
     }
+
 }

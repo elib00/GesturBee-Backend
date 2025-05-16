@@ -3,7 +3,6 @@ using GesturBee_Backend.Enums;
 using GesturBee_Backend.Models;
 using GesturBee_Backend.Repository.Interfaces;
 using GesturBee_Backend.Services.Interfaces;
-using Microsoft.AspNetCore.Http.HttpResults;
 
 namespace GesturBee_Backend.Services
 {
@@ -48,7 +47,7 @@ namespace GesturBee_Backend.Services
                 Data = teacherClasses
             };
         }
-        
+
         public async Task<ApiResponseDTO<List<Student>>> GetClassStudents(int classId)
         {
             List<Student> students = await _eClassroomRepository.GetClassStudents(classId);
@@ -65,22 +64,10 @@ namespace GesturBee_Backend.Services
             int studentId = (int)info.StudentId;
             int classId = (int)info.StudentId;
 
-            Student student = await _eClassroomRepository.GetStudentById(studentId);
+            ApiResponseDTO<object> checkStudentAndClass = await CheckStudentAndClassIfNull(studentId, classId);
+            if (!checkStudentAndClass.Success) return checkStudentAndClass;
 
-            if (student == null)
-            {
-                return new ApiResponseDTO<object> { Success = false, ResponseType = ResponseType.StudentNotFound };
-            }
-
-
-            Class cls = await _eClassroomRepository.GetClassById(classId);
-
-            if (cls == null)
-            {
-                return new ApiResponseDTO<object> { Success = false, ResponseType = ResponseType.ClassNotFound };
-            }
-
-            await _eClassroomRepository.AddStudentToClass(student, cls);
+            await _eClassroomRepository.AddStudentToClass(studentId, classId);
 
             return new ApiResponseDTO<object>
             {
@@ -94,26 +81,13 @@ namespace GesturBee_Backend.Services
             int studentId = (int)info.StudentId;
             int classId = (int)info.StudentId;
 
-            Student student = await _eClassroomRepository.GetStudentById(studentId);
-
-            if (student == null)
-            {
-                return new ApiResponseDTO<object> { Success = false, ResponseType = ResponseType.StudentNotFound };
-            }
-
-
-            Class cls = await _eClassroomRepository.GetClassById(classId);
-
-            if (cls == null)
-            {
-                return new ApiResponseDTO<object> { Success = false, ResponseType = ResponseType.ClassNotFound };
-            }
+            ApiResponseDTO<object> checkStudentAndClass = await CheckStudentAndClassIfNull(studentId, classId);
+            if (!checkStudentAndClass.Success) return checkStudentAndClass;
 
             //check if invitation is already present
-
             bool isAlreadyInvited = await _eClassroomRepository.StudentAlreadyInvited(studentId, classId);
 
-            if(isAlreadyInvited)
+            if (isAlreadyInvited)
             {
                 return new ApiResponseDTO<object>
                 {
@@ -122,7 +96,7 @@ namespace GesturBee_Backend.Services
                 };
             }
 
-            await _eClassroomRepository.InviteStudentToClass(student, cls);
+            await _eClassroomRepository.InviteStudentToClass(studentId, classId);
 
             return new ApiResponseDTO<object>
             {
@@ -143,12 +117,12 @@ namespace GesturBee_Backend.Services
 
             bool isNameAlreadyTaken = await _eClassroomRepository.ClassNameAlreadyTaken(info.ClassName);
 
-            if(isNameAlreadyTaken)
+            if (isNameAlreadyTaken)
             {
                 return new ApiResponseDTO<object> { Success = false, ResponseType = ResponseType.ClassNameAlreadyTaken };
             }
 
-  
+
             await _eClassroomRepository.CreateClass(info);
 
             return new ApiResponseDTO<object>
@@ -160,8 +134,99 @@ namespace GesturBee_Backend.Services
 
         public async Task<ApiResponseDTO<object>> RequestClassEnrollment(StudentAndClassDTO info)
         {
-            int studentId = (int) info.StudentId;
-            int classId =  (int) info.StudentId;
+            int studentId = (int)info.StudentId;
+            int classId = (int)info.StudentId;
+
+            ApiResponseDTO<object> checkStudentAndClass = await CheckStudentAndClassIfNull(studentId, classId);
+            if (!checkStudentAndClass.Success) return checkStudentAndClass;
+
+            bool hasAlreadyRequested = await _eClassroomRepository.RequestForClassEnrollmentAlreadySent(studentId, classId);
+
+            if (hasAlreadyRequested)
+            {
+                return new ApiResponseDTO<object>
+                {
+                    Success = false,
+                    ResponseType = ResponseType.EnrollmentRequestAlreadySent
+                };
+            }
+
+            await _eClassroomRepository.RequestClassEnrollment(studentId, classId);
+            return new ApiResponseDTO<object>
+            {
+                Success = true,
+                ResponseType = ResponseType.EnrollmentRequestSuccessful
+            };
+        }
+
+        public async Task<ApiResponseDTO<object>> ProcessEnrollmentRequest(ClassAdmissionDTO classAdmissionDetails)
+        {
+            int studentId = (int) classAdmissionDetails.StudentId;
+            int classId = (int) classAdmissionDetails.ClassId;
+
+            ApiResponseDTO<object> checkStudentAndClass = await CheckStudentAndClassIfNull(studentId, classId);
+
+            if (!checkStudentAndClass.Success) return checkStudentAndClass;
+
+            EnrollmentRequest enrollmentRequest = await _eClassroomRepository.GetEnrollmentRequest(studentId, classId);
+
+
+            if (classAdmissionDetails.Accept)
+            {
+                await _eClassroomRepository.AcceptEnrollmentRequest(enrollmentRequest);
+                return new ApiResponseDTO<object>
+                {
+                    Success = true,
+                    ResponseType = ResponseType.EnrollmentAcceptanceSuccessful
+                };
+            }
+            else
+            {
+                await _eClassroomRepository.RejectEnrollmentRequest(enrollmentRequest);
+                return new ApiResponseDTO<object>
+                {
+                    Success = true,
+                    ResponseType = ResponseType.EnrollmentRejectionSuccessful
+                };
+            }
+
+        }
+
+        public async Task<ApiResponseDTO<object>> ProcessInvitationRequest(ClassAdmissionDTO classAdmissionDetails)
+        {
+            int studentId = (int)classAdmissionDetails.StudentId;
+            int classId = (int)classAdmissionDetails.ClassId;
+
+            ApiResponseDTO<object> checkStudentAndClass = await CheckStudentAndClassIfNull(studentId, classId);
+
+            if (!checkStudentAndClass.Success) return checkStudentAndClass;
+
+            ClassInvitation invitation = await _eClassroomRepository.GetClassInvitation(studentId, classId);
+
+
+            if (classAdmissionDetails.Accept)
+            {
+                await _eClassroomRepository.AcceptInvitationRequest(invitation);
+                return new ApiResponseDTO<object>
+                {
+                    Success = true,
+                    ResponseType = ResponseType.InvitationAcceptanceSuccessful  
+                };
+            }
+            else
+            {
+                await _eClassroomRepository.RejectInvitationRequest(invitation);
+                return new ApiResponseDTO<object>
+                {
+                    Success = true,
+                    ResponseType = ResponseType.InvitationRejectionSuccessful
+                };
+            }
+
+        }
+
+        private async Task<ApiResponseDTO<object>> CheckStudentAndClassIfNull(int studentId, int classId)
+        {
 
             Student student = await _eClassroomRepository.GetStudentById(studentId);
 
@@ -174,28 +239,15 @@ namespace GesturBee_Backend.Services
             Class cls = await _eClassroomRepository.GetClassById(classId);
 
             if (cls == null)
-            {
+            { 
                 return new ApiResponseDTO<object> { Success = false, ResponseType = ResponseType.ClassNotFound };
             }
 
-            bool hasAlreadyRequested = await _eClassroomRepository.RequestForClassEnrollmentAlreadySent(studentId, classId);
-
-            if(hasAlreadyRequested)
-            {
-                return new ApiResponseDTO<object>
-                {
-                    Success = false,
-                    ResponseType = ResponseType.EnrollmentRequestAlreadySent
-                };
-            }
-
-            await _eClassroomRepository.RequestClassEnrollment(student, cls);
             return new ApiResponseDTO<object>
             {
                 Success = true,
-                ResponseType = ResponseType.EnrollmentRequestSuccessful
+                ResponseType = ResponseType.NoNullValues
             };
         }
-
     }
 }

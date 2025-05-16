@@ -1,5 +1,6 @@
 ﻿using GesturBee_Backend.DTO;
 using GesturBee_Backend.Models;
+using MimeKit.Tnef;
 
 namespace GesturBee_Backend.Repository.Interfaces
 {
@@ -10,13 +11,19 @@ namespace GesturBee_Backend.Repository.Interfaces
         Task<Student> GetStudentById(int studentId);
         Task<List<Class>> GetTeacherClasses(int teacherId);
         Task<List<Student>> GetClassStudents(int classId);
-        Task AddStudentToClass(Student student, Class cls);
-        Task InviteStudentToClass(Student student, Class cls);
+        Task AddStudentToClass(int studentId, int classId);
+        Task InviteStudentToClass(int studentId, int classId);
         Task<bool> StudentAlreadyInvited(int studentId, int classId);
         Task CreateClass(CreateClassDTO info);
         Task<Teacher> GetTeacherById(int teacherId);
         Task<bool> ClassNameAlreadyTaken(string className);
-        Task RequestClassEnrollment(Student student, Class cls);
+        Task RequestClassEnrollment(int studentId, int classId);
         Task<bool> RequestForClassEnrollmentAlreadySent(int studentId, int classId);
+        Task AcceptEnrollmentRequest(EnrollmentRequest enrollmentRequest);
+        Task RejectEnrollmentRequest(EnrollmentRequest enrollmentRequest);
+        Task AcceptInvitationRequest(ClassInvitation invitation);
+        Task RejectInvitationRequest(ClassInvitation invitation);
+        Task<EnrollmentRequest> GetEnrollmentRequest(int studentId, int classId);
+        Task<ClassInvitation> GetClassInvitation(int studentId, int classId);
     }
 }

@@ -38,5 +38,10 @@
         StudentInviteSuccessful,
         EnrollmentRequestSuccessful,
         ClassCreated,
+        EnrollmentAcceptanceSuccessful,
+        EnrollmentRejectionSuccessful,
+        InvitationAcceptanceSuccessful,
+        InvitationRejectionSuccessful,
+        NoNullValues,
     }
 }
