@@ -3,6 +3,7 @@ using GesturBee_Backend.Enums;
 using GesturBee_Backend.Models;
 using GesturBee_Backend.Repository.Interfaces;
 using GesturBee_Backend.Services.Interfaces;
+using Microsoft.AspNetCore.Http.HttpResults;
 
 namespace GesturBee_Backend.Services
 {
@@ -56,6 +57,32 @@ namespace GesturBee_Backend.Services
                 Success = true,
                 ResponseType = ResponseType.SuccessfulRetrievalOfResource,
                 Data = students
+            };
+        }
+
+        public async Task<ApiResponseDTO<object>> AddStudentToClass(int studentId, int classId)
+        {
+            Student student = await _eClassroomRepository.GetStudentById(studentId);
+
+            if (student == null)
+            {
+                return new ApiResponseDTO<object> { Success = false, ResponseType = ResponseType.StudentNotFound };
+            }
+
+
+            Class cls = await _eClassroomRepository.GetClassById(classId);
+
+            if (cls == null)
+            {
+                return new ApiResponseDTO<object> { Success = false, ResponseType = ResponseType.StudentNotFound };
+            }
+
+            await _eClassroomRepository.AddStudentToClass(student, cls);
+
+            return new ApiResponseDTO<object>
+            {
+                Success = true,
+                ResponseType = ResponseType.StudentAddedToClassroom
             };
         }
 

@@ -40,5 +40,19 @@ namespace GesturBee_Backend.Controllers
             ApiResponseDTO<List<Student>> response = await _eClassroomService.GetClassStudents(classId);
             return Ok(response);
         }
+
+        public async Task<IActionResult> AddStudentToClass([FromBody] AddStudentToClassDTO request)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
+            int studentId = (int) request.StudentId;
+            int classId = (int) request.ClassId;
+
+            await _eClassroomService.AddStudentToClass(studentId, classId);
+            return Created();
+        }
     }
 }

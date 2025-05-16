@@ -25,7 +25,11 @@
         
         //for external auth
         InvalidGoogleToken,
-        InvalidFacebookToken
+        InvalidFacebookToken,
 
+        //for classroom
+        StudentNotFound, 
+        ClassroomNotFound,
+        StudentAddedToClassroom
     }
 }
