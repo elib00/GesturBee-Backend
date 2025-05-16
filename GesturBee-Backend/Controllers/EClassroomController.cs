@@ -22,7 +22,7 @@ namespace GesturBee_Backend.Controllers
 
 
         [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
-        [HttpGet( "student/{studentId}/classes/")]
+        [HttpGet("student/{studentId}/classes/")]
         public async Task<IActionResult> GetStudentClasses([FromRoute] int studentId)
         {
             ApiResponseDTO<List<Class>> response = await _eClassroomService.GetStudentClasses(studentId);
@@ -177,8 +177,8 @@ namespace GesturBee_Backend.Controllers
 
         [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
         [HttpPost("process-invitation/")]
-        public async Task<IActionResult> ProcessInvitationRequest([FromBody] ClassAdmissionDTO classAdmissionDetails)
-        {
+        public async Task<IActionResult> ProcessInvitationRequest([FromBody] ClassAdmissionDTO classAdmissionDetails, [FromRoute])
+        {   
             if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);
