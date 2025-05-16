@@ -29,12 +29,14 @@
 
         //for classroom
         StudentNotFound, 
-        ClassroomNotFound,
+        ClassNotFound,
         TeacherNotFound,
         ClassNameAlreadyTaken,
         StudentAddedToClassroom,
         StudentAlreadyInvited,
+        EnrollmentRequestAlreadySent,
         StudentInviteSuccessful,
+        EnrollmentRequestSuccessful,
         ClassCreated,
     }
 }
