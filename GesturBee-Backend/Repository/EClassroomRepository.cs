@@ -2,6 +2,7 @@
 
 using GesturBee_Backend.Repository.Interfaces;
 using GesturBee_Backend.Models;
+using MimeKit.Tnef;
 
 namespace GesturBee_Backend.Repository
 {
@@ -13,11 +14,16 @@ namespace GesturBee_Backend.Repository
         {
             _backendDbContext = backendDbContext;
         }
-       
+
         public async Task<Class> GetClassById(int classId)
         {
             return await _backendDbContext.Classes.FindAsync(classId);
-            }
+        }
+
+        public async Task<Student> GetStudentById(int studentId)
+        {
+            return await _backendDbContext.Students.FindAsync(studentId);
+        }
 
         public async Task<List<Class>> GetStudentClasses(int studentId)
         {
@@ -53,6 +59,17 @@ namespace GesturBee_Backend.Repository
                         .ThenInclude(user => user.Profile)
                 .Select(studentClass => studentClass.Student)
                 .ToListAsync();
+        }
+
+        public async Task AddStudentToClass(Student student, Class cls)
+        {
+            await _backendDbContext.StudentClasses.AddAsync(new StudentClass
+            {
+                Student = student,
+                Class = cls
+            });
+
+            await _backendDbContext.SaveChangesAsync();
         }
 
     }
