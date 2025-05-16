@@ -1,4 +1,5 @@
 ﻿using GesturBee_Backend.DTO;
+using GesturBee_Backend.Enums;
 using GesturBee_Backend.Models;
 using GesturBee_Backend.Services.Interfaces;
 using Microsoft.AspNetCore.Mvc;
@@ -41,7 +42,7 @@ namespace GesturBee_Backend.Controllers
             return Ok(response);
         }
 
-        public async Task<IActionResult> AddStudentToClass([FromBody] AddStudentToClassDTO request)
+        public async Task<IActionResult> AddStudentToClass([FromBody] StudentAndClassDTO request)
         {
             if (!ModelState.IsValid)
             {
@@ -51,8 +52,41 @@ namespace GesturBee_Backend.Controllers
             int studentId = (int) request.StudentId;
             int classId = (int) request.ClassId;
 
-            await _eClassroomService.AddStudentToClass(studentId, classId);
-            return Created();
+            ApiResponseDTO<object> response = await _eClassroomService.AddStudentToClass(studentId, classId);
+
+            if (!response.Success)
+            {
+                return NotFound(response);
+            }
+
+            return StatusCode(StatusCodes.Status201Created, response);
+        }
+
+        public async Task<IActionResult> InviteStudentToClass([FromBody] StudentAndClassDTO request)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
+            int studentId = (int)request.StudentId;
+            int classId = (int)request.ClassId;
+
+            ApiResponseDTO<object> response = await _eClassroomService.InviteStudentToClass(studentId, classId);\
+
+            if (!response.Success)
+            {
+                if(response.ResponseType == ResponseType.StudentAlreadyInvited)
+                {
+                    return Conflict(response);
+                }
+                else
+                {
+                    return NotFound(response);
+                }
+            }
+
+            return StatusCode(StatusCodes.Status201Created, response);
         }
     }
 }

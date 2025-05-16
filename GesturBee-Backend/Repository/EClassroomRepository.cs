@@ -72,5 +72,24 @@ namespace GesturBee_Backend.Repository
             await _backendDbContext.SaveChangesAsync();
         }
 
+        public async Task InviteStudentToClass(Student student, Class cls)
+        {
+            await _backendDbContext.ClassInvitations.AddAsync(new ClassInvitation
+            {
+                Student = student,
+                Class = cls,
+                InvitedAt = DateTime.UtcNow
+            });
+
+            await _backendDbContext.SaveChangesAsync();
+        }
+
+        public async Task<bool> StudentAlreadyInvited(int studentId, int classId)
+        {
+            bool isAlreadyInvited = await _backendDbContext.ClassInvitations
+                .AnyAsync(classInvitation => classInvitation.StudentId == studentId && classInvitation.ClassId == classId);
+
+            return isAlreadyInvited;
+        }
     }
 }
