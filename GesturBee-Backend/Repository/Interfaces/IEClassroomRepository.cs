@@ -16,5 +16,7 @@ namespace GesturBee_Backend.Repository.Interfaces
         Task CreateClass(CreateClassDTO info);
         Task<Teacher> GetTeacherById(int teacherId);
         Task<bool> ClassNameAlreadyTaken(string className);
+        Task RequestClassEnrollment(Student student, Class cls);
+        Task<bool> RequestForClassEnrollmentAlreadySent(int studentId, int classId);
     }
 }
