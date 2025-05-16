@@ -3,6 +3,7 @@
 using GesturBee_Backend.Repository.Interfaces;
 using GesturBee_Backend.Models;
 using MimeKit.Tnef;
+using GesturBee_Backend.DTO;
 
 namespace GesturBee_Backend.Repository
 {
@@ -23,6 +24,11 @@ namespace GesturBee_Backend.Repository
         public async Task<Student> GetStudentById(int studentId)
         {
             return await _backendDbContext.Students.FindAsync(studentId);
+        }
+
+        public async Task<Teacher> GetTeacherById(int teacherId)
+        {
+            return await _backendDbContext.Teachers.FindAsync(teacherId);
         }
 
         public async Task<List<Class>> GetStudentClasses(int studentId)
@@ -86,10 +92,29 @@ namespace GesturBee_Backend.Repository
 
         public async Task<bool> StudentAlreadyInvited(int studentId, int classId)
         {
-            bool isAlreadyInvited = await _backendDbContext.ClassInvitations
+            return await _backendDbContext.ClassInvitations
                 .AnyAsync(classInvitation => classInvitation.StudentId == studentId && classInvitation.ClassId == classId);
-
-            return isAlreadyInvited;
         }
+
+        public async Task CreateClass(CreateClassDTO info)
+        {
+            Class cls = new Class
+            {
+                TeacherId = info.TeacherId,
+                ClassName = info.ClassName,
+                ClassDescription = info.ClassDescription,
+                CreatedAt = DateTime.UtcNow,
+            };
+
+            await _backendDbContext.Classes.AddAsync(cls);
+            await _backendDbContext.SaveChangesAsync();
+        }
+
+        public async Task<bool> ClassNameAlreadyTaken(string className)
+        {
+            return await _backendDbContext.Classes.AnyAsync(c => c.ClassName == className);
+        }
+
+
     }
 }

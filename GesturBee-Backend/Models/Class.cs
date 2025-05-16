@@ -15,6 +15,8 @@ namespace GesturBee_Backend.Models
         [JsonIgnore] //hide this because class code is a secret hehez
         public string? ClassCode { get; set; }
 
+        public DateTime CreatedAt { get; set; }
+
 
         [ForeignKey("TeacherId")]
         public int TeacherId { get; set; }

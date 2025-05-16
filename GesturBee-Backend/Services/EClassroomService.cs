@@ -117,10 +117,38 @@ namespace GesturBee_Backend.Services
             }
 
             await _eClassroomRepository.InviteStudentToClass(student, cls);
+
             return new ApiResponseDTO<object>
             {
                 Success = true,
                 ResponseType = ResponseType.StudentInviteSuccessful
+            };
+        }
+
+        public async Task<ApiResponseDTO<object>> CreateClass(CreateClassDTO info)
+        {
+            int teacherId = info.TeacherId;
+            Teacher teacher = await _eClassroomRepository.GetTeacherById(teacherId);
+
+            if (teacher == null)
+            {
+                return new ApiResponseDTO<object> { Success = false, ResponseType = ResponseType.TeacherNotFound };
+            }
+
+            bool isNameAlreadyTaken = await _eClassroomRepository.ClassNameAlreadyTaken(info.ClassName);
+
+            if(isNameAlreadyTaken)
+            {
+                return new ApiResponseDTO<object> { Success = false, ResponseType = ResponseType.ClassNameAlreadyTaken };
+            }
+
+  
+            await _eClassroomRepository.CreateClass(info);
+
+            return new ApiResponseDTO<object>
+            {
+                Success = true,
+                ResponseType = ResponseType.ClassCreated
             };
         }
 

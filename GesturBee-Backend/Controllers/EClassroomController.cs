@@ -72,11 +72,35 @@ namespace GesturBee_Backend.Controllers
             int studentId = (int)request.StudentId;
             int classId = (int)request.ClassId;
 
-            ApiResponseDTO<object> response = await _eClassroomService.InviteStudentToClass(studentId, classId);\
+            ApiResponseDTO<object> response = await _eClassroomService.InviteStudentToClass(studentId, classId);
 
             if (!response.Success)
             {
                 if(response.ResponseType == ResponseType.StudentAlreadyInvited)
+                {
+                    return Conflict(response);
+                }
+                else
+                {
+                    return NotFound(response);
+                }
+            }
+
+            return StatusCode(StatusCodes.Status201Created, response);
+        }
+
+        public async Task<IActionResult> CreateClass([FromBody] CreateClassDTO info)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
+            ApiResponseDTO<object> response = await _eClassroomService.CreateClass(info);
+
+            if(!response.Success)
+            {
+                if(response.ResponseType == ResponseType.ClassNameAlreadyTaken)
                 {
                     return Conflict(response);
                 }
