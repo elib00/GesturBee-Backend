@@ -29,7 +29,7 @@ namespace GesturBee_Backend.Repository
             userProfileFromDb.BirthDate = profile.BirthDate;
 
             await _backendDbContext.SaveChangesAsync();
-
+                    
             return new UserProfileDTO
             {
                 FirstName = userProfileFromDb.FirstName,
