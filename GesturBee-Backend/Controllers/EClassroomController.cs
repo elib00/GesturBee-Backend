@@ -56,7 +56,7 @@ namespace GesturBee_Backend.Controllers
         }
 
         [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
-        [HttpPost("add-student/")]
+        [HttpPost("class/add-student/")]
 
         public async Task<IActionResult> AddStudentToClass([FromBody] StudentAndClassDTO request)
         {
@@ -75,11 +75,11 @@ namespace GesturBee_Backend.Controllers
                 return NotFound(response);
             }
 
-            return StatusCode(StatusCodes.Status201Created, response);
+            return StatusCode(StatusCodes.Status204NoContent, response);
         }
 
         [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
-        [HttpPost("invite-student/")]
+        [HttpPost("class/invite-student/")]
         public async Task<IActionResult> InviteStudentToClass([FromBody] StudentAndClassDTO request)
         {
             if (!ModelState.IsValid)
@@ -105,7 +105,7 @@ namespace GesturBee_Backend.Controllers
         }
 
         [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
-        [HttpPost("create-class/")]
+        [HttpPost("class/create-class/")]
         public async Task<IActionResult> CreateClass([FromBody] CreateClassDTO info)
         {
             if (!ModelState.IsValid)
@@ -131,7 +131,7 @@ namespace GesturBee_Backend.Controllers
         }
 
         [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
-        [HttpPost("request-enrollment/")]
+        [HttpPost("class/request-enrollment/")]
         public async Task<IActionResult> RequestClassEnrollment([FromBody] StudentAndClassDTO info)
         {
             if (!ModelState.IsValid)
@@ -157,7 +157,7 @@ namespace GesturBee_Backend.Controllers
         }
 
         [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
-        [HttpPost("process-enrollment/")]
+        [HttpPost("class/process-enrollment/")]
         public async Task<IActionResult> ProcessEnrollmentRequest([FromBody] ClassAdmissionDTO classAdmissionDetails)
         {
             if (!ModelState.IsValid)
@@ -176,7 +176,7 @@ namespace GesturBee_Backend.Controllers
         }
 
         [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
-        [HttpPost("process-invitation/")]
+        [HttpPost("class/process-invitation/")]
         public async Task<IActionResult> ProcessInvitationRequest([FromBody] ClassAdmissionDTO classAdmissionDetails, [FromRoute])
         {   
             if (!ModelState.IsValid)
@@ -194,7 +194,20 @@ namespace GesturBee_Backend.Controllers
             return StatusCode(StatusCodes.Status204NoContent, response);
         }
 
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+        [HttpPost("teacher/{teacherId}/class-enrollments")]
+        public async Task<IActionResult> GetTeacherClassEnrollmentRequests([FromRoute] int teacherId)
+        {
+            ApiResponseDTO<List<ClassEnrollmentGroupDTO>> response = await _eClassroomService.GetTeacherClassEnrollmentRequests(teacherId);
+            return Ok(response);
+        }
 
-
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+        [HttpPost("student/{studentId}/class-invitations")]
+        public async Task<IActionResult> GetStudentClassInvitationRequests([FromRoute] int studentId)
+        {
+            ApiResponseDTO<List<ClassInvitationGroupDTO>> response = await _eClassroomService.GetStudentClassInvitationRequests(studentId);
+            return Ok(response);
+        }
     }
 }
