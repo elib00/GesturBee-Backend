@@ -42,6 +42,7 @@
         EnrollmentRejectionSuccessful,
         InvitationAcceptanceSuccessful,
         InvitationRejectionSuccessful,
+        StudentRemovalSuccessful,
         NoNullValues,
     }
 }

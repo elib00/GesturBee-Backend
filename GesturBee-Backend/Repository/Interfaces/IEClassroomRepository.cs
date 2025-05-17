@@ -27,5 +27,7 @@ namespace GesturBee_Backend.Repository.Interfaces
         Task<ClassInvitation> GetClassInvitation(int studentId, int classId);
         Task<List<ClassEnrollmentGroupDTO>> GetTeacherClassEnrollmentRequests(int teacherId);
         Task<List<ClassInvitationGroupDTO>> GetStudentClassInvitationRequests(int studentId);
+        Task RemoveStudentClass(StudentClass studentClass);
+        Task<StudentClass> GetStudentClass(int studentId, int classId);
     }
 }
