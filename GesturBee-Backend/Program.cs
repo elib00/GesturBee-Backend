@@ -42,6 +42,9 @@ builder.Services.AddHttpClient();
 // Add dependencies
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IAuthRepository, AuthRepository>();
+builder.Services.AddScoped<IEClassroomService, EClassroomService>();
+builder.Services.AddScoped<IEClassroomRepository, EClassroomRepository>();
+builder.Services.AddScoped<IRoadmapRepository, RoadmapRepository>();
 
 builder.Services.AddScoped<IJwtService, JwtService>();
 builder.Services.AddScoped<GoogleAuthService>();
