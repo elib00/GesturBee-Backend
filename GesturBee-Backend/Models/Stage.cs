@@ -10,8 +10,6 @@ namespace GesturBee_Backend.Models
         public int Id { get; set; }
 
         public string StageName { get; set; }
-        
         public int RequiredStars { get; set; }
-
     }
 }

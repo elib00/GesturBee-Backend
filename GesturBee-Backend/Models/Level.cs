@@ -13,6 +13,7 @@ namespace GesturBee_Backend.Models
         public int StageId { get; set; }
 
         public string LevelName { get; set; }
+        public bool IsCompleted { get; set; }
 
         [JsonIgnore]
         public Stage Stage { get; set; }

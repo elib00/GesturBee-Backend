@@ -177,7 +177,7 @@ namespace GesturBee_Backend.Controllers
 
         [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
         [HttpPost("class/process-invitation/")]
-        public async Task<IActionResult> ProcessInvitationRequest([FromBody] ClassAdmissionDTO classAdmissionDetails, [FromRoute])
+        public async Task<IActionResult> ProcessInvitationRequest([FromBody] ClassAdmissionDTO classAdmissionDetails)
         {   
             if (!ModelState.IsValid)
             {
