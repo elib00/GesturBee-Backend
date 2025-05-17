@@ -16,5 +16,7 @@ namespace GesturBee_Backend
         public DbSet<StudentClass> StudentClasses { get; set; }
         public DbSet<ClassInvitation> ClassInvitations { get; set; }
         public DbSet<EnrollmentRequest> EnrollmentRequests { get; set; }
+        public DbSet<Level> Levels { get; set; }
+        public DbSet<Exercise> Exercises { get; set; }
     }
 }
