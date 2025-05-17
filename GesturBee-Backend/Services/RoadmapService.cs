@@ -15,13 +15,13 @@ namespace GesturBee_Backend.Services
             _roadmapRepository = roadmapRepository;
         }
 
-        public async Task<ApiResponseDTO<object>> MarkLevelAsCompleted(int levelId)
+        public async Task<ApiResponseDTO> MarkLevelAsCompleted(int levelId)
         {
             Level level = await _roadmapRepository.GetLevelById(levelId);
 
             if(level == null)
             {
-                return new ApiResponseDTO<object>
+                return new ApiResponseDTO
                 {
                     Success = false,
                     ResponseType = ResponseType.LevelNotFound
@@ -30,27 +30,27 @@ namespace GesturBee_Backend.Services
 
             await _roadmapRepository.MarkLevelAsCompleted(level);
 
-            return new ApiResponseDTO<object>
+            return new ApiResponseDTO
             {
                 Success = true,
                 ResponseType = ResponseType.LevelCompleted
             };
         }
 
-        public async Task<ApiResponseDTO<object>> CreateExercise(CreateExerciseDTO info)
+        public async Task<ApiResponseDTO> CreateExercise(CreateExerciseDTO info)
         {
             await _roadmapRepository.CreateExercise(info);
-            return new ApiResponseDTO<object>
+            return new ApiResponseDTO
             {
                 Success = true,
                 ResponseType = ResponseType.ExerciseCreationSuccessful
             };
         }
 
-        public async Task<ApiResponseDTO<object>> EditExerciseItem(ExerciseItemDTO exerciseItem)
+        public async Task<ApiResponseDTO> EditExerciseItem(ExerciseItemDTO exerciseItem)
         {
             await _roadmapRepository.EditExerciseItem(exerciseItem);
-            return new ApiResponseDTO<object>
+            return new ApiResponseDTO
             {
                 Success = true,
                 ResponseType = ResponseType.ExerciseItemEditSuccessful

@@ -311,14 +311,14 @@ namespace GesturBee_Backend.Services
             return userRoles;
         }
 
-        public async Task<ApiResponseDTO<object>> ResetPassword(ResetPasswordDTO resetDetails)
+        public async Task<ApiResponseDTO> ResetPassword(ResetPasswordDTO resetDetails)
         {
             string email = resetDetails.Email;
             string newPassword = resetDetails.NewPassword;
             string confirmPassword = resetDetails.NewPassword;
 
             if (string.IsNullOrWhiteSpace(email) || string.IsNullOrWhiteSpace(newPassword) || string.IsNullOrWhiteSpace(confirmPassword))
-                return new ApiResponseDTO<object>
+                return new ApiResponseDTO
                 {
                     Success = false,
                     ResponseType = ResponseType.MissingInput,
@@ -327,7 +327,7 @@ namespace GesturBee_Backend.Services
 
             if(newPassword != confirmPassword)
             {
-                return new ApiResponseDTO<object>
+                return new ApiResponseDTO
                 {
                     Success = false,
                     ResponseType = ResponseType.ResetPasswordMismatch
@@ -340,7 +340,7 @@ namespace GesturBee_Backend.Services
 
             await _authRepository.ResetPassword(email, hashedPassword);
 
-            return new ApiResponseDTO<object>
+            return new ApiResponseDTO
             {
                 Success = true,
                 ResponseType = ResponseType.PasswordResetSuccessful
