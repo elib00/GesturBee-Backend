@@ -48,6 +48,7 @@
         //for roadmap
         LevelNotFound,
         LevelCompleted,
-        ExerciseCreationSuccessful
+        ExerciseCreationSuccessful,
+        ExerciseItemEditSuccessful
     }
 }
