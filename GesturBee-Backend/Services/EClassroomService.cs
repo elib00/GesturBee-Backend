@@ -225,6 +225,29 @@ namespace GesturBee_Backend.Services
 
         }
 
+        public async Task<ApiResponseDTO<List<ClassEnrollmentGroupDTO>>> GetTeacherClassEnrollmentRequests(int teacherId)
+        {
+            List<ClassEnrollmentGroupDTO> teacherClassEnrollmentRequests = await _eClassroomRepository.GetTeacherClassEnrollmentRequests(teacherId);
+
+            return new ApiResponseDTO<List<ClassEnrollmentGroupDTO>>
+            {
+                Success = true,
+                ResponseType = ResponseType.SuccessfulRetrievalOfResource,
+                Data = teacherClassEnrollmentRequests
+            };
+        }
+
+        public async Task<ApiResponseDTO<List<ClassInvitationGroupDTO>>> GetStudentClassInvitationRequests(int studentId)
+        {
+            List<ClassInvitationGroupDTO> studentClassInvitationRequests = await _eClassroomRepository.GetStudentClassInvitationRequests(studentId);
+            return new ApiResponseDTO<List<ClassInvitationGroupDTO>>
+            {
+                Success = true,
+                ResponseType = ResponseType.SuccessfulRetrievalOfResource,
+                Data = studentClassInvitationRequests
+            };
+        }
+
         private async Task<ApiResponseDTO<object>> CheckStudentAndClassIfNull(int studentId, int classId)
         {
 

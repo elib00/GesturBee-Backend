@@ -50,9 +50,9 @@ namespace GesturBee_Backend.Repository
             return await _backendDbContext.Classes
                 .AsNoTracking()
                 .Where(c => c.TeacherId == teacherId)
-                .Include(c => c.Teacher)
-                    .ThenInclude(teacher => teacher.User)
-                        .ThenInclude(user => user.Profile)
+                //.Include(c => c.Teacher)
+                //    .ThenInclude(teacher => teacher.User)
+                //        .ThenInclude(user => user.Profile)
                 .ToListAsync();
         }
 
@@ -199,6 +199,49 @@ namespace GesturBee_Backend.Repository
         {
             return await _backendDbContext.ClassInvitations
                .FirstOrDefaultAsync(enrollmentRequest => enrollmentRequest.StudentId == studentId && enrollmentRequest.ClassId == classId);
+        }
+
+        public async Task<List<ClassEnrollmentGroupDTO>> GetTeacherClassEnrollmentRequests(int teacherId)
+        {
+            return await _backendDbContext.EnrollmentRequests
+                .Include(er => er.Student) //eager load
+                    .ThenInclude(s => s.User) 
+                        .ThenInclude(u => u.Profile)
+               .Where(er => er.Class.TeacherId == teacherId)
+               .GroupBy(er => new { er.ClassId, er.Class.ClassName })
+               .Select(g => new ClassEnrollmentGroupDTO
+               {
+                   ClassId = g.Key.ClassId,
+                   ClassName = g.Key.ClassName,
+                   Requests = g.Select(er => new EnrollmentRequestDTO
+                   {
+                       StudentName = er.Student.User.Profile.FirstName + " " + er.Student.User.Profile.LastName,
+                       RequestedAt = er.RequestedAt
+                   }).ToList()
+               })
+               .ToListAsync();
+        }
+
+        public async Task<List<ClassInvitationGroupDTO>> GetStudentClassInvitationRequests(int studentId)
+        {
+            return await _backendDbContext.ClassInvitations
+                .Include(ci => ci.Class) //eager load
+                    .ThenInclude(cls => cls.Teacher)
+                        .ThenInclude(teacher => teacher.User)
+                            .ThenInclude(user => user.Profile)
+               .Where(ci => ci.StudentId == studentId)
+               .GroupBy(ci => new { ci.ClassId, ci.Class.ClassName })
+               .Select(g => new ClassInvitationGroupDTO
+               {
+                   ClassId = g.Key.ClassId,
+                   ClassName = g.Key.ClassName,
+                   Requests = g.Select(ci => new InvitationRequestDTO
+                   {
+                       TeacherName = ci.Class.Teacher.User.Profile.FirstName + " " + ci.Class.Teacher.User.Profile.LastName,
+                       InvitedAt = ci.InvitedAt
+                   }).ToList()
+               })
+               .ToListAsync();
         }
     }
 }

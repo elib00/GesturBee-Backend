@@ -25,5 +25,7 @@ namespace GesturBee_Backend.Repository.Interfaces
         Task RejectInvitationRequest(ClassInvitation invitation);
         Task<EnrollmentRequest> GetEnrollmentRequest(int studentId, int classId);
         Task<ClassInvitation> GetClassInvitation(int studentId, int classId);
+        Task<List<ClassEnrollmentGroupDTO>> GetTeacherClassEnrollmentRequests(int teacherId);
+        Task<List<ClassInvitationGroupDTO>> GetStudentClassInvitationRequests(int studentId);
     }
 }
