@@ -209,5 +209,24 @@ namespace GesturBee_Backend.Controllers
             ApiResponseDTO<List<ClassInvitationGroupDTO>> response = await _eClassroomService.GetStudentClassInvitationRequests(studentId);
             return Ok(response);
         }
+
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+        [HttpPost("class/remove-student")]
+        public async Task<IActionResult> RemoveStudentFromClass([FromBody] StudentAndClassDTO info)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
+            ApiResponseDTO<object> response = await _eClassroomService.RemoveStudentFromClass(info);
+
+            if (!response.Success)
+            {
+                return NotFound(info.StudentId);
+            }
+
+            return StatusCode(StatusCodes.Status204NoContent, response);
+        }
     }
 }

@@ -248,6 +248,24 @@ namespace GesturBee_Backend.Services
             };
         }
 
+        public async Task<ApiResponseDTO<object>> RemoveStudentFromClass(StudentAndClassDTO info)
+        {
+            int studentId = (int)info.StudentId;
+            int classId = (int)info.ClassId;
+
+            ApiResponseDTO<object> checkStudentAndClass = await CheckStudentAndClassIfNull(studentId, classId);
+            if (!checkStudentAndClass.Success) return checkStudentAndClass;
+
+            StudentClass studentClassToRemove = await _eClassroomRepository.GetStudentClass(studentId, classId);
+            
+            await _eClassroomRepository.RemoveStudentClass(studentClassToRemove);
+            return new ApiResponseDTO<object>
+            {
+                Success = true,
+                ResponseType = ResponseType.StudentRemovalSuccessful
+            };
+        }
+
         private async Task<ApiResponseDTO<object>> CheckStudentAndClassIfNull(int studentId, int classId)
         {
 

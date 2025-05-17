@@ -32,6 +32,13 @@ namespace GesturBee_Backend.Repository
             return await _backendDbContext.Teachers.FindAsync(teacherId);
         }
 
+        public async Task<StudentClass> GetStudentClass(int studentId, int classId)
+        {
+            return await _backendDbContext.StudentClasses
+                .FirstOrDefaultAsync(studentClass => studentClass.StudentId == studentId && studentClass.ClassId == classId);
+
+        }
+
         public async Task<List<Class>> GetStudentClasses(int studentId)
         {
             return await _backendDbContext.StudentClasses
@@ -243,5 +250,13 @@ namespace GesturBee_Backend.Repository
                })
                .ToListAsync();
         }
+
+        public async Task RemoveStudentClass(StudentClass studentClass)
+        {
+            _backendDbContext.StudentClasses.Remove(studentClass);
+            await _backendDbContext.SaveChangesAsync();
+        }
+        
+
     }
 }
