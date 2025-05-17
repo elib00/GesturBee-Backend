@@ -6,5 +6,6 @@ namespace GesturBee_Backend.Services.Interfaces
     {
         Task<ApiResponseDTO<object>> MarkLevelAsCompleted(int levelId);
         Task<ApiResponseDTO<object>> CreateExercise(CreateExerciseDTO info);
+        Task<ApiResponseDTO<object>> EditExerciseItem(ExerciseItemDTO exerciseItem);
     }
 }
