@@ -44,5 +44,10 @@
         InvitationRejectionSuccessful,
         StudentRemovalSuccessful,
         NoNullValues,
+
+        //for roadmap
+        LevelNotFound,
+        LevelCompleted,
+        ExerciseCreationSuccessful
     }
 }
