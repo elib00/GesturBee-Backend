@@ -30,6 +30,13 @@ namespace GesturBee_Backend.Controllers
             _emailService = emailService;
         }
 
+        [HttpGet("health/")]
+        public async Task<IActionResult> CheckHealth()
+        {
+            return Ok();
+        }
+
+
         [AllowAnonymous]
         [HttpPost("register/")]
         public async Task<IActionResult> RegisterUser([FromBody] UserRegistrationDTO user)
