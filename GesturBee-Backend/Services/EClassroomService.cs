@@ -48,10 +48,10 @@ namespace GesturBee_Backend.Services
             };
         }
 
-        public async Task<ApiResponseDTO<List<Student>>> GetClassStudents(int classId)
+        public async Task<ApiResponseDTO<List<User>>> GetClassStudents(int classId)
         {
-            List<Student> students = await _eClassroomRepository.GetClassStudents(classId);
-            return new ApiResponseDTO<List<Student>>
+            List<User> students = await _eClassroomRepository.GetClassStudents(classId);
+            return new ApiResponseDTO<List<User>>
             {
                 Success = true,
                 ResponseType = ResponseType.SuccessfulRetrievalOfResource,
@@ -269,7 +269,7 @@ namespace GesturBee_Backend.Services
         private async Task<ApiResponseDTO> CheckStudentAndClassIfNull(int studentId, int classId)
         {
 
-            Student student = await _eClassroomRepository.GetStudentById(studentId);
+            User student = await _eClassroomRepository.GetStudentById(studentId);
 
             if (student == null)
             {

@@ -22,9 +22,9 @@ namespace GesturBee_Backend.Repository
             return await _backendDbContext.Classes.FindAsync(classId);
         }
 
-        public async Task<Student> GetStudentById(int studentId)
+        public async Task<User> GetStudentById(int studentId)
         {
-            return await _backendDbContext.Students.FindAsync(studentId);
+            return await _backendDbContext.Users.FindAsync(studentId);
         }
 
         public async Task<Teacher> GetTeacherById(int teacherId)
@@ -46,9 +46,8 @@ namespace GesturBee_Backend.Repository
                 .Where(studentClass => studentClass.StudentId == studentId)
                 .Include(studentClass => studentClass.Class)
                     .ThenInclude(cls => cls.Teacher)
-                        .ThenInclude(teacher => teacher.User)
-                            .ThenInclude(user => user.Account)
-                .Select(studentClass => studentClass.Class)  // Extract just the Class
+                        .ThenInclude(teacher => teacher.Profile)
+                .Select(studentClass => studentClass.Class) //project just the class
                 .ToListAsync();
         }
 
@@ -57,20 +56,16 @@ namespace GesturBee_Backend.Repository
             return await _backendDbContext.Classes
                 .AsNoTracking()
                 .Where(c => c.TeacherId == teacherId)
-                //.Include(c => c.Teacher)
-                //    .ThenInclude(teacher => teacher.User)
-                //        .ThenInclude(user => user.Profile)
                 .ToListAsync();
         }
 
-        public async Task<List<Student>> GetClassStudents(int classId)
+        public async Task<List<User>> GetClassStudents(int classId)
         {
             return await _backendDbContext.StudentClasses
                 .AsNoTracking()
                 .Where(studentClass => studentClass.ClassId == classId)
                 .Include(studentClass => studentClass.Student)
-                    .ThenInclude(student => student.User)
-                        .ThenInclude(user => user.Profile)
+                    .ThenInclude(user => user.Profile)
                 .Select(studentClass => studentClass.Student)
                 .ToListAsync();
         }
@@ -156,7 +151,7 @@ namespace GesturBee_Backend.Repository
 
         public async Task AcceptEnrollmentRequest(EnrollmentRequest enrollmentRequest)
         {
-            Student student = enrollmentRequest.Student;
+            User student = enrollmentRequest.Student;
             Class cls = enrollmentRequest.Class;
 
             //add the student to the class
@@ -177,7 +172,7 @@ namespace GesturBee_Backend.Repository
 
         public async Task AcceptInvitationRequest(ClassInvitation invitation)
         {
-            Student student = invitation.Student;
+            User student = invitation.Student;
             Class cls = invitation.Class;
 
             //add the student to the class
@@ -212,7 +207,6 @@ namespace GesturBee_Backend.Repository
         {
             return await _backendDbContext.EnrollmentRequests
                 .Include(er => er.Student) //eager load
-                    .ThenInclude(s => s.User) 
                         .ThenInclude(u => u.Profile)
                .Where(er => er.Class.TeacherId == teacherId)
                .GroupBy(er => new { er.ClassId, er.Class.ClassName })
@@ -222,7 +216,7 @@ namespace GesturBee_Backend.Repository
                    ClassName = g.Key.ClassName,
                    Requests = g.Select(er => new EnrollmentRequestDTO
                    {
-                       StudentName = er.Student.User.Profile.FirstName + " " + er.Student.User.Profile.LastName,
+                       StudentName = er.Student.Profile.FirstName + " " + er.Student.Profile.LastName,
                        RequestedAt = er.RequestedAt
                    }).ToList()
                })
@@ -234,8 +228,7 @@ namespace GesturBee_Backend.Repository
             return await _backendDbContext.ClassInvitations
                 .Include(ci => ci.Class) //eager load
                     .ThenInclude(cls => cls.Teacher)
-                        .ThenInclude(teacher => teacher.User)
-                            .ThenInclude(user => user.Profile)
+                        .ThenInclude(user => user.Profile)
                .Where(ci => ci.StudentId == studentId)
                .GroupBy(ci => new { ci.ClassId, ci.Class.ClassName })
                .Select(g => new ClassInvitationGroupDTO
@@ -244,7 +237,7 @@ namespace GesturBee_Backend.Repository
                    ClassName = g.Key.ClassName,
                    Requests = g.Select(ci => new InvitationRequestDTO
                    {
-                       TeacherName = ci.Class.Teacher.User.Profile.FirstName + " " + ci.Class.Teacher.User.Profile.LastName,
+                       TeacherName = ci.Class.Teacher.Profile.FirstName + " " + ci.Class.Teacher.Profile.LastName,
                        InvitedAt = ci.InvitedAt
                    }).ToList()
                })

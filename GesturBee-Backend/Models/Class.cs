@@ -23,10 +23,16 @@ namespace GesturBee_Backend.Models
 
 
         //[JsonIgnore]
-        public Teacher? Teacher { get; set; }
+        public User? Teacher { get; set; }
+
+        [JsonIgnore]
 
         public ICollection<ClassInvitation> ClassInvitations { get; set; }
+
+        [JsonIgnore]
         public ICollection<EnrollmentRequest> EnrollmentRequests { get; set; }
+
+        [JsonIgnore]
         public ICollection<StudentClass> StudentClasses { get; set; }
     }
 }

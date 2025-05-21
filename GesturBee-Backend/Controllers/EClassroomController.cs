@@ -51,7 +51,7 @@ namespace GesturBee_Backend.Controllers
         [HttpGet("class/{classId}/students/")]
         public async Task<IActionResult> GetClassStudents([FromRoute] int classId)
         {
-            ApiResponseDTO<List<Student>> response = await _eClassroomService.GetClassStudents(classId);
+            ApiResponseDTO<List<User>> response = await _eClassroomService.GetClassStudents(classId);
             return Ok(response);
         }
 

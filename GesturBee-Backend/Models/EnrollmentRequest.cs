@@ -16,7 +16,7 @@ namespace GesturBee_Backend.Models
         public int ClassId { get; set; }
 
         //nav prop
-        public Student Student { get; set; }
+        public User Student { get; set; }
         public Class Class { get; set; }
     }
 }
