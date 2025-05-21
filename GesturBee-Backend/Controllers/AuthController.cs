@@ -33,7 +33,10 @@ namespace GesturBee_Backend.Controllers
         [HttpGet("health/")]
         public async Task<IActionResult> CheckHealth()
         {
-            return Ok();
+            return Ok(new
+            {
+                Message = "Connected"
+            });
         }
 
 
