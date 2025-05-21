@@ -10,8 +10,6 @@ namespace GesturBee_Backend
         public DbSet<User> Users { get; set; }
         public DbSet<UserAccount> UserAccounts { get; set; }
         public DbSet<UserProfile> UserProfiles { get; set; }
-        public DbSet<Student> Students { get; set; }
-        public DbSet<Teacher> Teachers { get; set; }
         public DbSet<Class> Classes { get; set; }
         public DbSet<StudentClass> StudentClasses { get; set; }
         public DbSet<ClassInvitation> ClassInvitations { get; set; }
@@ -23,51 +21,6 @@ namespace GesturBee_Backend
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
-
-            modelBuilder.Entity<ClassInvitation>(classInvitation =>
-            {
-                classInvitation.HasKey(ci => ci.Id);
-
-                classInvitation.HasOne(ci => ci.Class)
-                    .WithMany(c => c.ClassInvitations)
-                    .HasForeignKey(ci => ci.ClassId)
-                    .OnDelete(DeleteBehavior.Restrict);  // keep this if it's safe to cascade on Class deletion
-
-                classInvitation.HasOne(ci => ci.Student)
-                    .WithMany(s => s.ClassInvitations)
-                    .HasForeignKey(ci => ci.StudentId)
-                    .OnDelete(DeleteBehavior.Restrict); // prevents cascade path conflict
-            });
-
-            modelBuilder.Entity<EnrollmentRequest>(enrollmentRequest =>
-            {
-                enrollmentRequest.HasKey(er => er.Id);
-
-                enrollmentRequest.HasOne(er => er.Class)
-                    .WithMany(c => c.EnrollmentRequests)
-                    .HasForeignKey(ci => ci.ClassId)
-                    .OnDelete(DeleteBehavior.Restrict);
-
-                enrollmentRequest.HasOne(ci => ci.Student)
-                    .WithMany(s => s.EnrollmentRequests)
-                    .HasForeignKey(ci => ci.StudentId)
-                    .OnDelete(DeleteBehavior.Restrict);
-            });
-
-            modelBuilder.Entity<StudentClass>(studentClass =>
-            {
-                studentClass.HasKey(sc => sc.Id);
-
-                studentClass.HasOne(sc => sc.Class)
-                    .WithMany(c => c.StudentClasses)
-                    .HasForeignKey(sc => sc.ClassId)
-                    .OnDelete(DeleteBehavior.Restrict);
-
-                studentClass.HasOne(sc => sc.Student)
-                    .WithMany(s => s.StudentClasses)
-                    .HasForeignKey(sc => sc.StudentId)
-                    .OnDelete(DeleteBehavior.Restrict);
-            });
         }
 
 
