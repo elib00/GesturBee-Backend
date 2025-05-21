@@ -18,7 +18,7 @@ namespace GesturBee_Backend.Models
         public int Score { get; set; }
 
         [JsonIgnore]
-        public Student Student { get; set; }
+        public User Student { get; set; }
 
         [JsonIgnore]
         public Exercise Exercise { get; set; }

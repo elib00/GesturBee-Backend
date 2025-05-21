@@ -108,7 +108,7 @@ namespace GesturBee_Backend.Services
         public async Task<ApiResponseDTO> CreateClass(CreateClassDTO info)
         {
             int teacherId = info.TeacherId;
-            Teacher teacher = await _eClassroomRepository.GetTeacherById(teacherId);
+            User teacher = await _eClassroomRepository.GetUserById(teacherId);
 
             if (teacher == null)
             {
@@ -266,10 +266,11 @@ namespace GesturBee_Backend.Services
             };
         }
 
+        //TODO: replace by CheckIfUserExists
         private async Task<ApiResponseDTO> CheckStudentAndClassIfNull(int studentId, int classId)
         {
 
-            User student = await _eClassroomRepository.GetStudentById(studentId);
+            User student = await _eClassroomRepository.GetUserById(studentId);
 
             if (student == null)
             {

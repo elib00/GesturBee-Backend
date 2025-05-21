@@ -60,38 +60,45 @@ namespace GesturBee_Backend.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "Students",
+                name: "Classes",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    UserId = table.Column<int>(type: "int", nullable: false)
+                    ClassName = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    ClassDescription = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    ClassCode = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    TeacherId = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Students", x => x.Id);
+                    table.PrimaryKey("PK_Classes", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_Students_Users_UserId",
-                        column: x => x.UserId,
+                        name: "FK_Classes_Users_TeacherId",
+                        column: x => x.TeacherId,
                         principalTable: "Users",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
-                name: "Teachers",
+                name: "Exercises",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    UserId = table.Column<int>(type: "int", nullable: false)
+                    TeacherId = table.Column<int>(type: "int", nullable: false),
+                    ExerciseTitle = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    ExerciseDescription = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Teachers", x => x.Id);
+                    table.PrimaryKey("PK_Exercises", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_Teachers_Users_UserId",
-                        column: x => x.UserId,
+                        name: "FK_Exercises_Users_TeacherId",
+                        column: x => x.TeacherId,
                         principalTable: "Users",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
@@ -143,51 +150,6 @@ namespace GesturBee_Backend.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "Classes",
-                columns: table => new
-                {
-                    Id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    ClassName = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    ClassDescription = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    ClassCode = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    TeacherId = table.Column<int>(type: "int", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Classes", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_Classes_Teachers_TeacherId",
-                        column: x => x.TeacherId,
-                        principalTable: "Teachers",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "Exercises",
-                columns: table => new
-                {
-                    Id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    TeacherId = table.Column<int>(type: "int", nullable: false),
-                    ExerciseTitle = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    ExerciseDescription = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Exercises", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_Exercises_Teachers_TeacherId",
-                        column: x => x.TeacherId,
-                        principalTable: "Teachers",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                });
-
-            migrationBuilder.CreateTable(
                 name: "ClassInvitations",
                 columns: table => new
                 {
@@ -207,9 +169,9 @@ namespace GesturBee_Backend.Migrations
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
-                        name: "FK_ClassInvitations_Students_StudentId",
+                        name: "FK_ClassInvitations_Users_StudentId",
                         column: x => x.StudentId,
-                        principalTable: "Students",
+                        principalTable: "Users",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
                 });
@@ -234,9 +196,9 @@ namespace GesturBee_Backend.Migrations
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
-                        name: "FK_EnrollmentRequests_Students_StudentId",
+                        name: "FK_EnrollmentRequests_Users_StudentId",
                         column: x => x.StudentId,
-                        principalTable: "Students",
+                        principalTable: "Users",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
                 });
@@ -260,9 +222,9 @@ namespace GesturBee_Backend.Migrations
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
-                        name: "FK_StudentClasses_Students_StudentId",
+                        name: "FK_StudentClasses_Users_StudentId",
                         column: x => x.StudentId,
-                        principalTable: "Students",
+                        principalTable: "Users",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
                 });
@@ -365,16 +327,6 @@ namespace GesturBee_Backend.Migrations
                 column: "StudentId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Students_UserId",
-                table: "Students",
-                column: "UserId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Teachers_UserId",
-                table: "Teachers",
-                column: "UserId");
-
-            migrationBuilder.CreateIndex(
                 name: "IX_UserAccounts_UserId",
                 table: "UserAccounts",
                 column: "UserId",
@@ -424,16 +376,10 @@ namespace GesturBee_Backend.Migrations
                 name: "Classes");
 
             migrationBuilder.DropTable(
-                name: "Students");
-
-            migrationBuilder.DropTable(
                 name: "ExerciseItems");
 
             migrationBuilder.DropTable(
                 name: "Exercises");
-
-            migrationBuilder.DropTable(
-                name: "Teachers");
 
             migrationBuilder.DropTable(
                 name: "Users");

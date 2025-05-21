@@ -223,24 +223,6 @@ namespace GesturBee_Backend.Migrations
                     b.ToTable("Stage");
                 });
 
-            modelBuilder.Entity("GesturBee_Backend.Models.Student", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<int>("UserId")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("UserId");
-
-                    b.ToTable("Students");
-                });
-
             modelBuilder.Entity("GesturBee_Backend.Models.StudentClass", b =>
                 {
                     b.Property<int>("Id")
@@ -262,24 +244,6 @@ namespace GesturBee_Backend.Migrations
                     b.HasIndex("StudentId");
 
                     b.ToTable("StudentClasses");
-                });
-
-            modelBuilder.Entity("GesturBee_Backend.Models.Teacher", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<int>("UserId")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("UserId");
-
-                    b.ToTable("Teachers");
                 });
 
             modelBuilder.Entity("GesturBee_Backend.Models.User", b =>
@@ -387,8 +351,8 @@ namespace GesturBee_Backend.Migrations
 
             modelBuilder.Entity("GesturBee_Backend.Models.Class", b =>
                 {
-                    b.HasOne("GesturBee_Backend.Models.Teacher", "Teacher")
-                        .WithMany("Classes")
+                    b.HasOne("GesturBee_Backend.Models.User", "Teacher")
+                        .WithMany("TaughtClasses")
                         .HasForeignKey("TeacherId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -404,7 +368,7 @@ namespace GesturBee_Backend.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("GesturBee_Backend.Models.Student", "Student")
+                    b.HasOne("GesturBee_Backend.Models.User", "Student")
                         .WithMany("ClassInvitations")
                         .HasForeignKey("StudentId")
                         .OnDelete(DeleteBehavior.Restrict)
@@ -423,7 +387,7 @@ namespace GesturBee_Backend.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("GesturBee_Backend.Models.Student", "Student")
+                    b.HasOne("GesturBee_Backend.Models.User", "Student")
                         .WithMany("EnrollmentRequests")
                         .HasForeignKey("StudentId")
                         .OnDelete(DeleteBehavior.Restrict)
@@ -436,7 +400,7 @@ namespace GesturBee_Backend.Migrations
 
             modelBuilder.Entity("GesturBee_Backend.Models.Exercise", b =>
                 {
-                    b.HasOne("GesturBee_Backend.Models.Teacher", "Teacher")
+                    b.HasOne("GesturBee_Backend.Models.User", "Teacher")
                         .WithMany()
                         .HasForeignKey("TeacherId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -467,17 +431,6 @@ namespace GesturBee_Backend.Migrations
                     b.Navigation("Stage");
                 });
 
-            modelBuilder.Entity("GesturBee_Backend.Models.Student", b =>
-                {
-                    b.HasOne("GesturBee_Backend.Models.User", "User")
-                        .WithMany()
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("User");
-                });
-
             modelBuilder.Entity("GesturBee_Backend.Models.StudentClass", b =>
                 {
                     b.HasOne("GesturBee_Backend.Models.Class", "Class")
@@ -486,7 +439,7 @@ namespace GesturBee_Backend.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("GesturBee_Backend.Models.Student", "Student")
+                    b.HasOne("GesturBee_Backend.Models.User", "Student")
                         .WithMany("StudentClasses")
                         .HasForeignKey("StudentId")
                         .OnDelete(DeleteBehavior.Restrict)
@@ -495,17 +448,6 @@ namespace GesturBee_Backend.Migrations
                     b.Navigation("Class");
 
                     b.Navigation("Student");
-                });
-
-            modelBuilder.Entity("GesturBee_Backend.Models.Teacher", b =>
-                {
-                    b.HasOne("GesturBee_Backend.Models.User", "User")
-                        .WithMany()
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("GesturBee_Backend.Models.UserAccount", b =>
@@ -561,27 +503,21 @@ namespace GesturBee_Backend.Migrations
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("GesturBee_Backend.Models.Student", b =>
-                {
-                    b.Navigation("ClassInvitations");
-
-                    b.Navigation("EnrollmentRequests");
-
-                    b.Navigation("StudentClasses");
-                });
-
-            modelBuilder.Entity("GesturBee_Backend.Models.Teacher", b =>
-                {
-                    b.Navigation("Classes");
-                });
-
             modelBuilder.Entity("GesturBee_Backend.Models.User", b =>
                 {
                     b.Navigation("Account")
                         .IsRequired();
 
+                    b.Navigation("ClassInvitations");
+
+                    b.Navigation("EnrollmentRequests");
+
                     b.Navigation("Profile")
                         .IsRequired();
+
+                    b.Navigation("StudentClasses");
+
+                    b.Navigation("TaughtClasses");
                 });
 #pragma warning restore 612, 618
         }

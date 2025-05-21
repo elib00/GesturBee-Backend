@@ -8,14 +8,13 @@ namespace GesturBee_Backend.Repository.Interfaces
     {
         Task<List<Class>> GetStudentClasses(int  studentId);
         Task<Class> GetClassById(int classId);
-        Task<User> GetStudentById(int studentId);
+        Task<User> GetUserById(int studentId);
         Task<List<Class>> GetTeacherClasses(int teacherId);
         Task<List<User>> GetClassStudents(int classId);
         Task AddStudentToClass(int studentId, int classId);
         Task InviteStudentToClass(int studentId, int classId);
         Task<bool> StudentAlreadyInvited(int studentId, int classId);
         Task CreateClass(CreateClassDTO info);
-        Task<Teacher> GetTeacherById(int teacherId);
         Task<bool> ClassNameAlreadyTaken(string className);
         Task RequestClassEnrollment(int studentId, int classId);
         Task<bool> RequestForClassEnrollmentAlreadySent(int studentId, int classId);

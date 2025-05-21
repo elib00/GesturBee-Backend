@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Text.Json.Serialization;
 
 namespace GesturBee_Backend.Models
 {
@@ -18,5 +19,13 @@ namespace GesturBee_Backend.Models
         public required UserProfile Profile { get; set; }
 
         public DateTime? LastLogin { get; set; }
+
+        [JsonIgnore]
+        public ICollection<Class> TaughtClasses { get; set; } = new List<Class>();
+        [JsonIgnore]
+        public ICollection<ClassInvitation> ClassInvitations { get; set; } = new List<ClassInvitation>();
+        public ICollection<EnrollmentRequest> EnrollmentRequests { get; set; } = new List<EnrollmentRequest>();
+        public ICollection<StudentClass> StudentClasses { get; set; } = new List<StudentClass>();
+
     }
 }

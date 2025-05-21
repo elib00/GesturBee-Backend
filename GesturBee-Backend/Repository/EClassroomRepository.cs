@@ -22,14 +22,9 @@ namespace GesturBee_Backend.Repository
             return await _backendDbContext.Classes.FindAsync(classId);
         }
 
-        public async Task<User> GetStudentById(int studentId)
+        public async Task<User> GetUserById(int studentId)
         {
             return await _backendDbContext.Users.FindAsync(studentId);
-        }
-
-        public async Task<Teacher> GetTeacherById(int teacherId)
-        {
-            return await _backendDbContext.Teachers.FindAsync(teacherId);
         }
 
         public async Task<StudentClass> GetStudentClass(int studentId, int classId)
@@ -53,11 +48,15 @@ namespace GesturBee_Backend.Repository
 
         public async Task<List<Class>> GetTeacherClasses(int teacherId)
         {
-            return await _backendDbContext.Classes
-                .AsNoTracking()
-                .Where(c => c.TeacherId == teacherId)
-                .ToListAsync();
+            //return await _backendDbContext.Classes
+            //    .AsNoTracking()
+            //    .Where(c => c.TeacherId == teacherId)
+            //    .ToListAsync();
+
+            User user = await _backendDbContext.Users.FindAsync(teacherId);
+            return user.TaughtClasses.ToList();
         }
+
 
         public async Task<List<User>> GetClassStudents(int classId)
         {
