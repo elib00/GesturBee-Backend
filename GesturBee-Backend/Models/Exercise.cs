@@ -18,7 +18,7 @@ namespace GesturBee_Backend.Models
         public DateTime CreatedAt { get; set; }
 
         [JsonIgnore]
-        public Teacher? Teacher { get; set; }
+        public User? Teacher { get; set; }
         public List<ExerciseItem> ExerciseItems { get; set; } = new List<ExerciseItem>();
     }
 }

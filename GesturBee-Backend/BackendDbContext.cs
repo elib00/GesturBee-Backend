@@ -10,8 +10,6 @@ namespace GesturBee_Backend
         public DbSet<User> Users { get; set; }
         public DbSet<UserAccount> UserAccounts { get; set; }
         public DbSet<UserProfile> UserProfiles { get; set; }
-        public DbSet<Student> Students { get; set; }
-        public DbSet<Teacher> Teachers { get; set; }
         public DbSet<Class> Classes { get; set; }
         public DbSet<StudentClass> StudentClasses { get; set; }
         public DbSet<ClassInvitation> ClassInvitations { get; set; }
@@ -23,6 +21,11 @@ namespace GesturBee_Backend
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
+
+            modelBuilder.Entity<Class>()
+                .HasOne(c => c.Teacher)
+                .WithMany(u => u.TaughtClasses)
+                .HasForeignKey(c => c.TeacherId);
 
             modelBuilder.Entity<ClassInvitation>(classInvitation =>
             {

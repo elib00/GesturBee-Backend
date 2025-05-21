@@ -17,16 +17,20 @@ namespace GesturBee_Backend.Models
 
         public DateTime CreatedAt { get; set; }
 
-
         [ForeignKey("TeacherId")]
         public int TeacherId { get; set; }
 
-
         //[JsonIgnore]
-        public Teacher? Teacher { get; set; }
+        public User? Teacher { get; set; } = null!;
+
+        [JsonIgnore]
 
         public ICollection<ClassInvitation> ClassInvitations { get; set; }
+
+        [JsonIgnore]
         public ICollection<EnrollmentRequest> EnrollmentRequests { get; set; }
+
+        [JsonIgnore]
         public ICollection<StudentClass> StudentClasses { get; set; }
     }
 }
