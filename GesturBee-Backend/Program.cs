@@ -9,8 +9,6 @@ using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.Google;
 using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using System.Text.Json.Serialization;
@@ -42,6 +40,9 @@ builder.Services.AddHttpClient();
 // Add dependencies
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IAuthRepository, AuthRepository>();
+builder.Services.AddScoped<IEClassroomService, EClassroomService>();
+builder.Services.AddScoped<IEClassroomRepository, EClassroomRepository>();
+builder.Services.AddScoped<IRoadmapRepository, RoadmapRepository>();
 
 builder.Services.AddScoped<IJwtService, JwtService>();
 builder.Services.AddScoped<GoogleAuthService>();
@@ -196,3 +197,4 @@ app.UseHttpsRedirection();
 app.MapControllers();
 
 app.Run();
+

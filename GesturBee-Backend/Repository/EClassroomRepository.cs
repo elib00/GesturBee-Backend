@@ -256,7 +256,5 @@ namespace GesturBee_Backend.Repository
             _backendDbContext.StudentClasses.Remove(studentClass);
             await _backendDbContext.SaveChangesAsync();
         }
-        
-
     }
 }

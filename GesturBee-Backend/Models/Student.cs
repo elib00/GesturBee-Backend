@@ -11,5 +11,9 @@ namespace GesturBee_Backend.Models
 
         //nav prop
         public User? User { get; set; }
+
+        public ICollection<ClassInvitation> ClassInvitations { get; set; }
+        public ICollection<EnrollmentRequest> EnrollmentRequests { get; set; }
+        public ICollection<StudentClass> StudentClasses { get; set; } 
     }
 }

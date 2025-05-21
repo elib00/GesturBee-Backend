@@ -30,6 +30,16 @@ namespace GesturBee_Backend.Controllers
             _emailService = emailService;
         }
 
+        [HttpGet("health/")]
+        public async Task<IActionResult> CheckHealth()
+        {
+            return Ok(new
+            {
+                Message = "Connected"
+            });
+        }
+
+
         [AllowAnonymous]
         [HttpPost("register/")]
         public async Task<IActionResult> RegisterUser([FromBody] UserRegistrationDTO user)
@@ -72,7 +82,8 @@ namespace GesturBee_Backend.Controllers
             string token = _jwtService.GenerateToken(new AuthTokenRequestDTO
             {
                 Email = response?.Data.Email,
-                Roles = response?.Data.Roles
+                Roles = response?.Data.Roles,
+                Type = "gesturbee-auth"
             });
 
             return Ok(new

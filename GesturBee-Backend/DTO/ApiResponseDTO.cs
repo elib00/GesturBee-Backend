@@ -8,4 +8,13 @@ namespace GesturBee_Backend.DTO
         public ResponseType? ResponseType { get; set; }
         public T? Data { get; set; }
     }
+
+    public class ApiResponseDTO : ApiResponseDTO<object?>
+    {
+       public ApiResponseDTO()
+        {
+            Data = null;
+        }
+    }
+
 }
