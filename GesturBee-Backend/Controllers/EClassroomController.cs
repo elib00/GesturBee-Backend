@@ -33,7 +33,6 @@ namespace GesturBee_Backend.Controllers
 
         [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
         [HttpGet("class/{classId}/")]
-
         public async Task<IActionResult> GetClassById([FromRoute] int classId)
         {
             ApiResponseDTO<Class> response = await _eClassroomService.GetClassById(classId);
@@ -76,11 +75,6 @@ namespace GesturBee_Backend.Controllers
         [HttpPost("class/create-class/")]
         public async Task<IActionResult> CreateClass([FromBody] CreateClassDTO info)
         {
-            if (!ModelState.IsValid)
-            {
-                return BadRequest(ModelState);
-            }
-
             ApiResponseDTO<object> response = await _eClassroomService.CreateClass(info);
 
             if(!response.Success)
@@ -123,11 +117,6 @@ namespace GesturBee_Backend.Controllers
         [HttpPost("class/process-enrollment/")]
         public async Task<IActionResult> ProcessEnrollmentRequest([FromBody] ClassAdmissionDTO classAdmissionDetails)
         {
-            if (!ModelState.IsValid)
-            {
-                return BadRequest(ModelState);
-            }
-
             ApiResponseDTO<object> response = await _eClassroomService.ProcessEnrollmentRequest(classAdmissionDetails);
 
             if (!response.Success)
