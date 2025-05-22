@@ -146,14 +146,14 @@ builder.Services.AddRateLimiter(options =>
                ?? "unknown",
            factory: _ => new FixedWindowRateLimiterOptions
            {
-               PermitLimit = 5,  // Allow 20 requests per user per minute per ip
+               PermitLimit = 100,  // Allow 20 requests per user per minute per ip
                Window = TimeSpan.FromMinutes(1),
                QueueLimit = 0
            }));
 
     options.AddFixedWindowLimiter("fixed", limiterOptions =>
     {
-        limiterOptions.PermitLimit = 5; // Allow 5 requests
+        limiterOptions.PermitLimit = 100; // Allow 5 requests
         limiterOptions.Window = TimeSpan.FromSeconds(10); // Every 10 seconds
         limiterOptions.QueueProcessingOrder = QueueProcessingOrder.OldestFirst;
         limiterOptions.QueueLimit = 2; // Allow 2 extra requests in queue
