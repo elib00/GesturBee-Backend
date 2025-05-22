@@ -2,7 +2,6 @@ using Amazon.Extensions.NETCore.Setup;
 using Amazon.Runtime;
 using Amazon;
 using Amazon.S3;
-using Amazon.S3;
 using GesturBee_Backend;
 using GesturBee_Backend.Repository;
 using GesturBee_Backend.Repository.Interfaces;
