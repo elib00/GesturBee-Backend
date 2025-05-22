@@ -49,6 +49,8 @@
         LevelNotFound,
         LevelCompleted,
         ExerciseCreationSuccessful,
-        ExerciseItemEditSuccessful
+        ExerciseItemEditSuccessful,
+        RoadmapProgressNotFound,
+        RoadmapProgressEditSuccessful,
     }
 }

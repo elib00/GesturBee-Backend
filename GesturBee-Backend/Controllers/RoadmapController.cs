@@ -56,5 +56,18 @@ namespace GesturBee_Backend.Controllers
             ApiResponseDTO<object> response = await _roadmapService.EditExerciseItem(exercise);
             return StatusCode(StatusCodes.Status204NoContent, response);
         }
+
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+        [HttpPatch("user/{userId}/edit-progress/")]
+        public async Task<IActionResult> EditRoadmapProgress([FromRoute] int userId, [FromBody] RoadmapProgressDTO newProgress)
+        {
+            ApiResponseDTO response = await _roadmapService.EditRoadmapProgress(userId, newProgress);
+            if (!response.Success)
+            {
+                return NotFound(response);
+            }
+
+            return StatusCode(StatusCodes.Status204NoContent, response);
+        }
     }
 }

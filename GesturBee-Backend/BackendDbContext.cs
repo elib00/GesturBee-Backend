@@ -12,11 +12,11 @@ namespace GesturBee_Backend
         public DbSet<UserProfile> UserProfiles { get; set; }
         public DbSet<Class> Classes { get; set; }
         public DbSet<StudentClass> StudentClasses { get; set; }
-        public DbSet<ClassInvitation> ClassInvitations { get; set; }
         public DbSet<EnrollmentRequest> EnrollmentRequests { get; set; }
         public DbSet<Level> Levels { get; set; }
         public DbSet<Exercise> Exercises { get; set; }
         public DbSet<ExerciseItem> ExerciseItems { get; set; }
+        public DbSet<RoadmapProgress> RoadmapProgresses { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -26,21 +26,6 @@ namespace GesturBee_Backend
                 .HasOne(c => c.Teacher)
                 .WithMany(u => u.TaughtClasses)
                 .HasForeignKey(c => c.TeacherId);
-
-            modelBuilder.Entity<ClassInvitation>(classInvitation =>
-            {
-                classInvitation.HasKey(ci => ci.Id);
-
-                classInvitation.HasOne(ci => ci.Class)
-                    .WithMany(c => c.ClassInvitations)
-                    .HasForeignKey(ci => ci.ClassId)
-                    .OnDelete(DeleteBehavior.Restrict);  // keep this if it's safe to cascade on Class deletion
-
-                classInvitation.HasOne(ci => ci.Student)
-                    .WithMany(s => s.ClassInvitations)
-                    .HasForeignKey(ci => ci.StudentId)
-                    .OnDelete(DeleteBehavior.Restrict); // prevents cascade path conflict
-            });
 
             modelBuilder.Entity<EnrollmentRequest>(enrollmentRequest =>
             {

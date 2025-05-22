@@ -169,5 +169,6 @@ namespace GesturBee_Backend.Controllers
 
             return Ok(new { Url = url });
         }
+
     }
 }

@@ -33,7 +33,16 @@ namespace GesturBee_Backend.Services
 
             //construct ang user nga object
             User newUser = ConstructUser(userDetails);
+
             await _authRepository.CreateUser(newUser);
+
+            //create a roadmap progress that defaults to stage 1 level 1
+            RoadmapProgress roadmapProgress = new RoadmapProgress
+            {
+                UserId = newUser.Id,
+            };
+
+            await _authRepository.CreateRoadmapProgress(roadmapProgress);
 
             return new ApiResponseDTO<UserDetailsDTO>
             {

@@ -9,5 +9,6 @@ namespace GesturBee_Backend.Repository.Interfaces
         Task CreateUser(User user);
         Task ResetPassword(string email, string newPassword);
         Task UpdateLastLogin(User user);
+        Task CreateRoadmapProgress(RoadmapProgress roadmapProgress);
     }
 }
