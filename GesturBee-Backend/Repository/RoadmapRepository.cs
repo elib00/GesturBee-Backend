@@ -26,7 +26,6 @@ namespace GesturBee_Backend.Repository
                 .FirstOrDefaultAsync(rp => rp.UserId == userId);
         }
 
-
         public async Task<ExerciseItem> GetExerciseItemById(int exerciseItemId)
         {
             return await _backendDbContext.ExerciseItems.FindAsync(exerciseItemId);

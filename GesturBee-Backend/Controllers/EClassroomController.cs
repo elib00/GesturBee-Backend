@@ -151,10 +151,10 @@ namespace GesturBee_Backend.Controllers
         }
 
         [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
-        [HttpGet("user/all/")]
-        public async Task<IActionResult> GetAllUsers()
+        [HttpGet("class/{classId}/users-not-enrolled/")]
+        public async Task<IActionResult> GetAllUsersNotEnrolledInClass([FromRoute] int classId)
         {
-            ApiResponseDTO<List<User>> response = await _eClassroomService.GetAllUsers();
+            ApiResponseDTO<List<User>> response = await _eClassroomService.GetAllUsersNotEnrolledInClass(classId);
             return Ok(response);
         }
 
