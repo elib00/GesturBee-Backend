@@ -59,11 +59,8 @@ namespace GesturBee_Backend.Services
             };
         }
 
-        public async Task<ApiResponseDTO> AddStudentToClass(StudentAndClassDTO info)
+        public async Task<ApiResponseDTO> AddStudentToClass(int studentId, int classId)
         {
-            int studentId = (int)info.StudentId;
-            int classId = (int)info.StudentId;
-
             ApiResponseDTO checkStudentAndClass = await CheckStudentAndClassIfNull(studentId, classId);
             if (!checkStudentAndClass.Success) return checkStudentAndClass;
 
@@ -73,35 +70,6 @@ namespace GesturBee_Backend.Services
             {
                 Success = true,
                 ResponseType = ResponseType.StudentAddedToClassroom
-            };
-        }
-
-        public async Task<ApiResponseDTO> InviteStudentToClass(StudentAndClassDTO info)
-        {
-            int studentId = (int)info.StudentId;
-            int classId = (int)info.StudentId;
-
-            ApiResponseDTO checkStudentAndClass = await CheckStudentAndClassIfNull(studentId, classId);
-            if (!checkStudentAndClass.Success) return checkStudentAndClass;
-
-            //check if invitation is already present
-            bool isAlreadyInvited = await _eClassroomRepository.StudentAlreadyInvited(studentId, classId);
-
-            if (isAlreadyInvited)
-            {
-                return new ApiResponseDTO
-                {
-                    Success = false,
-                    ResponseType = ResponseType.StudentAlreadyInvited
-                };
-            }
-
-            await _eClassroomRepository.InviteStudentToClass(studentId, classId);
-
-            return new ApiResponseDTO
-            {
-                Success = true,
-                ResponseType = ResponseType.StudentInviteSuccessful
             };
         }
 
@@ -132,11 +100,8 @@ namespace GesturBee_Backend.Services
             };
         }
 
-        public async Task<ApiResponseDTO> RequestClassEnrollment(StudentAndClassDTO info)
+        public async Task<ApiResponseDTO> RequestClassEnrollment(int studentId, int classId)
         {
-            int studentId = (int)info.StudentId;
-            int classId = (int)info.StudentId;
-
             ApiResponseDTO checkStudentAndClass = await CheckStudentAndClassIfNull(studentId, classId);
             if (!checkStudentAndClass.Success) return checkStudentAndClass;
 
@@ -192,67 +157,8 @@ namespace GesturBee_Backend.Services
 
         }
 
-        public async Task<ApiResponseDTO> ProcessInvitationRequest(ClassAdmissionDTO classAdmissionDetails)
+        public async Task<ApiResponseDTO> RemoveStudentFromClass(int studentId, int classId)
         {
-            int studentId = (int)classAdmissionDetails.StudentId;
-            int classId = (int)classAdmissionDetails.ClassId;
-
-            ApiResponseDTO checkStudentAndClass = await CheckStudentAndClassIfNull(studentId, classId);
-
-            if (!checkStudentAndClass.Success) return checkStudentAndClass;
-
-            ClassInvitation invitation = await _eClassroomRepository.GetClassInvitation(studentId, classId);
-
-
-            if (classAdmissionDetails.Accept)
-            {
-                await _eClassroomRepository.AcceptInvitationRequest(invitation);
-                return new ApiResponseDTO
-                {
-                    Success = true,
-                    ResponseType = ResponseType.InvitationAcceptanceSuccessful  
-                };
-            }
-            else
-            {
-                await _eClassroomRepository.RejectInvitationRequest(invitation);
-                return new ApiResponseDTO
-                {
-                    Success = true,
-                    ResponseType = ResponseType.InvitationRejectionSuccessful
-                };
-            }
-
-        }
-
-        public async Task<ApiResponseDTO<List<ClassEnrollmentGroupDTO>>> GetTeacherClassEnrollmentRequests(int teacherId)
-        {
-            List<ClassEnrollmentGroupDTO> teacherClassEnrollmentRequests = await _eClassroomRepository.GetTeacherClassEnrollmentRequests(teacherId);
-
-            return new ApiResponseDTO<List<ClassEnrollmentGroupDTO>>
-            {
-                Success = true,
-                ResponseType = ResponseType.SuccessfulRetrievalOfResource,
-                Data = teacherClassEnrollmentRequests
-            };
-        }
-
-        public async Task<ApiResponseDTO<List<ClassInvitationGroupDTO>>> GetStudentClassInvitationRequests(int studentId)
-        {
-            List<ClassInvitationGroupDTO> studentClassInvitationRequests = await _eClassroomRepository.GetStudentClassInvitationRequests(studentId);
-            return new ApiResponseDTO<List<ClassInvitationGroupDTO>>
-            {
-                Success = true,
-                ResponseType = ResponseType.SuccessfulRetrievalOfResource,
-                Data = studentClassInvitationRequests
-            };
-        }
-
-        public async Task<ApiResponseDTO> RemoveStudentFromClass(StudentAndClassDTO info)
-        {
-            int studentId = (int)info.StudentId;
-            int classId = (int)info.ClassId;
-
             ApiResponseDTO checkStudentAndClass = await CheckStudentAndClassIfNull(studentId, classId);
             if (!checkStudentAndClass.Success) return checkStudentAndClass;
 
