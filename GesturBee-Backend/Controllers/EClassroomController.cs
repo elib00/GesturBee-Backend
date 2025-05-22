@@ -14,10 +14,12 @@ namespace GesturBee_Backend.Controllers
     public class EClassroomController : ControllerBase
     {
         private readonly IEClassroomService _eClassroomService;
-        
-        public EClassroomController(IEClassroomService eClassroomService)
+        private readonly IS3Service _s3Service;
+
+        public EClassroomController(IEClassroomService eClassroomService, IS3Service s3Service)
         {
             _eClassroomService = eClassroomService;
+            _s3Service = s3Service;
         }
 
 
@@ -227,6 +229,18 @@ namespace GesturBee_Backend.Controllers
             }
 
             return StatusCode(StatusCodes.Status204NoContent, response);
+        }
+
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+        [HttpPost("upload-presigned-url/")]
+        public async Task<IActionResult> GetUploadPresignedURL([FromBody] UploadRequestDTO uploadRequest)
+        {
+            if (string.IsNullOrEmpty(uploadRequest.FileName) || string.IsNullOrEmpty(uploadRequest.ContentType))
+                return BadRequest("FileName and ContentType are required.");
+
+            string url = _s3Service.GeneratePreSignedUploadUrl(uploadRequest.FileName, uploadRequest.ContentType);
+
+            return Ok(new { Url = url });
         }
     }
 }

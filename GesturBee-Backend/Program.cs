@@ -1,3 +1,8 @@
+using Amazon.Extensions.NETCore.Setup;
+using Amazon.Runtime;
+using Amazon;
+using Amazon.S3;
+using Amazon.S3;
 using GesturBee_Backend;
 using GesturBee_Backend.Repository;
 using GesturBee_Backend.Repository.Interfaces;
@@ -37,6 +42,16 @@ builder.Services.AddControllers()
 
 builder.Services.AddHttpClient();
 
+//for AWS
+var awsOptions = new AWSOptions
+{
+    Credentials = new BasicAWSCredentials(builder.Configuration["AWS:AccessKeyId"], builder.Configuration["AWS:SecretAccessKey"]),
+    Region = RegionEndpoint.GetBySystemName(builder.Configuration["AWS:Region"])
+};
+
+builder.Services.AddDefaultAWSOptions(awsOptions);
+builder.Services.AddAWSService<IAmazonS3>();
+
 // Add dependencies
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IAuthRepository, AuthRepository>();
@@ -48,6 +63,7 @@ builder.Services.AddScoped<IJwtService, JwtService>();
 builder.Services.AddScoped<GoogleAuthService>();
 builder.Services.AddScoped<FacebookAuthService>();
 builder.Services.AddScoped<IExternalAuthServiceFactory, ExternalAuthServiceFactory>();
+builder.Services.AddScoped<IS3Service, S3Service>();
 
 builder.Services.AddScoped<IEmailService, EmailService>();
 
