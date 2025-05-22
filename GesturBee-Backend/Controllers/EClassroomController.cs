@@ -58,19 +58,11 @@ namespace GesturBee_Backend.Controllers
         }
 
         [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
-        [HttpPost("class/add-student/")]
+        [HttpPost("class/{classId}/add-student/{studentId}/")]
 
-        public async Task<IActionResult> AddStudentToClass([FromBody] StudentAndClassDTO request)
+        public async Task<IActionResult> AddStudentToClass([FromRoute] int studentId, [FromRoute] int classId)
         {
-            if (!ModelState.IsValid)
-            {
-                return BadRequest(ModelState);
-            }
-
-            int studentId = (int) request.StudentId;
-            int classId = (int) request.ClassId;
-
-            ApiResponseDTO<object> response = await _eClassroomService.AddStudentToClass(request);
+            ApiResponseDTO response = await _eClassroomService.AddStudentToClass(studentId, classId);
 
             if (!response.Success)
             {
@@ -78,32 +70,6 @@ namespace GesturBee_Backend.Controllers
             }
 
             return StatusCode(StatusCodes.Status204NoContent, response);
-        }
-
-        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
-        [HttpPost("class/invite-student/")]
-        public async Task<IActionResult> InviteStudentToClass([FromBody] StudentAndClassDTO request)
-        {
-            if (!ModelState.IsValid)
-            {
-                return BadRequest(ModelState);
-            }
-
-            ApiResponseDTO<object> response = await _eClassroomService.InviteStudentToClass(request);
-
-            if (!response.Success)
-            {
-                if(response.ResponseType == ResponseType.StudentAlreadyInvited)
-                {
-                    return Conflict(response);
-                }
-                else
-                {
-                    return NotFound(response);
-                }
-            }
-
-            return StatusCode(StatusCodes.Status201Created, response);
         }
 
         [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
@@ -133,15 +99,10 @@ namespace GesturBee_Backend.Controllers
         }
 
         [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
-        [HttpPost("class/request-enrollment/")]
-        public async Task<IActionResult> RequestClassEnrollment([FromBody] StudentAndClassDTO info)
+        [HttpPost("class/{classId}/request-enrollment/{studentId}/")]
+        public async Task<IActionResult> RequestClassEnrollment([FromRoute] int studentId, [FromRoute] int classId)
         {
-            if (!ModelState.IsValid)
-            {
-                return BadRequest(ModelState);
-            }
-
-            ApiResponseDTO<object> response = await _eClassroomService.RequestClassEnrollment(info);
+            ApiResponseDTO<object> response = await _eClassroomService.RequestClassEnrollment(studentId, classId);
 
             if (!response.Success)
             {
@@ -178,63 +139,23 @@ namespace GesturBee_Backend.Controllers
         }
 
         [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
-        [HttpPost("class/process-invitation/")]
-        public async Task<IActionResult> ProcessInvitationRequest([FromBody] ClassAdmissionDTO classAdmissionDetails)
-        {   
-            if (!ModelState.IsValid)
-            {
-                return BadRequest(ModelState);
-            }
+        [HttpPost("class/{classId}/enrollments-requests")]
+        public async Task<IActionResult> GetClassEnrollmentRequests([FromRoute] int classId)
+        {
+            ApiResponseDTO<ICollection<User>> response = await _eClassroomService.GetClassEnrollmentRequests(classId);
+            return Ok(response);
+        }
 
-            ApiResponseDTO<object> response = await _eClassroomService.ProcessInvitationRequest(classAdmissionDetails);
+
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+        [HttpPost("class/{classId}/remove-student/{studentId}/")]
+        public async Task<IActionResult> RemoveStudentFromClass([FromRoute] int studentId, [FromRoute] int classId)
+        {
+            ApiResponseDTO<object> response = await _eClassroomService.RemoveStudentFromClass(studentId, classId);
 
             if (!response.Success)
             {
                 return NotFound(response);
-            }
-
-            return StatusCode(StatusCodes.Status204NoContent, response);
-        }
-
-        //[Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
-        //[HttpPost("teacher/{teacherId}/class-enrollments-requests")]
-        //public async Task<IActionResult> GetTeacherClassEnrollmentRequests([FromRoute] int teacherId)
-        //{
-        //    ApiResponseDTO<List<ClassEnrollmentGroupDTO>> response = await _eClassroomService.GetTeacherClassEnrollmentRequests(teacherId);
-        //    return Ok(response);
-        //}
-
-        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
-        [HttpPost("class/{teacherId}/enrollments-requests")]
-        public async Task<IActionResult> GetClassEnrollmentRequests([FromRoute] int teacherId)
-        {
-            ApiResponseDTO<ICollection<User>> response = await _eClassroomService.GetClassEnrollmentRequests(teacherId);
-            return Ok(response);
-        }
-
-
-        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
-        [HttpPost("student/{studentId}/class-invitations")]
-        public async Task<IActionResult> GetStudentClassInvitationRequests([FromRoute] int studentId)
-        {
-            ApiResponseDTO<List<ClassInvitationGroupDTO>> response = await _eClassroomService.GetStudentClassInvitationRequests(studentId);
-            return Ok(response);
-        }
-
-        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
-        [HttpPost("class/remove-student")]
-        public async Task<IActionResult> RemoveStudentFromClass([FromBody] StudentAndClassDTO info)
-        {
-            if (!ModelState.IsValid)
-            {
-                return BadRequest(ModelState);
-            }
-
-            ApiResponseDTO<object> response = await _eClassroomService.RemoveStudentFromClass(info);
-
-            if (!response.Success)
-            {
-                return NotFound(info.StudentId);
             }
 
             return StatusCode(StatusCodes.Status204NoContent, response);

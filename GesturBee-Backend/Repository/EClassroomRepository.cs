@@ -77,24 +77,6 @@ namespace GesturBee_Backend.Repository
             await _backendDbContext.SaveChangesAsync();
         }
 
-        public async Task InviteStudentToClass(int studentId, int classId)
-        {
-            await _backendDbContext.ClassInvitations.AddAsync(new ClassInvitation
-            {
-                StudentId = studentId,
-                ClassId = classId,
-                InvitedAt = DateTime.UtcNow
-            });
-
-            await _backendDbContext.SaveChangesAsync();
-        }
-
-        public async Task<bool> StudentAlreadyInvited(int studentId, int classId)
-        {
-            return await _backendDbContext.ClassInvitations
-                .AnyAsync(classInvitation => classInvitation.StudentId == studentId && classInvitation.ClassId == classId);
-        }
-
         public async Task CreateClass(CreateClassDTO info)
         {
             //create the class code
@@ -144,12 +126,6 @@ namespace GesturBee_Backend.Repository
             await _backendDbContext.SaveChangesAsync();
         }
 
-        private async Task RemoveClassInvitation(ClassInvitation classInvitation)
-        {
-            _backendDbContext.ClassInvitations.Remove(classInvitation)  ;
-            await _backendDbContext.SaveChangesAsync();
-        }
-
         public async Task AcceptEnrollmentRequest(EnrollmentRequest enrollmentRequest)
         {
             User student = enrollmentRequest.Student;
@@ -171,40 +147,13 @@ namespace GesturBee_Backend.Repository
             await RemoveEnrollmentRequest(enrollmentRequest);
         }
 
-        public async Task AcceptInvitationRequest(ClassInvitation invitation)
-        {
-            User student = invitation.Student;
-            Class cls = invitation.Class;
-
-            //add the student to the class
-            StudentClass studentClass = new StudentClass
-            {
-                StudentId = student.Id,
-                ClassId = cls.Id
-            };
-
-            await _backendDbContext.StudentClasses.AddAsync(studentClass);
-            await RemoveClassInvitation(invitation);
-        }
-
-        public async Task RejectInvitationRequest(ClassInvitation invitation)
-        {
-            await RemoveClassInvitation(invitation);
-        }
-
         public async Task<EnrollmentRequest> GetEnrollmentRequest(int studentId, int classId)
         {
             return await _backendDbContext.EnrollmentRequests
                 .FirstOrDefaultAsync(enrollmentRequest => enrollmentRequest.StudentId == studentId && enrollmentRequest.ClassId == classId);
         }
 
-        public async Task<ClassInvitation> GetClassInvitation(int studentId, int classId)
-        {
-            return await _backendDbContext.ClassInvitations
-               .FirstOrDefaultAsync(enrollmentRequest => enrollmentRequest.StudentId == studentId && enrollmentRequest.ClassId == classId);
-        }
-
-        public async Task<List<ClassEnrollmentGroupDTO>> GetTeacherClassEnrollmentRequests(int teacherId)
+        public async Task<List<ClassEnrollmentGroupDTO>> GetTeacherClassEnrollmentRequests( t teacherId)
         {
             return await _backendDbContext.EnrollmentRequests
                 .Include(er => er.Student) //eager load
@@ -232,27 +181,6 @@ namespace GesturBee_Backend.Repository
                 .Where(er => er.ClassId == classId)
                 .Select(er => er.Student)
                 .ToListAsync();
-        }
-
-        public async Task<List<ClassInvitationGroupDTO>> GetStudentClassInvitationRequests(int studentId)
-        {
-            return await _backendDbContext.ClassInvitations
-                .Include(ci => ci.Class) //eager load
-                    .ThenInclude(cls => cls.Teacher)
-                        .ThenInclude(user => user.Profile)
-               .Where(ci => ci.StudentId == studentId)
-               .GroupBy(ci => new { ci.ClassId, ci.Class.ClassName })
-               .Select(g => new ClassInvitationGroupDTO
-               {
-                   ClassId = g.Key.ClassId,
-                   ClassName = g.Key.ClassName,
-                   Requests = g.Select(ci => new InvitationRequestDTO
-                   {
-                       TeacherName = ci.Class.Teacher.Profile.FirstName + " " + ci.Class.Teacher.Profile.LastName,
-                       InvitedAt = ci.InvitedAt
-                   }).ToList()
-               })
-               .ToListAsync();
         }
 
         public async Task RemoveStudentClass(StudentClass studentClass)
