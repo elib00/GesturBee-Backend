@@ -215,5 +215,16 @@ namespace GesturBee_Backend.Services
                 ResponseType = ResponseType.NoNullValues
             };
         }
+
+        public async Task<ApiResponseDTO<List<User>>> GetAllUsers()
+        {
+            List<User> users = await _eClassroomRepository.GetAllUsers();
+            return new ApiResponseDTO<List<User>>
+            {
+                Success = true,
+                ResponseType = ResponseType.SuccessfulRetrievalOfResource,
+                Data = users
+            };
+        }
     }
 }

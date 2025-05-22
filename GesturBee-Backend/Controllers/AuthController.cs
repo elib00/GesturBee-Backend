@@ -82,7 +82,6 @@ namespace GesturBee_Backend.Controllers
             string token = _jwtService.GenerateToken(new AuthTokenRequestDTO
             {
                 Email = response?.Data.Email,
-                Roles = response?.Data.Roles,
                 Type = "gesturbee-auth"
             });
 
@@ -121,7 +120,6 @@ namespace GesturBee_Backend.Controllers
             string token = _jwtService.GenerateToken(new AuthTokenRequestDTO
             {
                 Email = response?.Data.Email,
-                Roles = response?.Data.Roles,
                 Type = "google-auth"
             });
 
@@ -152,7 +150,6 @@ namespace GesturBee_Backend.Controllers
             string token = _jwtService.GenerateToken(new AuthTokenRequestDTO
             {
                 Email = response?.Data.Email,
-                Roles = response?.Data.Roles,
                 Type = "facebook-auth"
             });
 
@@ -204,7 +201,6 @@ namespace GesturBee_Backend.Controllers
             string token = _jwtService.GenerateToken(new AuthTokenRequestDTO
             {
                 Email = response?.Data.Email,
-                Roles = response?.Data.Roles,
                 Type = "password-reset"
             });
 
