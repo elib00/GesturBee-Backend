@@ -79,5 +79,24 @@ namespace GesturBee_Backend.Services
             };
         }
 
+        public async Task<ApiResponseDTO> GetRoadmapProgressWithUserId(int userId)
+        {
+            RoadmapProgress roadmapProgress = await _roadmapRepository.GetRoadmapProgressWithUserId(userId);
+            if(roadmapProgress == null)
+            {
+                return new ApiResponseDTO
+                {
+                    Success = false,
+                    ResponseType = ResponseType.RoadmapProgressNotFound
+                };
+            }
+
+            return new ApiResponseDTO
+            {
+                Success = true,
+                ResponseType = ResponseType.SuccessfulRetrievalOfResource
+            };
+        }
+
     }
 }

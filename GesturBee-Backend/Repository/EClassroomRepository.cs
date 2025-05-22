@@ -169,10 +169,15 @@ namespace GesturBee_Backend.Repository
             await _backendDbContext.SaveChangesAsync();
         }
 
-        public async Task<List<User>> GetAllUsers()
+        public async Task<List<User>> GetAllUsersNotEnrolledInClass(int classId)
         {
+            IQueryable<int> enrolledUserIds = _backendDbContext.StudentClasses
+               .Where(sc => sc.ClassId == classId)
+               .Select(sc => sc.StudentId);
+
             return await _backendDbContext.Users
                 .Include(u => u.Profile)
+                .Where(u => !enrolledUserIds.Contains(u.Id))
                 .ToListAsync();
         }
     }

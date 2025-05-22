@@ -69,5 +69,18 @@ namespace GesturBee_Backend.Controllers
 
             return StatusCode(StatusCodes.Status204NoContent, response);
         }
+
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+        [HttpGet("/user/{userId}/progress/")]
+        public async Task<IActionResult> GetUserCurrentProgress([FromRoute] int userId)
+        {
+            ApiResponseDTO response = await _roadmapService.GetRoadmapProgressWithUserId(userId);
+            if (!response.Success)
+            {
+                return NotFound(response);
+            }
+
+            return Ok(response);
+        }
     }
 }
