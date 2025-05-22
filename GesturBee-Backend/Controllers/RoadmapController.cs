@@ -18,7 +18,7 @@ namespace GesturBee_Backend.Controllers
         }
 
         [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
-        [HttpPatch("level/{levelId}/complete-level")]
+        [HttpPatch("level/{levelId}/complete-level/")]
         public async Task<IActionResult> MarkLevelAsCompleted([FromRoute] int levelId)
         {
             ApiResponseDTO<object> response = await _roadmapService.MarkLevelAsCompleted(levelId);
@@ -32,7 +32,7 @@ namespace GesturBee_Backend.Controllers
         }
 
         [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
-        [HttpPost("exercise/create-exercise")]
+        [HttpPost("exercise/create-exercise/")]
         public async Task<IActionResult> CreateExercise([FromBody] CreateExerciseDTO exercise)
         {
             if (!ModelState.IsValid)
