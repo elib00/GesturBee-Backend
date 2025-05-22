@@ -151,6 +151,14 @@ namespace GesturBee_Backend.Controllers
         }
 
         [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+        [HttpGet("user/all/")]
+        public async Task<IActionResult> GetAllUsers()
+        {
+            ApiResponseDTO<List<User>> response = await _eClassroomService.GetAllUsers();
+            return Ok(response);
+        }
+
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
         [HttpPost("upload-presigned-url/")]
         public async Task<IActionResult> GetUploadPresignedURL([FromBody] UploadRequestDTO uploadRequest)
         {
@@ -161,5 +169,6 @@ namespace GesturBee_Backend.Controllers
 
             return Ok(new { Url = url });
         }
+
     }
 }

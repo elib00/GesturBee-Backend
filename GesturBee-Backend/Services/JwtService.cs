@@ -34,10 +34,10 @@ namespace GesturBee_Backend.Services
              claims.Add(new Claim("type", details.Type));
 
             //add each role manually
-            foreach (var role in details.Roles)
-            {
-                claims.Add(new Claim(ClaimTypes.Role, role));
-            }
+            //foreach (var role in details.Roles)
+            //{
+            //    claims.Add(new Claim(ClaimTypes.Role, role));
+            //}
 
             var token = new JwtSecurityToken(
                 issuer: _configuration["Jwt:Issuer"],

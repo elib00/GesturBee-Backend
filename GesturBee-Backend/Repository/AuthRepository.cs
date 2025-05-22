@@ -49,5 +49,11 @@ namespace GesturBee_Backend.Repository
             user.LastLogin = DateTime.Now;
             await _backendDbContext.SaveChangesAsync();
         }
+
+        public async Task CreateRoadmapProgress(RoadmapProgress roadmapProgress)
+        {
+            await _backendDbContext.RoadmapProgresses.AddAsync(roadmapProgress);
+            await _backendDbContext.SaveChangesAsync();
+        }
     }
 }

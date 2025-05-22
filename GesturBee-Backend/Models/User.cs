@@ -9,9 +9,6 @@ namespace GesturBee_Backend.Models
         [Key]
         public int Id { get; set; }
 
-        [NotMapped] //i store ra nako diri later on ang mga roless
-        public List<string> Roles { get; set; } = new List<string>(["User"]);
-
         [Required] //para needed sha for creation
         public required UserAccount Account { get; set; }
 
@@ -23,8 +20,8 @@ namespace GesturBee_Backend.Models
         [JsonIgnore]
         public ICollection<Class> TaughtClasses { get; set; } = new List<Class>();
         [JsonIgnore]
-        public ICollection<ClassInvitation> ClassInvitations { get; set; } = new List<ClassInvitation>();
         public ICollection<EnrollmentRequest> EnrollmentRequests { get; set; } = new List<EnrollmentRequest>();
+        [JsonIgnore]
         public ICollection<StudentClass> StudentClasses { get; set; } = new List<StudentClass>();
 
     }

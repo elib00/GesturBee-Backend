@@ -9,5 +9,7 @@ namespace GesturBee_Backend.Repository.Interfaces
         Task MarkLevelAsCompleted(Level level);
         Task CreateExercise(CreateExerciseDTO info);
         Task EditExerciseItem(ExerciseItemDTO exerciseItem);
+        Task<RoadmapProgress> GetRoadmapProgressWithUserId(int userId);
+        Task EditRoadmapProgress(RoadmapProgress roadmapProgress, RoadmapProgressDTO newProgress);
     }
 }

@@ -2,6 +2,7 @@
 using GesturBee_Backend.Models;
 using GesturBee_Backend.Repository.Interfaces;
 using GesturBee_Backend.Helpers;
+using Microsoft.EntityFrameworkCore;
 
 namespace GesturBee_Backend.Repository
 {
@@ -18,6 +19,13 @@ namespace GesturBee_Backend.Repository
         {
             return await _backendDbContext.Levels.FindAsync(levelId);
         }
+
+        public async Task<RoadmapProgress> GetRoadmapProgressWithUserId(int userId)
+        {
+            return await _backendDbContext.RoadmapProgresses
+                .FirstOrDefaultAsync(rp => rp.UserId == userId);
+        }
+
 
         public async Task<ExerciseItem> GetExerciseItemById(int exerciseItemId)
         {
@@ -59,6 +67,12 @@ namespace GesturBee_Backend.Repository
             exerciseItem.ChoiceD.UpdateIfChanged(item.ChoiceD, val => item.ChoiceD = val);
             exerciseItem.CorrectAnswer.UpdateIfChanged(item.CorrectAnswer, val => item.CorrectAnswer = val);
 
+            await _backendDbContext.SaveChangesAsync();
+        }
+        public async Task EditRoadmapProgress(RoadmapProgress roadmapProgress, RoadmapProgressDTO newProgress)
+        {
+            roadmapProgress.Level = newProgress.Level;
+            roadmapProgress.Stage = newProgress.Stage;
             await _backendDbContext.SaveChangesAsync();
         }
     }

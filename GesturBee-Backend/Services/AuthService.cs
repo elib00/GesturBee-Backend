@@ -33,7 +33,16 @@ namespace GesturBee_Backend.Services
 
             //construct ang user nga object
             User newUser = ConstructUser(userDetails);
+
             await _authRepository.CreateUser(newUser);
+
+            //create a roadmap progress that defaults to stage 1 level 1
+            RoadmapProgress roadmapProgress = new RoadmapProgress
+            {
+                UserId = newUser.Id,
+            };
+
+            await _authRepository.CreateRoadmapProgress(roadmapProgress);
 
             return new ApiResponseDTO<UserDetailsDTO>
             {
@@ -49,7 +58,6 @@ namespace GesturBee_Backend.Services
                     Gender = newUser.Profile.Gender,
                     BirthDate = newUser.Profile.BirthDate,
                     LastLogin = newUser.LastLogin,
-                    Roles = newUser.Roles
                 }
             };
         }
@@ -101,8 +109,6 @@ namespace GesturBee_Backend.Services
             // user already has a local account
             if(existingUser != null)
             {
-                existingUser.Roles = await GetUserRoles(existingUser.Id);
-
                 // update the last login of the existing user
                 await _authRepository.UpdateLastLogin(existingUser);
 
@@ -119,8 +125,7 @@ namespace GesturBee_Backend.Services
                         ContactNumber = existingUser.Profile.ContactNumber,
                         Gender = existingUser.Profile.Gender,
                         BirthDate = existingUser.Profile.BirthDate,
-                        LastLogin = existingUser.LastLogin,
-                        Roles = existingUser.Roles
+                        LastLogin = existingUser.LastLogin
                     }
                 };
             }
@@ -150,7 +155,6 @@ namespace GesturBee_Backend.Services
                     Gender = newUser.Profile.Gender,
                     BirthDate = newUser.Profile.BirthDate,
                     LastLogin = newUser.LastLogin,
-                    Roles = newUser.Roles
                 }
             };
         }
@@ -169,8 +173,6 @@ namespace GesturBee_Backend.Services
             // user already has a local account
             if (existingUser != null)
             {
-                existingUser.Roles = await GetUserRoles(existingUser.Id);
-
                 // update the last login of the existing user
                 await _authRepository.UpdateLastLogin(existingUser);
 
@@ -188,7 +190,6 @@ namespace GesturBee_Backend.Services
                         Gender = existingUser.Profile.Gender,
                         BirthDate = existingUser.Profile.BirthDate,
                         LastLogin = existingUser.LastLogin,
-                        Roles = existingUser.Roles
                     }
                 };
             }
@@ -218,7 +219,6 @@ namespace GesturBee_Backend.Services
                     Gender = newUser.Profile.Gender,
                     BirthDate = newUser.Profile.BirthDate,
                     LastLogin = newUser.LastLogin,
-                    Roles = newUser.Roles
                 }
             };
         }
@@ -257,8 +257,6 @@ namespace GesturBee_Backend.Services
                 };
             }
 
-            userFromDb.Roles = await GetUserRoles(userFromDb.Id);
-
             //update the last login of the user
             await _authRepository.UpdateLastLogin(userFromDb);
 
@@ -275,40 +273,9 @@ namespace GesturBee_Backend.Services
                     ContactNumber = userFromDb.Profile.ContactNumber,
                     Gender = userFromDb.Profile.Gender,
                     BirthDate = userFromDb.Profile.BirthDate,
-                    LastLogin = userFromDb.LastLogin,
-                    Roles = userFromDb.Roles
+                    LastLogin = userFromDb.LastLogin
                 }
             };
-        }
-
-        private async Task<List<string>> GetUserRoles(int userId)
-        {
-            bool isUserAStudent = true;
-            bool isUserATeacher = true;
-
-            List<string> userRoles = new List<string>(["User"]);
-
-            if (isUserAStudent)
-            {
-                userRoles.Add("Student");
-            }
-
-            if (isUserATeacher)
-            {
-                userRoles.Add("Teacher");
-            }
-
-            //return new ApiResponseDTO<object>
-            //{
-            //    Success = true,
-            //    ResponseType = ResponseType.SuccessfulRetrievalOfResource,
-            //    Data = new
-            //    {
-            //        UserRoles = userRoles
-            //    }
-            //};
-
-            return userRoles;
         }
 
         public async Task<ApiResponseDTO> ResetPassword(ResetPasswordDTO resetDetails)

@@ -3,6 +3,7 @@ using GesturBee_Backend.Models;
 using GesturBee_Backend.Repository.Interfaces;
 using GesturBee_Backend.Services.Interfaces;
 using GesturBee_Backend.Enums;
+using GesturBee_Backend.Repository;
 
 namespace GesturBee_Backend.Services
 {
@@ -54,6 +55,27 @@ namespace GesturBee_Backend.Services
             {
                 Success = true,
                 ResponseType = ResponseType.ExerciseItemEditSuccessful
+            };
+        }
+
+        public async Task<ApiResponseDTO> EditRoadmapProgress(int userId, RoadmapProgressDTO newProgress)
+        {
+            RoadmapProgress roadmapProgress = await _roadmapRepository.GetRoadmapProgressWithUserId(userId);
+            if (roadmapProgress == null)
+            {
+                return new ApiResponseDTO
+                {
+                    Success = false,
+                    ResponseType = ResponseType.RoadmapProgressNotFound
+                };
+            }
+
+            await _roadmapRepository.EditRoadmapProgress(roadmapProgress, newProgress);
+
+            return new ApiResponseDTO
+            {
+                Success = true,
+                ResponseType = ResponseType.RoadmapProgressEditSuccessful
             };
         }
 

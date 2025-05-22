@@ -168,5 +168,12 @@ namespace GesturBee_Backend.Repository
             _backendDbContext.StudentClasses.Remove(studentClass);
             await _backendDbContext.SaveChangesAsync();
         }
+
+        public async Task<List<User>> GetAllUsers()
+        {
+            return await _backendDbContext.Users
+                .Include(u => u.Profile)
+                .ToListAsync();
+        }
     }
 }
