@@ -224,6 +224,16 @@ namespace GesturBee_Backend.Repository
                .ToListAsync();
         }
 
+        public async Task<ICollection<User>> GetClassEnrollmentRequests(int classId)
+        {
+            return await _backendDbContext.EnrollmentRequests
+                .Include(er => er.Student)
+                    .ThenInclude(s => s.Profile)
+                .Where(er => er.ClassId == classId)
+                .Select(er => er.Student)
+                .ToListAsync();
+        }
+
         public async Task<List<ClassInvitationGroupDTO>> GetStudentClassInvitationRequests(int studentId)
         {
             return await _backendDbContext.ClassInvitations

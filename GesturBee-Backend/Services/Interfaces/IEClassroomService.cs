@@ -18,6 +18,7 @@ namespace GesturBee_Backend.Services.Interfaces
         Task<ApiResponseDTO<List<ClassEnrollmentGroupDTO>>> GetTeacherClassEnrollmentRequests(int teacherId);
         Task<ApiResponseDTO<List<ClassInvitationGroupDTO>>> GetStudentClassInvitationRequests(int studentId);
         Task<ApiResponseDTO> RemoveStudentFromClass(StudentAndClassDTO info);
+        Task<ApiResponseDTO<ICollection<User>>> GetClassEnrollmentRequests(int classId);
         //Task<ApiResponseDTO<object>> LeaveClass(StudentAndClassDTO info);
     }
 

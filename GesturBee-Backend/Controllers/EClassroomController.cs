@@ -196,13 +196,22 @@ namespace GesturBee_Backend.Controllers
             return StatusCode(StatusCodes.Status204NoContent, response);
         }
 
+        //[Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+        //[HttpPost("teacher/{teacherId}/class-enrollments-requests")]
+        //public async Task<IActionResult> GetTeacherClassEnrollmentRequests([FromRoute] int teacherId)
+        //{
+        //    ApiResponseDTO<List<ClassEnrollmentGroupDTO>> response = await _eClassroomService.GetTeacherClassEnrollmentRequests(teacherId);
+        //    return Ok(response);
+        //}
+
         [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
-        [HttpPost("teacher/{teacherId}/class-enrollments")]
-        public async Task<IActionResult> GetTeacherClassEnrollmentRequests([FromRoute] int teacherId)
+        [HttpPost("class/{teacherId}/enrollments-requests")]
+        public async Task<IActionResult> GetClassEnrollmentRequests([FromRoute] int teacherId)
         {
-            ApiResponseDTO<List<ClassEnrollmentGroupDTO>> response = await _eClassroomService.GetTeacherClassEnrollmentRequests(teacherId);
+            ApiResponseDTO<ICollection<User>> response = await _eClassroomService.GetClassEnrollmentRequests(teacherId);
             return Ok(response);
         }
+
 
         [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
         [HttpPost("student/{studentId}/class-invitations")]
