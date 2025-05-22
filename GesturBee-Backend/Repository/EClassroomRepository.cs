@@ -153,26 +153,6 @@ namespace GesturBee_Backend.Repository
                 .FirstOrDefaultAsync(enrollmentRequest => enrollmentRequest.StudentId == studentId && enrollmentRequest.ClassId == classId);
         }
 
-        public async Task<List<ClassEnrollmentGroupDTO>> GetTeacherClassEnrollmentRequests( t teacherId)
-        {
-            return await _backendDbContext.EnrollmentRequests
-                .Include(er => er.Student) //eager load
-                        .ThenInclude(u => u.Profile)
-               .Where(er => er.Class.TeacherId == teacherId)
-               .GroupBy(er => new { er.ClassId, er.Class.ClassName })
-               .Select(g => new ClassEnrollmentGroupDTO
-               {
-                   ClassId = g.Key.ClassId,
-                   ClassName = g.Key.ClassName,
-                   Requests = g.Select(er => new EnrollmentRequestDTO
-                   {
-                       StudentName = er.Student.Profile.FirstName + " " + er.Student.Profile.LastName,
-                       RequestedAt = er.RequestedAt
-                   }).ToList()
-               })
-               .ToListAsync();
-        }
-
         public async Task<ICollection<User>> GetClassEnrollmentRequests(int classId)
         {
             return await _backendDbContext.EnrollmentRequests
