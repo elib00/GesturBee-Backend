@@ -52,9 +52,6 @@ namespace GesturBee_Backend.Repository
                 .AsNoTracking()
                 .Where(c => c.TeacherId == teacherId)
                 .ToListAsync();
-
-            //User user = await _backendDbContext.Users.FindAsync(teacherId);
-            //return user.TaughtClasses.ToList();
         }
 
 
@@ -100,12 +97,17 @@ namespace GesturBee_Backend.Repository
 
         public async Task CreateClass(CreateClassDTO info)
         {
+            //create the class code
+            string guid = Guid.NewGuid().ToString("N").ToUpper();
+            string shortCode = guid.Substring(0, 4) + guid[^3..]; ; //shorten GUID -> first 4, last 3
+            string classCode = $"GB-{shortCode}";
+
             Class cls = new Class
             {
                 TeacherId = info.TeacherId,
                 ClassName = info.ClassName,
                 ClassDescription = info.ClassDescription,
-                ClassCode = "GB-",
+                ClassCode = classCode,
                 CreatedAt = DateTime.UtcNow,
             };
 
