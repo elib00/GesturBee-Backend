@@ -211,7 +211,7 @@ namespace GesturBee_Backend.Services
 
             return new ApiResponseDTO
             {
-                Success = true,
+                Success = true, 
                 ResponseType = ResponseType.NoNullValues
             };
         }
