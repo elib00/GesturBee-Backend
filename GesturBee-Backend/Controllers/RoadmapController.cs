@@ -35,11 +35,6 @@ namespace GesturBee_Backend.Controllers
         [HttpPost("exercise/create-exercise/")]
         public async Task<IActionResult> CreateExercise([FromBody] CreateExerciseDTO exercise)
         {
-            if (!ModelState.IsValid)
-            {
-                return BadRequest(ModelState);
-            }
-
             ApiResponseDTO<object> response = await _roadmapService.CreateExercise(exercise);
             return StatusCode(StatusCodes.Status201Created, response);
         }
@@ -71,7 +66,7 @@ namespace GesturBee_Backend.Controllers
         }
 
         [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
-        [HttpGet("/user/{userId}/progress/")]
+        [HttpGet("user/{userId}/progress/")]
         public async Task<IActionResult> GetUserCurrentProgress([FromRoute] int userId)
         {
             ApiResponseDTO response = await _roadmapService.GetRoadmapProgressWithUserId(userId);

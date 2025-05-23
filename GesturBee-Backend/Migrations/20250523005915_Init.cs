@@ -105,6 +105,27 @@ namespace GesturBee_Backend.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "RoadmapProgresses",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    UserId = table.Column<int>(type: "int", nullable: false),
+                    Stage = table.Column<int>(type: "int", nullable: false),
+                    Level = table.Column<int>(type: "int", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_RoadmapProgresses", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_RoadmapProgresses_Users_UserId",
+                        column: x => x.UserId,
+                        principalTable: "Users",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "UserAccounts",
                 columns: table => new
                 {
@@ -147,33 +168,6 @@ namespace GesturBee_Backend.Migrations
                         principalTable: "Users",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "ClassInvitations",
-                columns: table => new
-                {
-                    Id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    InvitedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    StudentId = table.Column<int>(type: "int", nullable: false),
-                    ClassId = table.Column<int>(type: "int", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_ClassInvitations", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_ClassInvitations_Classes_ClassId",
-                        column: x => x.ClassId,
-                        principalTable: "Classes",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
-                    table.ForeignKey(
-                        name: "FK_ClassInvitations_Users_StudentId",
-                        column: x => x.StudentId,
-                        principalTable: "Users",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
                 });
 
             migrationBuilder.CreateTable(
@@ -282,16 +276,6 @@ namespace GesturBee_Backend.Migrations
                 column: "TeacherId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_ClassInvitations_ClassId",
-                table: "ClassInvitations",
-                column: "ClassId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_ClassInvitations_StudentId",
-                table: "ClassInvitations",
-                column: "StudentId");
-
-            migrationBuilder.CreateIndex(
                 name: "IX_EnrollmentRequests_ClassId",
                 table: "EnrollmentRequests",
                 column: "ClassId");
@@ -315,6 +299,11 @@ namespace GesturBee_Backend.Migrations
                 name: "IX_Levels_StageId",
                 table: "Levels",
                 column: "StageId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_RoadmapProgresses_UserId",
+                table: "RoadmapProgresses",
+                column: "UserId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_StudentClasses_ClassId",
@@ -349,13 +338,13 @@ namespace GesturBee_Backend.Migrations
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
-                name: "ClassInvitations");
-
-            migrationBuilder.DropTable(
                 name: "EnrollmentRequests");
 
             migrationBuilder.DropTable(
                 name: "Levels");
+
+            migrationBuilder.DropTable(
+                name: "RoadmapProgresses");
 
             migrationBuilder.DropTable(
                 name: "StudentClasses");

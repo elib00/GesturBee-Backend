@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace GesturBee_Backend.Migrations
 {
     [DbContext(typeof(BackendDbContext))]
-    [Migration("20250521192213_Init")]
+    [Migration("20250523005915_Init")]
     partial class Init
     {
         /// <inheritdoc />
@@ -53,32 +53,6 @@ namespace GesturBee_Backend.Migrations
                     b.HasIndex("TeacherId");
 
                     b.ToTable("Classes");
-                });
-
-            modelBuilder.Entity("GesturBee_Backend.Models.ClassInvitation", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<int>("ClassId")
-                        .HasColumnType("int");
-
-                    b.Property<DateTime>("InvitedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<int>("StudentId")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("ClassId");
-
-                    b.HasIndex("StudentId");
-
-                    b.ToTable("ClassInvitations");
                 });
 
             modelBuilder.Entity("GesturBee_Backend.Models.EnrollmentRequest", b =>
@@ -204,6 +178,30 @@ namespace GesturBee_Backend.Migrations
                     b.HasIndex("StageId");
 
                     b.ToTable("Levels");
+                });
+
+            modelBuilder.Entity("GesturBee_Backend.Models.RoadmapProgress", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("Level")
+                        .HasColumnType("int");
+
+                    b.Property<int>("Stage")
+                        .HasColumnType("int");
+
+                    b.Property<int>("UserId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("RoadmapProgresses");
                 });
 
             modelBuilder.Entity("GesturBee_Backend.Models.Stage", b =>
@@ -363,25 +361,6 @@ namespace GesturBee_Backend.Migrations
                     b.Navigation("Teacher");
                 });
 
-            modelBuilder.Entity("GesturBee_Backend.Models.ClassInvitation", b =>
-                {
-                    b.HasOne("GesturBee_Backend.Models.Class", "Class")
-                        .WithMany("ClassInvitations")
-                        .HasForeignKey("ClassId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.HasOne("GesturBee_Backend.Models.User", "Student")
-                        .WithMany("ClassInvitations")
-                        .HasForeignKey("StudentId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.Navigation("Class");
-
-                    b.Navigation("Student");
-                });
-
             modelBuilder.Entity("GesturBee_Backend.Models.EnrollmentRequest", b =>
                 {
                     b.HasOne("GesturBee_Backend.Models.Class", "Class")
@@ -432,6 +411,17 @@ namespace GesturBee_Backend.Migrations
                         .IsRequired();
 
                     b.Navigation("Stage");
+                });
+
+            modelBuilder.Entity("GesturBee_Backend.Models.RoadmapProgress", b =>
+                {
+                    b.HasOne("GesturBee_Backend.Models.User", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("GesturBee_Backend.Models.StudentClass", b =>
@@ -488,8 +478,6 @@ namespace GesturBee_Backend.Migrations
 
             modelBuilder.Entity("GesturBee_Backend.Models.Class", b =>
                 {
-                    b.Navigation("ClassInvitations");
-
                     b.Navigation("EnrollmentRequests");
 
                     b.Navigation("StudentClasses");
@@ -510,8 +498,6 @@ namespace GesturBee_Backend.Migrations
                 {
                     b.Navigation("Account")
                         .IsRequired();
-
-                    b.Navigation("ClassInvitations");
 
                     b.Navigation("EnrollmentRequests");
 
