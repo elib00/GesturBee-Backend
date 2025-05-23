@@ -57,6 +57,7 @@ builder.Services.AddScoped<IAuthRepository, AuthRepository>();
 builder.Services.AddScoped<IEClassroomService, EClassroomService>();
 builder.Services.AddScoped<IEClassroomRepository, EClassroomRepository>();
 builder.Services.AddScoped<IRoadmapRepository, RoadmapRepository>();
+builder.Services.AddScoped<IRoadmapService, RoadmapService>();
 
 builder.Services.AddScoped<IJwtService, JwtService>();
 builder.Services.AddScoped<GoogleAuthService>();
