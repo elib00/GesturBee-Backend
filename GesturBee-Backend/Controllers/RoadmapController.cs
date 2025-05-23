@@ -78,7 +78,7 @@ namespace GesturBee_Backend.Controllers
         [HttpGet("user/{userId}/progress/")]
         public async Task<IActionResult> GetUserCurrentProgress([FromRoute] int userId)
         {
-            ApiResponseDTO response = await _roadmapService.GetRoadmapProgressWithUserId(userId);
+            ApiResponseDTO<RoadmapProgressDTO> response = await _roadmapService.GetRoadmapProgressWithUserId(userId);
             if (!response.Success)
             {
                 return NotFound(response);
