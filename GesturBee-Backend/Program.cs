@@ -130,7 +130,7 @@ builder.Services.AddCors(options =>
 
     options.AddPolicy("AllowFrontend", policy =>
     {
-        policy.WithOrigins("http://localhost:3000")
+        policy.WithOrigins("http://localhost:8081")
               .AllowAnyMethod()
               .AllowAnyHeader()
               .AllowCredentials();
@@ -195,7 +195,7 @@ if (app.Environment.IsDevelopment())
 
 
 //use cors
-app.UseCors("DevelopmentPolicy");
+app.UseCors("AllowFrontend");
 
 // Use authentication
 app.UseAuthentication();
@@ -207,8 +207,6 @@ app.UseAuthorization();
 app.UseRateLimiter();
 
 app.UseHttpsRedirection();
-
-
 
 app.MapControllers();
 
