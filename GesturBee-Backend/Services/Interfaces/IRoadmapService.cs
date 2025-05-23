@@ -1,4 +1,5 @@
 ﻿using GesturBee_Backend.DTO;
+using GesturBee_Backend.Models;
 
 namespace GesturBee_Backend.Services.Interfaces
 {
@@ -8,6 +9,6 @@ namespace GesturBee_Backend.Services.Interfaces
         Task<ApiResponseDTO> CreateExercise(CreateExerciseDTO info);
         Task<ApiResponseDTO> EditExerciseItem(ExerciseItemDTO exerciseItem);
         Task<ApiResponseDTO> EditRoadmapProgress(int roadmapProgressId, RoadmapProgressDTO newProgress);
-        Task<ApiResponseDTO> GetRoadmapProgressWithUserId(int userId);
+        Task<ApiResponseDTO<RoadmapProgressDTO>> GetRoadmapProgressWithUserId(int userId);
     }
 }

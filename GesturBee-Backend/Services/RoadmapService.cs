@@ -79,22 +79,27 @@ namespace GesturBee_Backend.Services
             };
         }
 
-        public async Task<ApiResponseDTO> GetRoadmapProgressWithUserId(int userId)
+        public async Task<ApiResponseDTO<RoadmapProgressDTO>>GetRoadmapProgressWithUserId(int userId)
         {
             RoadmapProgress roadmapProgress = await _roadmapRepository.GetRoadmapProgressWithUserId(userId);
             if(roadmapProgress == null)
             {
-                return new ApiResponseDTO
+                return new ApiResponseDTO<RoadmapProgressDTO>
                 {
                     Success = false,
                     ResponseType = ResponseType.RoadmapProgressNotFound
                 };
             }
 
-            return new ApiResponseDTO
+            return new ApiResponseDTO<RoadmapProgressDTO>
             {
                 Success = true,
-                ResponseType = ResponseType.SuccessfulRetrievalOfResource
+                ResponseType = ResponseType.SuccessfulRetrievalOfResource,
+                Data = new RoadmapProgressDTO
+                {
+                    Stage = roadmapProgress.Stage,
+                    Level = roadmapProgress.Level,
+                }
             };
         }
 
