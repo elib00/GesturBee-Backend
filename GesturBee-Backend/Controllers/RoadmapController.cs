@@ -17,6 +17,15 @@ namespace GesturBee_Backend.Controllers
             _roadmapService = roadmapService;
         }
 
+        [HttpGet("health/")]
+        public async Task<IActionResult> CheckHealth()
+        {
+            return Ok(new
+            {
+                Message = "Connected"
+            });
+        }
+
         [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
         [HttpPatch("level/{levelId}/complete-level/")]
         public async Task<IActionResult> MarkLevelAsCompleted([FromRoute] int levelId)
