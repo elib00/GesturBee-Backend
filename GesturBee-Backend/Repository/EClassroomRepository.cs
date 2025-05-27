@@ -180,5 +180,12 @@ namespace GesturBee_Backend.Repository
                 .Where(u => !enrolledUserIds.Contains(u.Id))
                 .ToListAsync();
         }
+
+        public async Task<Exercise?> GetExerciseById(int exerciseId)
+        {
+            return await _backendDbContext.Exercises
+                .Include(exercise => exercise.ExerciseItems)
+                .FirstOrDefaultAsync(exercise => exercise.Id == exerciseId);
+        }
     }
 }

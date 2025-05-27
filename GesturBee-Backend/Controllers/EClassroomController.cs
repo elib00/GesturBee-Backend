@@ -170,5 +170,19 @@ namespace GesturBee_Backend.Controllers
             return Ok(new { Url = url });
         }
 
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+        [HttpGet("exercise/{exerciseId}/")]
+        public async Task<IActionResult> GetExercise([FromRoute] int exerciseId)
+        {
+            ApiResponseDTO<Exercise> response = await _eClassroomService.GetExerciseById(exerciseId);
+
+            if (!response.Success)
+            {
+                return NotFound(response);
+            }
+
+            return Ok(response);
+        }
+
     }
 }

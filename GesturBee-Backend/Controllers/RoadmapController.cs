@@ -72,5 +72,7 @@ namespace GesturBee_Backend.Controllers
 
             return Ok(response);
         }
+
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
     }
 }

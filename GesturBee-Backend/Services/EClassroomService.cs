@@ -1,6 +1,7 @@
 ﻿using GesturBee_Backend.DTO;
 using GesturBee_Backend.Enums;
 using GesturBee_Backend.Models;
+using GesturBee_Backend.Repository;
 using GesturBee_Backend.Repository.Interfaces;
 using GesturBee_Backend.Services.Interfaces;
 
@@ -236,5 +237,28 @@ namespace GesturBee_Backend.Services
                 Data = users
             };
         }
+
+
+        public async Task<ApiResponseDTO<Exercise>> GetExerciseById(int exerciseId)
+        {
+            Exercise? exercise = await _eClassroomRepository.GetExerciseById(exerciseId);
+
+            if (exercise == null)
+            {
+                return new ApiResponseDTO<Exercise>
+                {
+                    Success = false,
+                    ResponseType = ResponseType.ExerciseNotFound
+                };
+            }
+
+            return new ApiResponseDTO<Exercise>
+            {
+                Success = true,
+                ResponseType = ResponseType.SuccessfulRetrievalOfResource,
+                Data = exercise
+            };
+        }
+
     }
 }

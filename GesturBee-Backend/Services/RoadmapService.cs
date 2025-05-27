@@ -80,6 +80,5 @@ namespace GesturBee_Backend.Services
                 }
             };
         }
-
     }
 }
