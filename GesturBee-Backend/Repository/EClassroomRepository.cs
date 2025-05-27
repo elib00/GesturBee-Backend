@@ -224,5 +224,10 @@ namespace GesturBee_Backend.Repository
 
             await _backendDbContext.SaveChangesAsync();
         }
+
+        private async Task<ExerciseItem> GetExerciseItemById(int exerciseItemId)
+        {
+            return await _backendDbContext.ExerciseItems.FindAsync(exerciseItemId);
+        }
     }
 }
