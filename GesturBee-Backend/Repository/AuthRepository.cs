@@ -1,5 +1,6 @@
 ﻿using GesturBee_Backend.Models;
 using GesturBee_Backend.Repository.Interfaces;
+using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 
 namespace GesturBee_Backend.Repository
@@ -31,10 +32,17 @@ namespace GesturBee_Backend.Repository
                 .AnyAsync(userAccount => userAccount.Email == email);
         }
 
-        public async Task CreateUser(User user)
+        public async Task<bool> CreateUser(User user)
         {
-            await _backendDbContext.Users.AddAsync(user);
-            await _backendDbContext.SaveChangesAsync();
+            try
+            {
+                await _backendDbContext.Users.AddAsync(user);
+                await _backendDbContext.SaveChangesAsync();
+                return true;
+            }catch(DbUpdateException)
+            {
+                return false;
+            }
         }
 
         public async Task ResetPassword(string email, string newPassword)
