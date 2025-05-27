@@ -260,5 +260,25 @@ namespace GesturBee_Backend.Services
             };
         }
 
+        public async Task<ApiResponseDTO> CreateExercise(CreateExerciseDTO info)
+        {
+            await _eClassroomRepository.CreateExercise(info);
+            return new ApiResponseDTO
+            {
+                Success = true,
+                ResponseType = ResponseType.ExerciseCreationSuccessful
+            };
+        }
+
+        public async Task<ApiResponseDTO> EditExerciseItem(ExerciseItemDTO exerciseItem)
+        {
+            await _eClassroomRepository.EditExerciseItem(exerciseItem);
+            return new ApiResponseDTO
+            {
+                Success = true,
+                ResponseType = ResponseType.ExerciseItemEditSuccessful
+            };
+        }
+
     }
 }

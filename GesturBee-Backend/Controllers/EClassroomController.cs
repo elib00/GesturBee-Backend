@@ -1,6 +1,7 @@
 ﻿using GesturBee_Backend.DTO;
 using GesturBee_Backend.Enums;
 using GesturBee_Backend.Models;
+using GesturBee_Backend.Services;
 using GesturBee_Backend.Services.Interfaces;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
@@ -182,6 +183,27 @@ namespace GesturBee_Backend.Controllers
             }
 
             return Ok(response);
+        }
+
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+        [HttpPost("exercise/create-exercise/")]
+        public async Task<IActionResult> CreateExercise([FromBody] CreateExerciseDTO exercise)
+        {
+            ApiResponseDTO<object> response = await _eClassroomService.CreateExercise(exercise);
+            return StatusCode(StatusCodes.Status201Created, response);
+        }
+
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+        [HttpPatch("exercise/item/edit-item")]
+        public async Task<IActionResult> EditExerciseItem([FromBody] ExerciseItemDTO exercise)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
+            ApiResponseDTO response = await _eClassroomService.EditExerciseItem(exercise);
+            return StatusCode(StatusCodes.Status204NoContent, response);
         }
 
     }

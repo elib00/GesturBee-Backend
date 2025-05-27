@@ -5,6 +5,7 @@ using GesturBee_Backend.Models;
 using MimeKit.Tnef;
 using GesturBee_Backend.DTO;
 using System.Threading.Tasks;
+using GesturBee_Backend.Helpers;
 
 namespace GesturBee_Backend.Repository
 {
@@ -186,6 +187,42 @@ namespace GesturBee_Backend.Repository
             return await _backendDbContext.Exercises
                 .Include(exercise => exercise.ExerciseItems)
                 .FirstOrDefaultAsync(exercise => exercise.Id == exerciseId);
+        }
+
+        public async Task CreateExercise(CreateExerciseDTO exercise)
+        {
+            Exercise newExercise = new Exercise
+            {
+                TeacherId = exercise.TeacherId,
+                ExerciseTitle = exercise.ExerciseTitle,
+                ExerciseDescription = exercise.ExerciseDescription,
+                CreatedAt = DateTime.UtcNow,
+                ExerciseItems = exercise.ExerciseItems
+            };
+
+            await _backendDbContext.Exercises.AddAsync(newExercise);
+            await _backendDbContext.SaveChangesAsync();
+        }
+
+        public async Task EditExerciseItem(ExerciseItemDTO exerciseItem)
+        {
+            int exerciseItemId = exerciseItem.ExerciseItemId;
+            ExerciseItem item = await GetExerciseItemById(exerciseItemId);
+
+            //extension methods
+            exerciseItem.ItemNumber.UpdateIfChanged(item.ItemNumber, val => item.ItemNumber = val);
+            exerciseItem.Question.UpdateIfChanged(item.Question, val => item.Question = val);
+            exerciseItem.CorrectAnswer.UpdateIfChanged(item.CorrectAnswer, val => item.CorrectAnswer = val);
+
+            if (item is MultipleChoiceItem mcItem)
+            {
+                exerciseItem.ChoiceA.UpdateIfChanged(mcItem.ChoiceA, val => mcItem.ChoiceA = val);
+                exerciseItem.ChoiceB.UpdateIfChanged(mcItem.ChoiceB, val => mcItem.ChoiceB = val);
+                exerciseItem.ChoiceC.UpdateIfChanged(mcItem.ChoiceC, val => mcItem.ChoiceC = val);
+                exerciseItem.ChoiceD.UpdateIfChanged(mcItem.ChoiceD, val => mcItem.ChoiceD = val);
+            }
+
+            await _backendDbContext.SaveChangesAsync();
         }
     }
 }
