@@ -24,5 +24,8 @@ namespace GesturBee_Backend.Repository.Interfaces
         Task RemoveStudentClass(StudentClass studentClass);
         Task<StudentClass> GetStudentClass(int studentId, int classId);
         Task<List<User>> GetAllUsersNotEnrolledInClass(int classId);
+        Task<Exercise?> GetExerciseById(int exerciseId);
+        Task CreateExercise(CreateExerciseDTO info);
+        Task EditExerciseItem(ExerciseItemDTO exerciseItem);
     }
 }

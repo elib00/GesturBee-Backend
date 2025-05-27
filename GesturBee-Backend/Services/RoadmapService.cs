@@ -16,26 +16,6 @@ namespace GesturBee_Backend.Services
             _roadmapRepository = roadmapRepository;
         }
 
-        public async Task<ApiResponseDTO> CreateExercise(CreateExerciseDTO info)
-        {
-            await _roadmapRepository.CreateExercise(info);
-            return new ApiResponseDTO
-            {
-                Success = true,
-                ResponseType = ResponseType.ExerciseCreationSuccessful
-            };
-        }
-
-        public async Task<ApiResponseDTO> EditExerciseItem(ExerciseItemDTO exerciseItem)
-        {
-            await _roadmapRepository.EditExerciseItem(exerciseItem);
-            return new ApiResponseDTO
-            {
-                Success = true,
-                ResponseType = ResponseType.ExerciseItemEditSuccessful
-            };
-        }
-
         public async Task<ApiResponseDTO> EditRoadmapProgress(int userId, RoadmapProgressDTO newProgress)
         {
             RoadmapProgress roadmapProgress = await _roadmapRepository.GetRoadmapProgressWithUserId(userId);
@@ -80,6 +60,5 @@ namespace GesturBee_Backend.Services
                 }
             };
         }
-
     }
 }

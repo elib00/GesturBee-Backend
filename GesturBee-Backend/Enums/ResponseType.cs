@@ -43,6 +43,7 @@
         InvitationAcceptanceSuccessful,
         InvitationRejectionSuccessful,
         StudentRemovalSuccessful,
+        ExerciseNotFound,
         NoNullValues,
 
         //for roadmap

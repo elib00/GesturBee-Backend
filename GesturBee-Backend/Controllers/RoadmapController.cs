@@ -27,27 +27,6 @@ namespace GesturBee_Backend.Controllers
         }
 
         [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
-        [HttpPost("exercise/create-exercise/")]
-        public async Task<IActionResult> CreateExercise([FromBody] CreateExerciseDTO exercise)
-        {
-            ApiResponseDTO<object> response = await _roadmapService.CreateExercise(exercise);
-            return StatusCode(StatusCodes.Status201Created, response);
-        }
-
-        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
-        [HttpPatch("exercise/item/edit-item")]
-        public async Task<IActionResult> EditExerciseItem([FromBody] ExerciseItemDTO exercise)
-        {
-            if (!ModelState.IsValid)
-            {
-                return BadRequest(ModelState);
-            }
-
-            ApiResponseDTO<object> response = await _roadmapService.EditExerciseItem(exercise);
-            return StatusCode(StatusCodes.Status204NoContent, response);
-        }
-
-        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
         [HttpPatch("user/{userId}/edit-progress/")]
         public async Task<IActionResult> EditRoadmapProgress([FromRoute] int userId, [FromBody] RoadmapProgressDTO newProgress)
         {
@@ -72,5 +51,7 @@ namespace GesturBee_Backend.Controllers
 
             return Ok(response);
         }
+
+
     }
 }
