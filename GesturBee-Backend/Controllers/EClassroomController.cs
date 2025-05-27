@@ -186,6 +186,20 @@ namespace GesturBee_Backend.Controllers
         }
 
         [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+        [HttpGet("teacher/{teacherId}/exercises/")]
+        public async Task<IActionResult> GetTeacherExercises([FromRoute] int teacherId)
+        {
+            ApiResponseDTO<List<Exercise>> response = await _eClassroomService.GetTeacherExercises(teacherId);
+
+            if (!response.Success)
+            {
+                return NotFound(response);
+            }
+
+            return Ok(response);
+        }
+
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
         [HttpPost("exercise/create-exercise/")]
         public async Task<IActionResult> CreateExercise([FromBody] CreateExerciseDTO exercise)
         {

@@ -189,6 +189,14 @@ namespace GesturBee_Backend.Repository
                 .FirstOrDefaultAsync(exercise => exercise.Id == exerciseId);
         }
 
+        public async Task<List<Exercise>> GetTeacherExercises(int teacherId)
+        {
+            return await _backendDbContext.Exercises
+                .Include(exercise => exercise.ExerciseItems)
+                .Where(exercise => exercise.TeacherId == teacherId)
+                .ToListAsync();
+        }
+
         public async Task CreateExercise(CreateExerciseDTO exercise)
         {
             Exercise newExercise = new Exercise
@@ -225,7 +233,7 @@ namespace GesturBee_Backend.Repository
             await _backendDbContext.SaveChangesAsync();
         }
 
-        private async Task<ExerciseItem> GetExerciseItemById(int exerciseItemId)
+        private async Task<ExerciseItem?> GetExerciseItemById(int exerciseItemId)
         {
             return await _backendDbContext.ExerciseItems.FindAsync(exerciseItemId);
         }

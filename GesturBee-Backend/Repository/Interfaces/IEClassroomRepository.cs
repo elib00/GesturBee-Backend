@@ -27,5 +27,6 @@ namespace GesturBee_Backend.Repository.Interfaces
         Task<Exercise?> GetExerciseById(int exerciseId);
         Task CreateExercise(CreateExerciseDTO info);
         Task EditExerciseItem(ExerciseItemDTO exerciseItem);
+        Task<List<Exercise>> GetTeacherExercises(int teacherId);
     }
 }
