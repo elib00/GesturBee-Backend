@@ -260,7 +260,18 @@ namespace GesturBee_Backend.Services
             };
         }
 
-        public async Task<ApiResponseDTO> CreateExercise(CreateExerciseDTO info)
+        public async Task<ApiResponseDTO<List<Exercise>>> GetTeacherExercises(int teacherId)
+        {
+            List<Exercise> exercises = await _eClassroomRepository.GetTeacherExercises(teacherId);
+            return new ApiResponseDTO<List<Exercise>>
+            {
+                Success = true,
+                ResponseType = ResponseType.SuccessfulRetrievalOfResource,
+                Data = exercises
+            };
+        }
+
+            public async Task<ApiResponseDTO> CreateExercise(CreateExerciseDTO info)
         {
             await _eClassroomRepository.CreateExercise(info);
             return new ApiResponseDTO

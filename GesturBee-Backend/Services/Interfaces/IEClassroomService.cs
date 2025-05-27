@@ -19,6 +19,7 @@ namespace GesturBee_Backend.Services.Interfaces
         Task<ApiResponseDTO<Exercise>> GetExerciseById(int exerciseId);
         Task<ApiResponseDTO> CreateExercise(CreateExerciseDTO info);
         Task<ApiResponseDTO> EditExerciseItem(ExerciseItemDTO exerciseItem);
+        Task<ApiResponseDTO<List<Exercise>>> GetTeacherExercises(int teacherId);
     }
 
 }
