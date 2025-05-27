@@ -22,6 +22,11 @@ namespace GesturBee_Backend
         {
             base.OnModelCreating(modelBuilder);
 
+            modelBuilder.Entity<UserAccount>()
+                .HasIndex(a => a.Email)
+                .IsUnique();
+
+
             modelBuilder.Entity<Class>()
                 .HasOne(c => c.Teacher)
                 .WithMany(u => u.TaughtClasses)

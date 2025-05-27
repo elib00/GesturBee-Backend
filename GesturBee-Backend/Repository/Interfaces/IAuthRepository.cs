@@ -6,7 +6,7 @@ namespace GesturBee_Backend.Repository.Interfaces
     {
         Task<bool> IsExistingEmail(string email);
         Task<User?> GetUserByEmail(string email);
-        Task CreateUser(User user);
+        Task<bool> CreateUser(User user);
         Task ResetPassword(string email, string newPassword);
         Task UpdateLastLogin(User user);
         Task CreateRoadmapProgress(RoadmapProgress roadmapProgress);

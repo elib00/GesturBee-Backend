@@ -23,6 +23,7 @@ namespace GesturBee_Backend.Services
 
             bool isExistingEmail = await _authRepository.IsExistingEmail(newUserEmail);
            
+            //not safe for race conditions
             if(isExistingEmail)
                 return new ApiResponseDTO<UserDetailsDTO>
                 {
@@ -34,7 +35,15 @@ namespace GesturBee_Backend.Services
             //construct ang user nga object
             User newUser = ConstructUser(userDetails);
 
-            await _authRepository.CreateUser(newUser);
+            bool successfulRegister = await _authRepository.CreateUser(newUser);
+
+            if(!successfulRegister)
+                return new ApiResponseDTO<UserDetailsDTO>
+                {
+                    Success = false,
+                    ResponseType = ResponseType.UserAlreadyExists,
+                    Data = null
+                };
 
             //create a roadmap progress that defaults to stage 1 level 1
             RoadmapProgress roadmapProgress = new RoadmapProgress
