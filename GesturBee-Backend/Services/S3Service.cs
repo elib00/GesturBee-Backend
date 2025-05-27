@@ -15,7 +15,7 @@ namespace GesturBee_Backend.Services
             _bucketName = configuration["AWS:BucketName"];
         }
 
-        public string GeneratePreSignedUploadUrl(string fileName, string contentType)
+        public string GeneratePreSignedClassVideoUploadUrl(string fileName, string contentType)
         {
             string key = $"class_materials/{fileName}"; // You can customize this path based on user/teacher/etc.
 
