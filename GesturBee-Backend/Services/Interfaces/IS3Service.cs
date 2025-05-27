@@ -2,6 +2,6 @@
 {
     public interface IS3Service
     {
-        string GeneratePreSignedUploadUrl(string fileName, string contentType);
+        string GeneratePreSignedClassVideoUploadUrl(string fileName, string contentType);
     }
 }

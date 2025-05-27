@@ -1,7 +1,6 @@
 ﻿using GesturBee_Backend.DTO;
 using GesturBee_Backend.Enums;
 using GesturBee_Backend.Models;
-using GesturBee_Backend.Services;
 using GesturBee_Backend.Services.Interfaces;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
@@ -166,7 +165,7 @@ namespace GesturBee_Backend.Controllers
             if (string.IsNullOrEmpty(uploadRequest.FileName) || string.IsNullOrEmpty(uploadRequest.ContentType))
                 return BadRequest("FileName and ContentType are required.");
 
-            string url = _s3Service.GeneratePreSignedUploadUrl(uploadRequest.FileName, uploadRequest.ContentType);
+            string url = _s3Service.GeneratePreSignedClassVideoUploadUrl(uploadRequest.FileName, uploadRequest.ContentType);
 
             return Ok(new { Url = url });
         }
