@@ -16,28 +16,6 @@ namespace GesturBee_Backend.Services
             _roadmapRepository = roadmapRepository;
         }
 
-        public async Task<ApiResponseDTO> MarkLevelAsCompleted(int levelId)
-        {
-            Level level = await _roadmapRepository.GetLevelById(levelId);
-
-            if(level == null)
-            {
-                return new ApiResponseDTO
-                {
-                    Success = false,
-                    ResponseType = ResponseType.LevelNotFound
-                };
-            }
-
-            await _roadmapRepository.MarkLevelAsCompleted(level);
-
-            return new ApiResponseDTO
-            {
-                Success = true,
-                ResponseType = ResponseType.LevelCompleted
-            };
-        }
-
         public async Task<ApiResponseDTO> CreateExercise(CreateExerciseDTO info)
         {
             await _roadmapRepository.CreateExercise(info);

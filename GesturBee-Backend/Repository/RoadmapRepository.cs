@@ -15,11 +15,6 @@ namespace GesturBee_Backend.Repository
             _backendDbContext = backendDbContext;
         }
 
-        public async Task<Level> GetLevelById(int levelId)
-        {
-            return await _backendDbContext.Levels.FindAsync(levelId);
-        }
-
         public async Task<RoadmapProgress> GetRoadmapProgressWithUserId(int userId)
         {
             return await _backendDbContext.RoadmapProgresses
@@ -29,12 +24,6 @@ namespace GesturBee_Backend.Repository
         public async Task<ExerciseItem> GetExerciseItemById(int exerciseItemId)
         {
             return await _backendDbContext.ExerciseItems.FindAsync(exerciseItemId);
-        }
-
-        public async Task MarkLevelAsCompleted(Level level)
-        {
-            level.IsCompleted = true;
-            await _backendDbContext.SaveChangesAsync();
         }
 
         public async Task CreateExercise(CreateExerciseDTO exercise)
@@ -55,16 +44,20 @@ namespace GesturBee_Backend.Repository
         public async Task EditExerciseItem(ExerciseItemDTO exerciseItem)
         {
             int exerciseItemId = exerciseItem.ExerciseItemId;
-            ExerciseItem item = await GetExerciseItemById(exerciseItemId);
+            ExerciseItem item = await GetExerciseItemById(exerciseItemId);  
 
             //extension methods
             exerciseItem.ItemNumber.UpdateIfChanged(item.ItemNumber, val => item.ItemNumber = val);
             exerciseItem.Question.UpdateIfChanged(item.Question, val => item.Question = val);
-            exerciseItem.ChoiceA.UpdateIfChanged(item.ChoiceA, val => item.ChoiceA = val);
-            exerciseItem.ChoiceB.UpdateIfChanged(item.ChoiceB, val => item.ChoiceB = val);
-            exerciseItem.ChoiceC.UpdateIfChanged(item.ChoiceC, val => item.ChoiceC = val);
-            exerciseItem.ChoiceD.UpdateIfChanged(item.ChoiceD, val => item.ChoiceD = val);
             exerciseItem.CorrectAnswer.UpdateIfChanged(item.CorrectAnswer, val => item.CorrectAnswer = val);
+
+            if(item is MultipleChoiceItem mcItem)
+            {
+                exerciseItem.ChoiceA.UpdateIfChanged(mcItem.ChoiceA, val => mcItem.ChoiceA = val);
+                exerciseItem.ChoiceB.UpdateIfChanged(mcItem.ChoiceB, val => mcItem.ChoiceB = val);
+                exerciseItem.ChoiceC.UpdateIfChanged(mcItem.ChoiceC, val => mcItem.ChoiceC = val);
+                exerciseItem.ChoiceD.UpdateIfChanged(mcItem.ChoiceD, val => mcItem.ChoiceD = val);
+            }
 
             await _backendDbContext.SaveChangesAsync();
         }

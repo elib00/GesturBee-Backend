@@ -13,12 +13,12 @@ namespace GesturBee_Backend.Models
         [ForeignKey("TeacherId")]
         public int TeacherId { get; set; }
 
-        public string ExerciseTitle {  get; set; }
-        public string ExerciseDescription { get; set; }
+        public string ExerciseTitle { get; set; } = string.Empty;
+        public string ExerciseDescription { get; set; } = string.Empty;
         public DateTime CreatedAt { get; set; }
 
         [JsonIgnore]
         public User? Teacher { get; set; }
-        public List<ExerciseItem> ExerciseItems { get; set; } = new List<ExerciseItem>();
+        public ICollection<ExerciseItem> ExerciseItems { get; set; } = [];
     }
 }

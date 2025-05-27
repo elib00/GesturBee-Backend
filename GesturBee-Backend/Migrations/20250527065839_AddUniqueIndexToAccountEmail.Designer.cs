@@ -4,6 +4,7 @@ using GesturBee_Backend;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace GesturBee_Backend.Migrations
 {
     [DbContext(typeof(BackendDbContext))]
-    partial class BackendDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250527065839_AddUniqueIndexToAccountEmail")]
+    partial class AddUniqueIndexToAccountEmail
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -115,6 +118,22 @@ namespace GesturBee_Backend.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
+                    b.Property<string>("ChoiceA")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("ChoiceB")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("ChoiceC")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("ChoiceD")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<string>("CorrectAnswer")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -125,11 +144,6 @@ namespace GesturBee_Backend.Migrations
                     b.Property<int>("ItemNumber")
                         .HasColumnType("int");
 
-                    b.Property<string>("ItemType")
-                        .IsRequired()
-                        .HasMaxLength(21)
-                        .HasColumnType("nvarchar(21)");
-
                     b.Property<string>("Question")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -139,10 +153,31 @@ namespace GesturBee_Backend.Migrations
                     b.HasIndex("ExerciseId");
 
                     b.ToTable("ExerciseItems");
+                });
 
-                    b.HasDiscriminator<string>("ItemType").HasValue("Base");
+            modelBuilder.Entity("GesturBee_Backend.Models.Level", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
 
-                    b.UseTphMappingStrategy();
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<bool>("IsCompleted")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("LevelName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("StageId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("StageId");
+
+                    b.ToTable("Levels");
                 });
 
             modelBuilder.Entity("GesturBee_Backend.Models.RoadmapProgress", b =>
@@ -167,6 +202,26 @@ namespace GesturBee_Backend.Migrations
                     b.HasIndex("UserId");
 
                     b.ToTable("RoadmapProgresses");
+                });
+
+            modelBuilder.Entity("GesturBee_Backend.Models.Stage", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("RequiredStars")
+                        .HasColumnType("int");
+
+                    b.Property<string>("StageName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Stage");
                 });
 
             modelBuilder.Entity("GesturBee_Backend.Models.StudentClass", b =>
@@ -298,29 +353,6 @@ namespace GesturBee_Backend.Migrations
                     b.ToTable("Video");
                 });
 
-            modelBuilder.Entity("GesturBee_Backend.Models.MultipleChoiceItem", b =>
-                {
-                    b.HasBaseType("GesturBee_Backend.Models.ExerciseItem");
-
-                    b.Property<string>("ChoiceA")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("ChoiceB")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("ChoiceC")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("ChoiceD")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasDiscriminator().HasValue("MultipleChoice");
-                });
-
             modelBuilder.Entity("GesturBee_Backend.Models.Class", b =>
                 {
                     b.HasOne("GesturBee_Backend.Models.User", "Teacher")
@@ -371,6 +403,17 @@ namespace GesturBee_Backend.Migrations
                         .IsRequired();
 
                     b.Navigation("Exercise");
+                });
+
+            modelBuilder.Entity("GesturBee_Backend.Models.Level", b =>
+                {
+                    b.HasOne("GesturBee_Backend.Models.Stage", "Stage")
+                        .WithMany()
+                        .HasForeignKey("StageId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Stage");
                 });
 
             modelBuilder.Entity("GesturBee_Backend.Models.RoadmapProgress", b =>

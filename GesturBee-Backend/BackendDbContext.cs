@@ -13,7 +13,6 @@ namespace GesturBee_Backend
         public DbSet<Class> Classes { get; set; }
         public DbSet<StudentClass> StudentClasses { get; set; }
         public DbSet<EnrollmentRequest> EnrollmentRequests { get; set; }
-        public DbSet<Level> Levels { get; set; }
         public DbSet<Exercise> Exercises { get; set; }
         public DbSet<ExerciseItem> ExerciseItems { get; set; }
         public DbSet<RoadmapProgress> RoadmapProgresses { get; set; }
@@ -25,6 +24,11 @@ namespace GesturBee_Backend
             modelBuilder.Entity<UserAccount>()
                 .HasIndex(a => a.Email)
                 .IsUnique();
+
+            modelBuilder.Entity<ExerciseItem>()
+                .HasDiscriminator<string>("ItemType") // This is the discriminator column
+                .HasValue<ExerciseItem>("Base")
+                .HasValue<MultipleChoiceItem>("MultipleChoice");
 
 
             modelBuilder.Entity<Class>()
