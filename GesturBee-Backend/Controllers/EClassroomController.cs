@@ -162,7 +162,7 @@ namespace GesturBee_Backend.Controllers
         [HttpPost("upload-presigned-url/")]
         public async Task<IActionResult> GetBatchUploadPresignedURL([FromBody] List<UploadRequestDTO> uploadRequests)
         {
-            Dictionary<string, string> map = [];
+            Dictionary<int, string> map = [];
             foreach(UploadRequestDTO uploadRequest in uploadRequests)
             {
                 if (string.IsNullOrEmpty(uploadRequest.FileName) || string.IsNullOrEmpty(uploadRequest.ContentType))
@@ -173,7 +173,8 @@ namespace GesturBee_Backend.Controllers
                 if (string.IsNullOrEmpty(url))
                     return StatusCode(StatusCodes.Status500InternalServerError, "Failed to generate pre-signed URL.");
 
-                map[uploadRequest.FileName] = url;
+
+                map[uploadRequest.ItemNumber] = url;
             }
 
             List<CreateExerciseContentDTO> entities = uploadRequests.Select(uploadRequest => new CreateExerciseContentDTO
