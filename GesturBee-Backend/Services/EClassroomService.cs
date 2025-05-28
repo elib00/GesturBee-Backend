@@ -304,5 +304,17 @@ namespace GesturBee_Backend.Services
                 ResponseType = ResponseType.ExerciseContentCreated
             };
         }
+
+        public async Task<ApiResponseDTO<ContentS3KeyDTO>> GetContentS3Key(GetContentS3KeyDTO info)
+        {
+            ContentS3KeyDTO contentKey = await _eClassroomRepository.GetContentS3Key(info.BatchId, info.ItemNumber);
+
+            return new ApiResponseDTO<ContentS3KeyDTO>
+            {
+                Success = true,
+                ResponseType = ResponseType.SuccessfulRetrievalOfResource,
+                Data = contentKey
+            };
+        }
     }
 }

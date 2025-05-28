@@ -168,7 +168,7 @@ namespace GesturBee_Backend.Controllers
                 if (string.IsNullOrEmpty(uploadRequest.FileName) || string.IsNullOrEmpty(uploadRequest.ContentType))
                     return BadRequest("FileName and ContentType are required.");
 
-                string url = _s3Service.GeneratePreSignedClassVideoUploadUrl(uploadRequest.FileName, uploadRequest.ContentType);
+                string url = _s3Service.GeneratePresignedClassVideoUploadUrl(uploadRequest.FileName, uploadRequest.ContentType);
 
                 if (string.IsNullOrEmpty(url))
                     return StatusCode(StatusCodes.Status500InternalServerError, "Failed to generate pre-signed URL.");
@@ -190,6 +190,24 @@ namespace GesturBee_Backend.Controllers
 
             return Ok(new { UrlMap = map, Response = response });
         }
+
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+        [HttpGet("get-presigned-url")]
+        public async Task<IActionResult> GetExerciseContentPresignedURL([FromBody] ContentS3KeyDTO key)
+        {
+            if (string.IsNullOrEmpty(key.Key)) 
+                return BadRequest("Key is required.");
+
+            string url = _s3Service.GeneratePresignedFetchExerciseContentUrl(key.Key);
+
+            if (string.IsNullOrEmpty(url))
+                return StatusCode(StatusCodes.Status500InternalServerError, "Failed to generate pre-signed URL.");
+
+            return Ok(new { Url = url });
+        }
+
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+        [HttpGet("get-presigned-url")]
 
         [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
         [HttpGet("exercise/{exerciseId}/")]
