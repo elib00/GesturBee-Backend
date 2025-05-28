@@ -11,7 +11,6 @@ namespace GesturBee_Backend.Models
 
         [ForeignKey("ExerciseItemId")]
         public int ExerciseItemId { get; set; }
-        public string URL { get; set; }
         public string Description { get; set; }
 
         [JsonIgnore]

@@ -1,6 +1,5 @@
 ﻿using GesturBee_Backend.DTO;
 using GesturBee_Backend.Models;
-using MimeKit.Tnef;
 
 namespace GesturBee_Backend.Repository.Interfaces
 {
@@ -25,8 +24,11 @@ namespace GesturBee_Backend.Repository.Interfaces
         Task<StudentClass> GetStudentClass(int studentId, int classId);
         Task<List<User>> GetAllUsersNotEnrolledInClass(int classId);
         Task<Exercise?> GetExerciseById(int exerciseId);
-        Task CreateExercise(CreateExerciseDTO info);
+        Task<Exercise> CreateExercise(CreateExerciseDTO info);
         Task EditExerciseItem(ExerciseItemDTO exerciseItem);
         Task<List<Exercise>> GetTeacherExercises(int teacherId);
+        Task CreateExerciseContent(CreateExerciseContentDTO exerciseContent);
+        //Task UpdateExerciseIdOfExerciseContents(int exerciseId, string batchId);
+        Task<List<ExerciseContent>> GetAllExerciseContents(string batchId);
     }
 }

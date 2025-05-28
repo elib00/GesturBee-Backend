@@ -13,9 +13,8 @@ namespace GesturBee_Backend.Models
         public int ExerciseId { get; set; }
 
         public int ItemNumber { get; set; }
-        public Video Video { get; set; }
         public string Question { get; set; } = string.Empty;
-        public string CorrectAnswer { get; set; }
+        public string CorrectAnswer { get; set; } = string.Empty;
 
         [JsonIgnore]
         public Exercise Exercise { get; set; }

@@ -127,8 +127,8 @@ namespace GesturBee_Backend.Services
 
         public async Task<ApiResponseDTO> ProcessEnrollmentRequest(ClassAdmissionDTO classAdmissionDetails)
         {
-            int studentId = (int) classAdmissionDetails.StudentId;
-            int classId = (int) classAdmissionDetails.ClassId;
+            int studentId = (int)classAdmissionDetails.StudentId;
+            int classId = (int)classAdmissionDetails.ClassId;
 
             ApiResponseDTO checkStudentAndClass = await CheckStudentAndClassIfNull(studentId, classId);
 
@@ -164,7 +164,7 @@ namespace GesturBee_Backend.Services
             if (!checkStudentAndClass.Success) return checkStudentAndClass;
 
             StudentClass studentClassToRemove = await _eClassroomRepository.GetStudentClass(studentId, classId);
-            
+
             await _eClassroomRepository.RemoveStudentClass(studentClassToRemove);
             return new ApiResponseDTO
             {
@@ -206,13 +206,13 @@ namespace GesturBee_Backend.Services
             Class cls = await _eClassroomRepository.GetClassById(classId);
 
             if (cls == null)
-            { 
+            {
                 return new ApiResponseDTO { Success = false, ResponseType = ResponseType.ClassNotFound };
             }
 
             return new ApiResponseDTO
             {
-                Success = true, 
+                Success = true,
                 ResponseType = ResponseType.NoNullValues
             };
         }
@@ -271,9 +271,13 @@ namespace GesturBee_Backend.Services
             };
         }
 
-            public async Task<ApiResponseDTO> CreateExercise(CreateExerciseDTO info)
+        public async Task<ApiResponseDTO> CreateExercise(CreateExerciseDTO info)
         {
             await _eClassroomRepository.CreateExercise(info);
+            
+            //change the exercise id of the exercise contents 
+            //await _eClassroomRepository.UpdateExerciseIdOfExerciseContents(exercise.Id, info.BatchId);
+
             return new ApiResponseDTO
             {
                 Success = true,
@@ -291,5 +295,14 @@ namespace GesturBee_Backend.Services
             };
         }
 
+        public async Task<ApiResponseDTO> CreateExerciseContent(CreateExerciseContentDTO exerciseContent)
+        {
+            await _eClassroomRepository.CreateExerciseContent(exerciseContent);
+            return new ApiResponseDTO
+            {
+                Success = true,
+                ResponseType = ResponseType.ExerciseContentCreated
+            };
+        }
     }
 }

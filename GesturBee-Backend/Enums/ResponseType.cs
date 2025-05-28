@@ -44,6 +44,7 @@
         InvitationRejectionSuccessful,
         StudentRemovalSuccessful,
         ExerciseNotFound,
+        ExerciseContentCreated,
         NoNullValues,
 
         //for roadmap
