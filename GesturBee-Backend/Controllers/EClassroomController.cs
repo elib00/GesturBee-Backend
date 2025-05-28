@@ -167,7 +167,21 @@ namespace GesturBee_Backend.Controllers
 
             string url = _s3Service.GeneratePreSignedClassVideoUploadUrl(uploadRequest.FileName, uploadRequest.ContentType);
 
-            return Ok(new { Url = url });
+            if (string.IsNullOrEmpty(url))
+                return StatusCode(StatusCodes.Status500InternalServerError, "Failed to generate pre-signed URL.");
+
+            CreateExerciseContentDTO exerciseContent = new()
+            {
+                ContentS3Key = $"class_materials/{uploadRequest.FileName}",
+                ContentType = uploadRequest.ContentType,
+                BatchId = uploadRequest.BatchId,
+                ItemNumber = uploadRequest.ItemNumber
+            };
+
+            //create the exercise content 
+            ApiResponseDTO response = await _eClassroomService.CreateExerciseContent(exerciseContent);
+
+            return Ok(new { Url = url, Response = response });
         }
 
         [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
@@ -202,7 +216,7 @@ namespace GesturBee_Backend.Controllers
         [HttpPost("exercise/create-exercise/")]
         public async Task<IActionResult> CreateExercise([FromBody] CreateExerciseDTO exercise)
         {
-            ApiResponseDTO<object> response = await _eClassroomService.CreateExercise(exercise);
+            ApiResponseDTO response = await _eClassroomService.CreateExercise(exercise);
             return StatusCode(StatusCodes.Status201Created, response);
         }
 

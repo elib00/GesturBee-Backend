@@ -197,25 +197,48 @@ namespace GesturBee_Backend.Repository
                 .ToListAsync();
         }
 
-        public async Task CreateExercise(CreateExerciseDTO exercise)
+        public async Task<List<ExerciseContent>> GetAllExerciseContents(string batchId)
         {
-            Exercise newExercise = new Exercise
+            return await _backendDbContext.ExerciseContents
+                .Where(exerciseContent => exerciseContent.BatchId == batchId)
+                .ToListAsync();
+        }
+
+        public async Task<Exercise> CreateExercise(CreateExerciseDTO exercise)
+        {
+            Exercise newExercise = new()
             {
                 TeacherId = exercise.TeacherId,
                 ExerciseTitle = exercise.ExerciseTitle,
                 ExerciseDescription = exercise.ExerciseDescription,
+                BatchId = exercise.BatchId,
                 CreatedAt = DateTime.UtcNow,
                 ExerciseItems = exercise.ExerciseItems
             };
 
             await _backendDbContext.Exercises.AddAsync(newExercise);
             await _backendDbContext.SaveChangesAsync();
+            return newExercise;
         }
+
+        //public async Task UpdateExerciseIdOfExerciseContents(int exerciseId, string batchId)
+        //{
+        //    List<ExerciseContent> exerciseContents = await _backendDbContext.ExerciseContents
+        //        .Where(exerciseContent => exerciseContent.BatchId == batchId)
+        //        .ToListAsync();
+
+        //    foreach (ExerciseContent exerciseContent in exerciseContents)
+        //    {
+        //        exerciseContent.ExerciseId = exerciseId;
+        //    }
+
+        //    await _backendDbContext.SaveChangesAsync();
+        //}
 
         public async Task EditExerciseItem(ExerciseItemDTO exerciseItem)
         {
             int exerciseItemId = exerciseItem.ExerciseItemId;
-            ExerciseItem item = await GetExerciseItemById(exerciseItemId);
+            ExerciseItem? item = await GetExerciseItemById(exerciseItemId);
 
             //extension methods
             exerciseItem.ItemNumber.UpdateIfChanged(item.ItemNumber, val => item.ItemNumber = val);
@@ -230,6 +253,21 @@ namespace GesturBee_Backend.Repository
                 exerciseItem.ChoiceD.UpdateIfChanged(mcItem.ChoiceD, val => mcItem.ChoiceD = val);
             }
 
+            await _backendDbContext.SaveChangesAsync();
+        }
+
+
+        public async Task CreateExerciseContent(CreateExerciseContentDTO exerciseContent)
+        {
+            ExerciseContent newExerciseContent = new()
+            {
+                ContentS3Key = exerciseContent.ContentS3Key,
+                ContentType = exerciseContent.ContentType,
+                BatchId = exerciseContent.BatchId,
+                ItemNumber = exerciseContent.ItemNumber
+            };
+
+            await _backendDbContext.ExerciseContents.AddAsync(newExerciseContent);
             await _backendDbContext.SaveChangesAsync();
         }
 
