@@ -213,27 +213,23 @@ namespace GesturBee_Backend.Repository
                 ExerciseDescription = exercise.ExerciseDescription,
                 BatchId = exercise.BatchId,
                 CreatedAt = DateTime.UtcNow,
-                ExerciseItems = exercise.ExerciseItems
             };
 
             await _backendDbContext.Exercises.AddAsync(newExercise);
             await _backendDbContext.SaveChangesAsync();
+
+            List<ExerciseItem> exerciseItems = exercise.ExerciseItems.Select(item => new ExerciseItem
+            {
+                ItemNumber = item.ItemNumber,
+                Question = item.Question,
+                CorrectAnswer = item.CorrectAnswer,
+                ExerciseId = newExercise.Id
+            }).ToList();
+
+            await _backendDbContext.ExerciseItems.AddRangeAsync(exerciseItems);
+            await _backendDbContext.SaveChangesAsync();
             return newExercise;
         }
-
-        //public async Task UpdateExerciseIdOfExerciseContents(int exerciseId, string batchId)
-        //{
-        //    List<ExerciseContent> exerciseContents = await _backendDbContext.ExerciseContents
-        //        .Where(exerciseContent => exerciseContent.BatchId == batchId)
-        //        .ToListAsync();
-
-        //    foreach (ExerciseContent exerciseContent in exerciseContents)
-        //    {
-        //        exerciseContent.ExerciseId = exerciseId;
-        //    }
-
-        //    await _backendDbContext.SaveChangesAsync();
-        //}
 
         public async Task EditExerciseItem(ExerciseItemDTO exerciseItem)
         {
@@ -269,6 +265,17 @@ namespace GesturBee_Backend.Repository
 
             await _backendDbContext.ExerciseContents.AddRangeAsync(entities);
             await _backendDbContext.SaveChangesAsync();
+        }
+
+        public async Task<ContentS3KeyDTO> GetContentS3Key(string batchId, int itemNumber)
+        {
+            ExerciseContent? content = await _backendDbContext.ExerciseContents
+                .FirstOrDefaultAsync(exerciseContent => exerciseContent.ItemNumber == itemNumber && exerciseContent.BatchId == batchId);
+
+            return new ContentS3KeyDTO
+            {
+                Key = content.ContentS3Key
+            };
         }
 
         private async Task<ExerciseItem?> GetExerciseItemById(int exerciseItemId)

@@ -15,7 +15,7 @@ namespace GesturBee_Backend.Services
             _bucketName = configuration["AWS:BucketName"];
         }
 
-        public string GeneratePreSignedClassVideoUploadUrl(string fileName, string contentType)
+        public string GeneratePresignedClassVideoUploadUrl(string fileName, string contentType)
         {
             string key = $"class_materials/{fileName}"; // teacher/id/uniqueId/video.mp4
 
@@ -28,9 +28,22 @@ namespace GesturBee_Backend.Services
                 ContentType = contentType
             };
 
-            string url = _s3Client.GetPreSignedURL(request);
-            return url;
+            return _s3Client.GetPreSignedURL(request);
         }
+
+        public string GeneratePresignedFetchExerciseContentUrl(string key)
+        {
+            GetPreSignedUrlRequest request = new()
+            {
+                BucketName = "gesturbee",
+                Key = key,
+                Expires = DateTime.UtcNow.AddMinutes(10),
+                Verb = HttpVerb.GET
+            };
+
+            return _s3Client.GetPreSignedURL(request);
+        }
+
     }
 
 }
