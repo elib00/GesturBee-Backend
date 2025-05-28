@@ -1,5 +1,6 @@
 ﻿using GesturBee_Backend.DTO;
 using GesturBee_Backend.Models;
+using System.Collections.Generic;
 
 namespace GesturBee_Backend.Repository.Interfaces
 {
@@ -27,7 +28,7 @@ namespace GesturBee_Backend.Repository.Interfaces
         Task<Exercise> CreateExercise(CreateExerciseDTO info);
         Task EditExerciseItem(ExerciseItemDTO exerciseItem);
         Task<List<Exercise>> GetTeacherExercises(int teacherId);
-        Task CreateExerciseContent(CreateExerciseContentDTO exerciseContent);
+        Task CreateBatchExerciseContent(List<CreateExerciseContentDTO> exerciseContents);
         //Task UpdateExerciseIdOfExerciseContents(int exerciseId, string batchId);
         Task<List<ExerciseContent>> GetAllExerciseContents(string batchId);
     }

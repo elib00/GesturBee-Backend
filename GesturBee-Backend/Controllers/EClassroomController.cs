@@ -160,28 +160,34 @@ namespace GesturBee_Backend.Controllers
 
         [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
         [HttpPost("upload-presigned-url/")]
-        public async Task<IActionResult> GetUploadPresignedURL([FromBody] UploadRequestDTO uploadRequest)
+        public async Task<IActionResult> GetBatchUploadPresignedURL([FromBody] List<UploadRequestDTO> uploadRequests)
         {
-            if (string.IsNullOrEmpty(uploadRequest.FileName) || string.IsNullOrEmpty(uploadRequest.ContentType))
-                return BadRequest("FileName and ContentType are required.");
+            Dictionary<string, string> map = [];
+            foreach(UploadRequestDTO uploadRequest in uploadRequests)
+            {
+                if (string.IsNullOrEmpty(uploadRequest.FileName) || string.IsNullOrEmpty(uploadRequest.ContentType))
+                    return BadRequest("FileName and ContentType are required.");
 
-            string url = _s3Service.GeneratePreSignedClassVideoUploadUrl(uploadRequest.FileName, uploadRequest.ContentType);
+                string url = _s3Service.GeneratePreSignedClassVideoUploadUrl(uploadRequest.FileName, uploadRequest.ContentType);
 
-            if (string.IsNullOrEmpty(url))
-                return StatusCode(StatusCodes.Status500InternalServerError, "Failed to generate pre-signed URL.");
+                if (string.IsNullOrEmpty(url))
+                    return StatusCode(StatusCodes.Status500InternalServerError, "Failed to generate pre-signed URL.");
 
-            CreateExerciseContentDTO exerciseContent = new()
+                map[uploadRequest.FileName] = url;
+            }
+
+            List<CreateExerciseContentDTO> entities = uploadRequests.Select(uploadRequest => new CreateExerciseContentDTO
             {
                 ContentS3Key = $"class_materials/{uploadRequest.FileName}",
                 ContentType = uploadRequest.ContentType,
                 BatchId = uploadRequest.BatchId,
                 ItemNumber = uploadRequest.ItemNumber
-            };
+            }).ToList();
 
             //create the exercise content 
-            ApiResponseDTO response = await _eClassroomService.CreateExerciseContent(exerciseContent);
+            ApiResponseDTO response = await _eClassroomService.CreateBatchExerciseContent(entities);
 
-            return Ok(new { Url = url, Response = response });
+            return Ok(new { UrlMap = map, Response = response });
         }
 
         [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
