@@ -257,17 +257,17 @@ namespace GesturBee_Backend.Repository
         }
 
 
-        public async Task CreateExerciseContent(CreateExerciseContentDTO exerciseContent)
+        public async Task CreateBatchExerciseContent(List<CreateExerciseContentDTO> exerciseContents)
         {
-            ExerciseContent newExerciseContent = new()
+            List<ExerciseContent> entities = exerciseContents.Select(exerciseContent => new ExerciseContent
             {
                 ContentS3Key = exerciseContent.ContentS3Key,
                 ContentType = exerciseContent.ContentType,
                 BatchId = exerciseContent.BatchId,
                 ItemNumber = exerciseContent.ItemNumber
-            };
+            }).ToList();
 
-            await _backendDbContext.ExerciseContents.AddAsync(newExerciseContent);
+            await _backendDbContext.ExerciseContents.AddRangeAsync(entities);
             await _backendDbContext.SaveChangesAsync();
         }
 
