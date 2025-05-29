@@ -197,13 +197,6 @@ namespace GesturBee_Backend.Repository
                 .ToListAsync();
         }
 
-        public async Task<List<ExerciseContent>> GetAllExerciseContents(string batchId)
-        {
-            return await _backendDbContext.ExerciseContents
-                .Where(exerciseContent => exerciseContent.BatchId == batchId)
-                .ToListAsync();
-        }
-
         public async Task<Exercise> CreateExercise(CreateExerciseDTO exercise)
         {
             Exercise newExercise = new()
@@ -218,20 +211,47 @@ namespace GesturBee_Backend.Repository
             await _backendDbContext.Exercises.AddAsync(newExercise);
             await _backendDbContext.SaveChangesAsync();
 
-            List<ExerciseItem> exerciseItems = exercise.ExerciseItems.Select(item => new ExerciseItem
+            List<ExerciseItem> exerciseItems = [];
+
+            if (exercise.Type == "Base")
             {
-                ItemNumber = item.ItemNumber,
-                Question = item.Question,
-                CorrectAnswer = item.CorrectAnswer,
-                ExerciseId = newExercise.Id
-            }).ToList();
+                exerciseItems = exercise.ExerciseItems.Select(item => new ExerciseItem
+                {
+                    ItemNumber = item.ItemNumber,
+                    Question = item.Question,
+                    CorrectAnswer = item.CorrectAnswer,
+                    Exercise = newExercise
+                }).ToList();
+            }
+            else if (exercise.Type == "MultipleChoice")
+            {
+                foreach (var item in exercise.ExerciseItems)
+                {
+                    exerciseItems.Add(new MultipleChoiceItem
+                    {
+                        ItemNumber = item.ItemNumber,
+                        Question = item.Question,
+                        CorrectAnswer = item.CorrectAnswer,
+                        Exercise = newExercise,
+                        ChoiceA = item.ChoiceA,
+                        ChoiceB = item.ChoiceB,
+                        ChoiceC = item.ChoiceC,
+                        ChoiceD = item.ChoiceD
+                    });
+                }
+
+            }
 
             await _backendDbContext.ExerciseItems.AddRangeAsync(exerciseItems);
             await _backendDbContext.SaveChangesAsync();
+
+            // Optional: attach items if needed
+            newExercise.ExerciseItems = exerciseItems;
+
             return newExercise;
         }
 
-        public async Task EditExerciseItem(ExerciseItemDTO exerciseItem)
+        public async Task EditExerciseItem(EditExerciseItemDTO exerciseItem)
         {
             int exerciseItemId = exerciseItem.ExerciseItemId;
             ExerciseItem? item = await GetExerciseItemById(exerciseItemId);

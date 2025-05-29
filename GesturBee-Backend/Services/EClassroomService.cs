@@ -274,9 +274,6 @@ namespace GesturBee_Backend.Services
         public async Task<ApiResponseDTO> CreateExercise(CreateExerciseDTO info)
         {
             await _eClassroomRepository.CreateExercise(info);
-            
-            //change the exercise id of the exercise contents 
-            //await _eClassroomRepository.UpdateExerciseIdOfExerciseContents(exercise.Id, info.BatchId);
 
             return new ApiResponseDTO
             {
@@ -285,7 +282,7 @@ namespace GesturBee_Backend.Services
             };
         }
 
-        public async Task<ApiResponseDTO> EditExerciseItem(ExerciseItemDTO exerciseItem)
+        public async Task<ApiResponseDTO> EditExerciseItem(EditExerciseItemDTO exerciseItem)
         {
             await _eClassroomRepository.EditExerciseItem(exerciseItem);
             return new ApiResponseDTO

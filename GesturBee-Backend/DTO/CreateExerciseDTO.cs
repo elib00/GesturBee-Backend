@@ -11,6 +11,7 @@ namespace GesturBee_Backend.DTO
         public string ExerciseTitle { get; set; }
         public string ExerciseDescription { get; set; }
         public string BatchId { get; set; }
-        public List<ExerciseItem> ExerciseItems { get; set; } = [];
+        public string Type { get; set; }
+        public List<CreateExerciseItemDTO> ExerciseItems { get; set; } = [];
     }
 }

@@ -18,7 +18,7 @@ namespace GesturBee_Backend.Services.Interfaces
         Task<ApiResponseDTO<List<User>>> GetAllUsersNotEnrolledInClass(int classId);
         Task<ApiResponseDTO<Exercise>> GetExerciseById(int exerciseId);
         Task<ApiResponseDTO> CreateExercise(CreateExerciseDTO info);
-        Task<ApiResponseDTO> EditExerciseItem(ExerciseItemDTO exerciseItem);
+        Task<ApiResponseDTO> EditExerciseItem(EditExerciseItemDTO exerciseItem);
         Task<ApiResponseDTO<List<Exercise>>> GetTeacherExercises(int teacherId);
         Task<ApiResponseDTO> CreateBatchExerciseContent(List<CreateExerciseContentDTO> exerciseContents);
         Task<ApiResponseDTO<ContentS3KeyDTO>> GetContentS3Key(GetContentS3KeyDTO info);

@@ -3,7 +3,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace GesturBee_Backend.DTO
 {
-    public class ExerciseItemDTO
+    public class EditExerciseItemDTO
     {
         [Required]
         public int ExerciseItemId { get; set; }
