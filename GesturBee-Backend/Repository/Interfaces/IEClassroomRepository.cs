@@ -26,11 +26,11 @@ namespace GesturBee_Backend.Repository.Interfaces
         Task<List<User>> GetAllUsersNotEnrolledInClass(int classId);
         Task<Exercise?> GetExerciseById(int exerciseId);
         Task<Exercise> CreateExercise(CreateExerciseDTO info);
-        Task EditExerciseItem(ExerciseItemDTO exerciseItem);
+        Task EditExerciseItem(EditExerciseItemDTO exerciseItem);
         Task<List<Exercise>> GetTeacherExercises(int teacherId);
         Task CreateBatchExerciseContent(List<CreateExerciseContentDTO> exerciseContents);
         //Task UpdateExerciseIdOfExerciseContents(int exerciseId, string batchId);
-        Task<List<ExerciseContent>> GetAllExerciseContents(string batchId);
+        //Task<List<ExerciseContent>> GetAllExerciseContents(string batchId);
         Task<ContentS3KeyDTO> GetContentS3Key(string batchId, int itemNumber);
     }
 }

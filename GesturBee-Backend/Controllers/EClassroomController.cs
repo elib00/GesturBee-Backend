@@ -207,7 +207,7 @@ namespace GesturBee_Backend.Controllers
         }
 
         [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
-        [HttpGet("get-presigned-url")]
+        [HttpGet("")]
 
         [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
         [HttpGet("exercise/{exerciseId}/")]
@@ -247,7 +247,7 @@ namespace GesturBee_Backend.Controllers
 
         [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
         [HttpPatch("exercise/item/edit-item")]
-        public async Task<IActionResult> EditExerciseItem([FromBody] ExerciseItemDTO exercise)
+        public async Task<IActionResult> EditExerciseItem([FromBody] EditExerciseItemDTO exercise)
         {
             if (!ModelState.IsValid)
             {
