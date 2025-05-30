@@ -175,7 +175,7 @@ namespace GesturBee_Backend.Controllers
         }
 
         [HttpGet("get-presigned-url")]
-        public async Task<IActionResult> GetExerciseContentPresignedURL([FromBody] ContentS3KeyDTO key)
+        public IActionResult GetExerciseContentPresignedURL([FromBody] ContentS3KeyDTO key)
         {
             if (string.IsNullOrEmpty(key.Key)) 
                 return BadRequest("Key is required.");

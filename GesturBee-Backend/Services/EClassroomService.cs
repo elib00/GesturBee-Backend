@@ -10,10 +10,12 @@ namespace GesturBee_Backend.Services
     public class EClassroomService : IEClassroomService
     {
         private readonly IEClassroomRepository _eClassroomRepository;
+        private readonly IS3Service _s3Service;
 
-        public EClassroomService(IEClassroomRepository eClassroomRepository)
+        public EClassroomService(IEClassroomRepository eClassroomRepository, IS3Service s3Service)
         {
             _eClassroomRepository = eClassroomRepository;
+            _s3Service = s3Service;
         }
 
         public async Task<ApiResponseDTO<List<Class>>> GetStudentClasses(int studentId)
@@ -254,7 +256,7 @@ namespace GesturBee_Backend.Services
 
             List<ExerciseContent> exerciseContents = await _eClassroomRepository.GetExerciseContents(exercise.BatchId);
 
-            GetExerciseDTO projectedExercise = new GetExerciseDTO
+            GetExerciseDTO projectedExercise = new()
             {
                 ExerciseTitle = exercise.ExerciseTitle,
                 ExerciseDescription = exercise.ExerciseDescription,
@@ -270,7 +272,7 @@ namespace GesturBee_Backend.Services
                             ItemNumber = item.ItemNumber,
                             Question = item.Question,
                             CorrectAnswer = item.CorrectAnswer,
-                            ContentS3Key = content?.ContentS3Key, // Use null-coalescing operator to handle null content
+                            PresignedURL = _s3Service.GeneratePresignedFetchExerciseContentUrl(content?.ContentS3Key),
                             ChoiceA = multipleChoiceItem.ChoiceA,
                             ChoiceB = multipleChoiceItem.ChoiceB,
                             ChoiceC = multipleChoiceItem.ChoiceC,
@@ -284,7 +286,7 @@ namespace GesturBee_Backend.Services
                             ItemNumber = item.ItemNumber,
                             Question = item.Question,
                             CorrectAnswer = item.CorrectAnswer,
-                            ContentS3Key = content?.ContentS3Key, //
+                            PresignedURL = _s3Service.GeneratePresignedFetchExerciseContentUrl(content?.ContentS3Key),
                         };
                     }      
                 }).ToList()
