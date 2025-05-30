@@ -239,24 +239,63 @@ namespace GesturBee_Backend.Services
         }
 
 
-        public async Task<ApiResponseDTO<Exercise>> GetExerciseById(int exerciseId)
+        public async Task<ApiResponseDTO<GetExerciseDTO>> GetExerciseById(int exerciseId)
         {
             Exercise? exercise = await _eClassroomRepository.GetExerciseById(exerciseId);
-
+         
             if (exercise == null)
             {
-                return new ApiResponseDTO<Exercise>
+                return new ApiResponseDTO<GetExerciseDTO>
                 {
                     Success = false,
                     ResponseType = ResponseType.ExerciseNotFound
                 };
             }
 
-            return new ApiResponseDTO<Exercise>
+            List<ExerciseContent> exerciseContents = await _eClassroomRepository.GetExerciseContents(exercise.BatchId);
+
+            GetExerciseDTO projectedExercise = new GetExerciseDTO
+            {
+                ExerciseTitle = exercise.ExerciseTitle,
+                ExerciseDescription = exercise.ExerciseDescription,
+                CreatedAt = exercise.CreatedAt,
+                ExerciseItems = exercise.ExerciseItems.Select(item =>
+                {
+                    ExerciseContent content = exerciseContents.FirstOrDefault(c => c.ItemNumber == item.ItemNumber && c.BatchId == exercise.BatchId);
+
+                    if (item is MultipleChoiceItem multipleChoiceItem)
+                    {
+                        return new GetExerciseItemDTO
+                        {
+                            ItemNumber = item.ItemNumber,
+                            Question = item.Question,
+                            CorrectAnswer = item.CorrectAnswer,
+                            ContentS3Key = content?.ContentS3Key, // Use null-coalescing operator to handle null content
+                            ChoiceA = multipleChoiceItem.ChoiceA,
+                            ChoiceB = multipleChoiceItem.ChoiceB,
+                            ChoiceC = multipleChoiceItem.ChoiceC,
+                            ChoiceD = multipleChoiceItem.ChoiceD
+                        };
+                    }
+                    else
+                    {
+                        return new GetExerciseItemDTO
+                        {
+                            ItemNumber = item.ItemNumber,
+                            Question = item.Question,
+                            CorrectAnswer = item.CorrectAnswer,
+                            ContentS3Key = content?.ContentS3Key, //
+                        };
+                    }      
+                }).ToList()
+            };
+           
+
+            return new ApiResponseDTO<GetExerciseDTO>
             {
                 Success = true,
                 ResponseType = ResponseType.SuccessfulRetrievalOfResource,
-                Data = exercise
+                Data = projectedExercise
             };
         }
 

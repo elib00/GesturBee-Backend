@@ -55,7 +55,6 @@ namespace GesturBee_Backend.Repository
                 .ToListAsync();
         }
 
-
         public async Task<List<User>> GetClassStudents(int classId)
         {
             return await _backendDbContext.StudentClasses
@@ -182,11 +181,19 @@ namespace GesturBee_Backend.Repository
                 .ToListAsync();
         }
 
-        public async Task<Exercise?> GetExerciseById(int exerciseId)
+        public async Task<Exercise> GetExerciseById(int exerciseId)
         {
             return await _backendDbContext.Exercises
                 .Include(exercise => exercise.ExerciseItems)
                 .FirstOrDefaultAsync(exercise => exercise.Id == exerciseId);
+        }
+
+        public async Task<List<ExerciseContent>> GetExerciseContents(string batchId)
+        {
+            return await _backendDbContext.ExerciseContents
+                .Where(exerciseContent => exerciseContent.BatchId == batchId)
+                .OrderBy(exerciseContent => exerciseContent.ItemNumber)
+                .ToListAsync();
         }
 
         public async Task<List<Exercise>> GetTeacherExercises(int teacherId)
@@ -271,7 +278,6 @@ namespace GesturBee_Backend.Repository
 
             await _backendDbContext.SaveChangesAsync();
         }
-
 
         public async Task CreateBatchExerciseContent(List<CreateExerciseContentDTO> exerciseContents)
         {

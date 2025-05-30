@@ -1,6 +1,6 @@
 ﻿namespace GesturBee_Backend.DTO
 {
-    public class CreateExerciseItemDTO
+    public class ExerciseItemDTO
     {
         public int ItemNumber { get; set; }
         public string Question { get; set; } = "";
