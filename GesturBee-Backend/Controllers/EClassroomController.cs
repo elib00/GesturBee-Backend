@@ -144,7 +144,7 @@ namespace GesturBee_Backend.Controllers
             return Ok(response);
         }
 
-        [HttpPost("teacher/{teacherId}/exercise-content/")]
+        [HttpPost("exercise-content/")]
         public async Task<IActionResult> CreateBatchExerciseContent([FromBody] List<CreateExerciseContentDTO> exerciseContents)
         {
             if (exerciseContents == null || exerciseContents.Count == 0)
@@ -215,7 +215,7 @@ namespace GesturBee_Backend.Controllers
             return Ok(response);
         }
 
-        [HttpPost("exercise/create-exercise")]
+        [HttpPost("exercise/")]
         public async Task<IActionResult> CreateExercise([FromBody] CreateExerciseDTO exercise)
         {
             ApiResponseDTO response = await _eClassroomService.CreateExercise(exercise);

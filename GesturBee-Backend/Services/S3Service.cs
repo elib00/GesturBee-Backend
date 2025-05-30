@@ -17,7 +17,7 @@ namespace GesturBee_Backend.Services
 
         public string GeneratePresignedClassVideoUploadUrl(string fileName, string contentType)
         {
-            string key = $"class_materials/{fileName}"; // teacher/id/uniqueId/video.mp4
+            string key = fileName; // teacher/id/uniqueId/video.mp4
 
             GetPreSignedUrlRequest request = new()
             {
