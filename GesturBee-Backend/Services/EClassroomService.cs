@@ -244,7 +244,7 @@ namespace GesturBee_Backend.Services
         public async Task<ApiResponseDTO<GetExerciseDTO>> GetExerciseById(int exerciseId)
         {
             Exercise? exercise = await _eClassroomRepository.GetExerciseById(exerciseId);
-         
+
             if (exercise == null)
             {
                 return new ApiResponseDTO<GetExerciseDTO>
@@ -288,10 +288,10 @@ namespace GesturBee_Backend.Services
                             CorrectAnswer = item.CorrectAnswer,
                             PresignedURL = _s3Service.GeneratePresignedFetchExerciseContentUrl(content?.ContentS3Key),
                         };
-                    }      
+                    }
                 }).ToList()
             };
-           
+
 
             return new ApiResponseDTO<GetExerciseDTO>
             {
@@ -352,6 +352,27 @@ namespace GesturBee_Backend.Services
                 Success = true,
                 ResponseType = ResponseType.SuccessfulRetrievalOfResource,
                 Data = contentKey
+            };
+        }
+
+        public async Task<ApiResponseDTO> CreateBatchExerciseItemAnswer(int exerciseId, List<ExerciseItemAnswerDTO> exerciseItemAnswers)
+        {
+            await _eClassroomRepository.CreateBatchExerciseItemAnswer(exerciseId, exerciseItemAnswers);
+            return new ApiResponseDTO
+            {
+                Success = true,
+                ResponseType = ResponseType.ResourceGroupCreated
+            };
+        }
+
+        public async Task<ApiResponseDTO<List<ExerciseItemAnswerDTO>>> GetBatchExerciseItemAnswer(int exerciseId)
+        {
+            List<ExerciseItemAnswerDTO> exerciseItemAnswers = await _eClassroomRepository.GetBatchExerciseItemAnswer(exerciseId);
+            return new ApiResponseDTO<List<ExerciseItemAnswerDTO>>
+            {
+                Success = true,
+                ResponseType = ResponseType.SuccessfulRetrievalOfResource,
+                Data = exerciseItemAnswers
             };
         }
     }

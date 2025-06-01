@@ -46,6 +46,7 @@
         ExerciseNotFound,
         ExerciseContentCreated,
         NoNullValues,
+        ResourceGroupCreated,
 
         //for roadmap
         LevelNotFound,
