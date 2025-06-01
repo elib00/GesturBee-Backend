@@ -17,6 +17,7 @@ namespace GesturBee_Backend
         public DbSet<ExerciseItem> ExerciseItems { get; set; }
         public DbSet<RoadmapProgress> RoadmapProgresses { get; set; }
         public DbSet<ExerciseContent> ExerciseContents { get; set; }
+        public DbSet<ExerciseItemAnswer> ExerciseItemAnswers { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

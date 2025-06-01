@@ -252,9 +252,6 @@ namespace GesturBee_Backend.Repository
             await _backendDbContext.ExerciseItems.AddRangeAsync(exerciseItems);
             await _backendDbContext.SaveChangesAsync();
 
-            // Optional: attach items if needed
-            newExercise.ExerciseItems = exerciseItems;
-
             return newExercise;
         }
 
@@ -302,6 +299,31 @@ namespace GesturBee_Backend.Repository
             {
                 Key = content.ContentS3Key
             };
+        }
+
+        public async Task CreateBatchExerciseItemAnswer(int exerciseId, List<ExerciseItemAnswerDTO> exerciseItemAnswers)
+        {
+            List<ExerciseItemAnswer> entities = exerciseItemAnswers.Select(exerciseItemAnswer => new ExerciseItemAnswer
+            {
+                ExerciseId = exerciseId,
+                ItemNumber = exerciseItemAnswer.ItemNumber,
+                Answer = exerciseItemAnswer.Answer
+            }).ToList();
+
+            await _backendDbContext.ExerciseItemAnswers.AddRangeAsync(entities);
+            await _backendDbContext.SaveChangesAsync();
+        }
+
+        public async Task<List<ExerciseItemAnswerDTO>> GetBatchExerciseItemAnswer(int exerciseId)
+        {
+            return await _backendDbContext.ExerciseItemAnswers
+                .Where(itemAnswer => itemAnswer.ExerciseId == exerciseId)
+                .Select(itemAnswer => new ExerciseItemAnswerDTO
+                {
+                    Answer = itemAnswer.Answer,
+                    ItemNumber = itemAnswer.ItemNumber
+                })
+                .ToListAsync();
         }
 
         private async Task<ExerciseItem?> GetExerciseItemById(int exerciseItemId)

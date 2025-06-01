@@ -202,7 +202,7 @@ namespace GesturBee_Backend.Controllers
         }
 
         [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
-        [HttpGet("teacher/{teacherId}/exercises/")]
+        [HttpGet("teacher/{teacherId}/exercises")]
         public async Task<IActionResult> GetTeacherExercises([FromRoute] int teacherId)
         {
             ApiResponseDTO<List<Exercise>> response = await _eClassroomService.GetTeacherExercises(teacherId);
@@ -215,7 +215,7 @@ namespace GesturBee_Backend.Controllers
             return Ok(response);
         }
 
-        [HttpPost("exercise/")]
+        [HttpPost("exercise")]
         public async Task<IActionResult> CreateExercise([FromBody] CreateExerciseDTO exercise)
         {
             ApiResponseDTO response = await _eClassroomService.CreateExercise(exercise);
@@ -232,6 +232,20 @@ namespace GesturBee_Backend.Controllers
 
             ApiResponseDTO response = await _eClassroomService.EditExerciseItem(exercise);
             return StatusCode(StatusCodes.Status204NoContent, response);
+        }
+
+        [HttpPost("exercise/{exerciseId}/answers")]
+        public async Task<IActionResult> CreateBatchExerciseItemAnswer([FromRoute] int exerciseId, [FromBody] List<ExerciseItemAnswerDTO> exerciseItemAnswers)
+        {
+            ApiResponseDTO response = await _eClassroomService.CreateBatchExerciseItemAnswer(exerciseId, exerciseItemAnswers);
+            return StatusCode(StatusCodes.Status201Created, response);
+        }
+
+        [HttpGet("exercise/{exerciseId}/answers")]
+        public async Task<IActionResult> GetBatchExerciseItemAnswer([FromRoute] int exerciseId)
+        {
+            ApiResponseDTO<List<ExerciseItemAnswerDTO>> response = await _eClassroomService.GetBatchExerciseItemAnswer(exerciseId);
+            return Ok(response);
         }
     }
 }
