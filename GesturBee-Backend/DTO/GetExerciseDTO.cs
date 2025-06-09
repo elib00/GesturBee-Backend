@@ -4,6 +4,7 @@
     {
         public string ExerciseTitle { get; set; } = string.Empty;
         public string ExerciseDescription { get; set; } = string.Empty;
+        public string ExerciseType { get; set; } = string.Empty;
         public DateTime CreatedAt { get; set; }
         public List<GetExerciseItemDTO> ExerciseItems { get; set; } = [];
     }
