@@ -255,6 +255,7 @@ namespace GesturBee_Backend.Services
             }
 
             List<ExerciseContent> exerciseContents = await _eClassroomRepository.GetExerciseContents(exercise.BatchId);
+            bool isMultipleChoice = false;
 
             GetExerciseDTO projectedExercise = new()
             {
@@ -267,6 +268,7 @@ namespace GesturBee_Backend.Services
 
                     if (item is MultipleChoiceItem multipleChoiceItem)
                     {
+                        isMultipleChoice = true;
                         return new GetExerciseItemDTO
                         {
                             ItemNumber = item.ItemNumber,
@@ -289,9 +291,10 @@ namespace GesturBee_Backend.Services
                             PresignedURL = _s3Service.GeneratePresignedFetchExerciseContentUrl(content?.ContentS3Key),
                         };
                     }
-                }).ToList()
+                }).ToList(),
             };
 
+            projectedExercise.ExerciseType = isMultipleChoice ? "MultipleChoice" : "Base";
 
             return new ApiResponseDTO<GetExerciseDTO>
             {
