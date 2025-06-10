@@ -234,18 +234,39 @@ namespace GesturBee_Backend.Controllers
             return StatusCode(StatusCodes.Status204NoContent, response);
         }
 
-        [HttpPost("exercise/{exerciseId}/answers")]
-        public async Task<IActionResult> CreateBatchExerciseItemAnswer([FromRoute] int exerciseId, [FromBody] List<ExerciseItemAnswerDTO> exerciseItemAnswers)
+        [HttpPost("student/{studentId}/class-exercise/{classExerciseId}/answers")]
+        public async Task<IActionResult> CreateBatchExerciseItemAnswer([FromRoute] int classExerciseId, [FromRoute] int studentId, [FromBody] List<ExerciseItemAnswerDTO> exerciseItemAnswers)
         {
-            ApiResponseDTO response = await _eClassroomService.CreateBatchExerciseItemAnswer(exerciseId, exerciseItemAnswers);
+            ApiResponseDTO response = await _eClassroomService.CreateBatchExerciseItemAnswer(classExerciseId, studentId, exerciseItemAnswers);
             return StatusCode(StatusCodes.Status201Created, response);
         }
 
-        [HttpGet("exercise/{exerciseId}/answers")]
-        public async Task<IActionResult> GetBatchExerciseItemAnswer([FromRoute] int exerciseId)
+        [HttpGet("student/{studentId}/class-exercise/{classExerciseId}/answers")]
+        public async Task<IActionResult> GetBatchExerciseItemAnswer([FromRoute] int classExerciseId, [FromRoute] int studentId)
         {
-            ApiResponseDTO<List<ExerciseItemAnswerDTO>> response = await _eClassroomService.GetBatchExerciseItemAnswer(exerciseId);
+            ApiResponseDTO<List<ExerciseItemAnswerDTO>> response = await _eClassroomService.GetBatchExerciseItemAnswer(classExerciseId, studentId);
             return Ok(response);
         }
+
+        [HttpPost("class/{classId:int}/exercise/{exerciseId:int}")]
+        public async Task<IActionResult> AssignExerciseToClass([FromRoute] int classId, [FromRoute] int exerciseId)
+        {
+            ApiResponseDTO response = await _eClassroomService.AssignExerciseToClass(classId, exerciseId);
+
+            if (!response.Success)
+            {
+                return Conflict(response);
+            }
+
+            return StatusCode(StatusCodes.Status201Created, response);
+        }
+
+        [HttpGet("class/{classId:int}/exercises")]
+        public async Task<IActionResult> GetClassExercises([FromRoute] int classId)
+        {
+            ApiResponseDTO<List<ClassExerciseDTO>> response = await _eClassroomService.GetClassExercises(classId);
+            return Ok(response);
+        }
+
     }
 }

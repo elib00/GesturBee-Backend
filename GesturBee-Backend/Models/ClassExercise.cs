@@ -12,7 +12,12 @@ namespace GesturBee_Backend.Models
         [ForeignKey("ClassId")]
         public int ClassId { get; set; }
 
+        [ForeignKey("ExerciseId")]
+        public int ExerciseId { get; set; }
+
         [JsonIgnore]
-        public Class Class { get; set; }
+        public Exercise? Exercise { get; set; }
+        [JsonIgnore]
+        public Class? Class { get; set; }
     }
 }

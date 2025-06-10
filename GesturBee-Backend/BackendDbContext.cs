@@ -17,7 +17,8 @@ namespace GesturBee_Backend
         public DbSet<ExerciseItem> ExerciseItems { get; set; }
         public DbSet<RoadmapProgress> RoadmapProgresses { get; set; }
         public DbSet<ExerciseContent> ExerciseContents { get; set; }
-        public DbSet<ExerciseItemAnswer> ExerciseItemAnswers { get; set; }
+        public DbSet<ClassExerciseItemAnswer> ExerciseItemAnswers { get; set; }
+        public DbSet<ClassExercise> ClassExercises { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -31,7 +32,6 @@ namespace GesturBee_Backend
                 .HasDiscriminator<string>("ItemType") // This is the discriminator column
                 .HasValue<ExerciseItem>("Base")
                 .HasValue<MultipleChoiceItem>("MultipleChoice");
-
 
             modelBuilder.Entity<Class>()
                 .HasOne(c => c.Teacher)
@@ -68,8 +68,5 @@ namespace GesturBee_Backend
                     .OnDelete(DeleteBehavior.Restrict);
             });
         }
-
-
-
     }
 }
