@@ -301,11 +301,12 @@ namespace GesturBee_Backend.Repository
             };
         }
 
-        public async Task CreateBatchExerciseItemAnswer(int exerciseId, List<ExerciseItemAnswerDTO> exerciseItemAnswers)
+        public async Task CreateBatchExerciseItemAnswer(int classExerciseId, int userId, List<ExerciseItemAnswerDTO> exerciseItemAnswers)
         {
-            List<ExerciseItemAnswer> entities = exerciseItemAnswers.Select(exerciseItemAnswer => new ExerciseItemAnswer
+            List<ClassExerciseItemAnswer> entities = exerciseItemAnswers.Select(exerciseItemAnswer => new ClassExerciseItemAnswer
             {
-                ExerciseId = exerciseId,
+                ClassExerciseId = classExerciseId,
+                UserId = userId,
                 ItemNumber = exerciseItemAnswer.ItemNumber,
                 Answer = exerciseItemAnswer.Answer
             }).ToList();
@@ -314,14 +315,48 @@ namespace GesturBee_Backend.Repository
             await _backendDbContext.SaveChangesAsync();
         }
 
-        public async Task<List<ExerciseItemAnswerDTO>> GetBatchExerciseItemAnswer(int exerciseId)
+        public async Task<List<ExerciseItemAnswerDTO>> GetBatchExerciseItemAnswer(int classExerciseId, int studentId)
         {
             return await _backendDbContext.ExerciseItemAnswers
-                .Where(itemAnswer => itemAnswer.ExerciseId == exerciseId)
+                .Where(itemAnswer => itemAnswer.ClassExerciseId == classExerciseId && itemAnswer.UserId == studentId)
                 .Select(itemAnswer => new ExerciseItemAnswerDTO
                 {
                     Answer = itemAnswer.Answer,
                     ItemNumber = itemAnswer.ItemNumber
+                })
+                .ToListAsync();
+        }
+
+        public async Task CreateClassExercise(int classId, int exerciseId)
+        {
+            ClassExercise classExercise = new()
+            {
+                ClassId = classId,
+                ExerciseId = exerciseId
+            };
+
+            await _backendDbContext.ClassExercises.AddAsync(classExercise);
+            await _backendDbContext.SaveChangesAsync();
+        } 
+        
+        public async Task<ClassExercise> CheckIfClassExerciseAlreadyExists(int classId, int exerciseId)
+        {
+            return await _backendDbContext.ClassExercises
+                .FirstOrDefaultAsync(ce => ce.ClassId == classId && ce.ExerciseId == exerciseId);
+
+        }
+
+        public async Task<List<ClassExerciseDTO>> GetClassExercises(int classId)
+        {
+            return await _backendDbContext.ClassExercises
+                .Include(classExercise => classExercise.Exercise)
+                .Where(classExercise => classExercise.ClassId == classId)
+                .Select(classExercise => new ClassExerciseDTO
+                {
+                    ClassExerciseId = classExercise.Id,
+                    ExerciseId = classExercise.ExerciseId,
+                    ExerciseTitle = classExercise.Exercise.ExerciseTitle,
+                    ExerciseDescription = classExercise.Exercise.ExerciseDescription
                 })
                 .ToListAsync();
         }

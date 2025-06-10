@@ -33,7 +33,10 @@ namespace GesturBee_Backend.Repository.Interfaces
         //Task<List<ExerciseContent>> GetAllExerciseContents(string batchId);
         Task<ContentS3KeyDTO> GetContentS3Key(string batchId, int itemNumber);
         Task<List<ExerciseContent>> GetExerciseContents(string batchId);
-        Task CreateBatchExerciseItemAnswer(int exerciseId, List<ExerciseItemAnswerDTO> exerciseItemAnswers);
-        Task<List<ExerciseItemAnswerDTO>> GetBatchExerciseItemAnswer(int exerciseId);
+        Task CreateBatchExerciseItemAnswer(int classExerciseId, int userId, List<ExerciseItemAnswerDTO> exerciseItemAnswers);
+        Task<List<ExerciseItemAnswerDTO>> GetBatchExerciseItemAnswer(int classExerciseId, int userId);
+        Task CreateClassExercise(int classId, int exerciseId);
+        Task<ClassExercise> CheckIfClassExerciseAlreadyExists(int classId, int exerciseId);
+        Task<List<ClassExerciseDTO>> GetClassExercises(int classId);
     }
 }

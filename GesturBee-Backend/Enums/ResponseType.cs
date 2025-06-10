@@ -47,6 +47,8 @@
         ExerciseContentCreated,
         NoNullValues,
         ResourceGroupCreated,
+        ClassExerciseAlreadyExists,
+        ClassExerciseSuccessfullyCreated,
 
         //for roadmap
         LevelNotFound,

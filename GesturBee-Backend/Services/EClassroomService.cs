@@ -358,9 +358,9 @@ namespace GesturBee_Backend.Services
             };
         }
 
-        public async Task<ApiResponseDTO> CreateBatchExerciseItemAnswer(int exerciseId, List<ExerciseItemAnswerDTO> exerciseItemAnswers)
+        public async Task<ApiResponseDTO> CreateBatchExerciseItemAnswer(int classExerciseId, int studentId, List<ExerciseItemAnswerDTO> exerciseItemAnswers)
         {
-            await _eClassroomRepository.CreateBatchExerciseItemAnswer(exerciseId, exerciseItemAnswers);
+            await _eClassroomRepository.CreateBatchExerciseItemAnswer(classExerciseId, studentId, exerciseItemAnswers);
             return new ApiResponseDTO
             {
                 Success = true,
@@ -368,14 +368,46 @@ namespace GesturBee_Backend.Services
             };
         }
 
-        public async Task<ApiResponseDTO<List<ExerciseItemAnswerDTO>>> GetBatchExerciseItemAnswer(int exerciseId)
+        public async Task<ApiResponseDTO<List<ExerciseItemAnswerDTO>>> GetBatchExerciseItemAnswer(int classExerciseId, int studentId)
         {
-            List<ExerciseItemAnswerDTO> exerciseItemAnswers = await _eClassroomRepository.GetBatchExerciseItemAnswer(exerciseId);
+            List<ExerciseItemAnswerDTO> exerciseItemAnswers = await _eClassroomRepository.GetBatchExerciseItemAnswer(classExerciseId, studentId);
             return new ApiResponseDTO<List<ExerciseItemAnswerDTO>>
             {
                 Success = true,
                 ResponseType = ResponseType.SuccessfulRetrievalOfResource,
                 Data = exerciseItemAnswers
+            };
+        }
+
+        public async Task<ApiResponseDTO> AssignExerciseToClass(int classId, int exerciseId)
+        {
+            ClassExercise existingClassExercise = await _eClassroomRepository.CheckIfClassExerciseAlreadyExists(classId, exerciseId);
+
+            if (existingClassExercise != null)
+            {
+                return new ApiResponseDTO
+                {
+                    Success = false,
+                    ResponseType = ResponseType.ClassExerciseAlreadyExists
+                };
+            }
+
+            await _eClassroomRepository.CreateClassExercise(classId, exerciseId);
+            return new()
+            {
+                Success = true,
+                ResponseType = ResponseType.ClassExerciseSuccessfullyCreated
+            };
+        }
+
+        public async Task<ApiResponseDTO<List<ClassExerciseDTO>>> GetClassExercises(int classId)
+        {
+            List<ClassExerciseDTO> classExercises = await _eClassroomRepository.GetClassExercises(classId);
+            return new()
+            {
+                Success = true,
+                ResponseType = ResponseType.SuccessfulRetrievalOfResource,
+                Data = classExercises
             };
         }
     }
