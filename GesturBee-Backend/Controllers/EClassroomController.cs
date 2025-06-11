@@ -69,9 +69,9 @@ namespace GesturBee_Backend.Controllers
         {
             ApiResponseDTO<object> response = await _eClassroomService.CreateClass(info);
 
-            if(!response.Success)
+            if (!response.Success)
             {
-                if(response.ResponseType == ResponseType.ClassNameAlreadyTaken)
+                if (response.ResponseType == ResponseType.ClassNameAlreadyTaken)
                 {
                     return Conflict(response);
                 }
@@ -158,7 +158,7 @@ namespace GesturBee_Backend.Controllers
         public IActionResult GetBatchUploadPresignedURL([FromBody] List<UploadRequestDTO> uploadRequests)
         {
             Dictionary<int, string> map = [];
-            foreach(UploadRequestDTO uploadRequest in uploadRequests)
+            foreach (UploadRequestDTO uploadRequest in uploadRequests)
             {
                 if (string.IsNullOrEmpty(uploadRequest.FileName) || string.IsNullOrEmpty(uploadRequest.ContentType))
                     return BadRequest("FileName and ContentType are required.");
@@ -177,7 +177,7 @@ namespace GesturBee_Backend.Controllers
         [HttpGet("get-presigned-url")]
         public IActionResult GetExerciseContentPresignedURL([FromBody] ContentS3KeyDTO key)
         {
-            if (string.IsNullOrEmpty(key.Key)) 
+            if (string.IsNullOrEmpty(key.Key))
                 return BadRequest("Key is required.");
 
             string url = _s3Service.GeneratePresignedFetchExerciseContentUrl(key.Key);
@@ -268,5 +268,12 @@ namespace GesturBee_Backend.Controllers
             return Ok(response);
         }
 
+        [HttpGet("class/{classId:int}/exercises/unassigned")]
+        public async Task<IActionResult> GetUnassignedClassExercises([FromRoute] int classId, [FromQuery] int teacherId)
+        {
+            ApiResponseDTO<List<GetUnassignedExerciseDTO>> response = await _eClassroomService.GetUnassignedClassExercises(classId, teacherId);
+            return Ok(response);
+
+        }
     }
 }

@@ -410,5 +410,16 @@ namespace GesturBee_Backend.Services
                 Data = classExercises
             };
         }
+
+        public async Task<ApiResponseDTO<List<GetUnassignedExerciseDTO>>> GetUnassignedClassExercises(int classId, int teacherId)
+        {
+            List<GetUnassignedExerciseDTO> unassignedExercises = await _eClassroomRepository.GetUnassignedClassExercises(classId, teacherId);
+            return new()
+            {
+                Success = true,
+                ResponseType = ResponseType.SuccessfulRetrievalOfResource,
+                Data = unassignedExercises
+            };
+        }
     }
 }

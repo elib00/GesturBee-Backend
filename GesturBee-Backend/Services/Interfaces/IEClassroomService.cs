@@ -26,6 +26,7 @@ namespace GesturBee_Backend.Services.Interfaces
         Task<ApiResponseDTO<List<ExerciseItemAnswerDTO>>> GetBatchExerciseItemAnswer(int classExerciseId, int userId);
         Task<ApiResponseDTO> AssignExerciseToClass(int classId, int exerciseId);
         Task<ApiResponseDTO<List<ClassExerciseDTO>>> GetClassExercises(int classId);
+        Task<ApiResponseDTO<List<GetUnassignedExerciseDTO>>> GetUnassignedClassExercises(int classId, int teacherId);
     }
 
 }
