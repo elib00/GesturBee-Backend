@@ -67,6 +67,18 @@ namespace GesturBee_Backend
                     .HasForeignKey(sc => sc.StudentId)
                     .OnDelete(DeleteBehavior.Restrict);
             });
+
+            modelBuilder.Entity<ClassExercise>()
+                .HasOne(ce => ce.Class)
+                .WithMany()
+                .HasForeignKey(ce => ce.ClassId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<ClassExercise>()
+                .HasOne(ce => ce.Exercise)
+                .WithMany()
+                .HasForeignKey(ce => ce.ExerciseId)
+                .OnDelete(DeleteBehavior.Restrict);
         }
     }
 }
