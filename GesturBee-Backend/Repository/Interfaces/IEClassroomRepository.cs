@@ -38,5 +38,6 @@ namespace GesturBee_Backend.Repository.Interfaces
         Task CreateClassExercise(int classId, int exerciseId);
         Task<ClassExercise> CheckIfClassExerciseAlreadyExists(int classId, int exerciseId);
         Task<List<ClassExerciseDTO>> GetClassExercises(int classId);
+        Task<List<GetUnassignedExerciseDTO>> GetUnassignedClassExercises(int classId, int teacherId);
     }
 }

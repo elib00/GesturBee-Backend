@@ -361,6 +361,21 @@ namespace GesturBee_Backend.Repository
                 .ToListAsync();
         }
 
+        public async Task<List<GetUnassignedExerciseDTO>> GetUnassignedClassExercises(int classId, int teacherId)
+        {
+            return await _backendDbContext.Exercises
+                .Where(ex => ex.TeacherId == teacherId &&
+                             !_backendDbContext.ClassExercises
+                                 .Any(ce => ce.ClassId == classId && ce.ExerciseId == ex.Id))
+                .Select(ex => new GetUnassignedExerciseDTO
+                {
+                    Id = ex.Id,
+                    ExerciseTitle = ex.ExerciseTitle,
+                    ExerciseDescription = ex.ExerciseDescription
+                })
+                .ToListAsync();
+        }
+
         private async Task<ExerciseItem?> GetExerciseItemById(int exerciseItemId)
         {
             return await _backendDbContext.ExerciseItems.FindAsync(exerciseItemId);
