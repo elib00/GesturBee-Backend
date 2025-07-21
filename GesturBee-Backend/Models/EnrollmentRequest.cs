@@ -14,7 +14,7 @@ namespace GesturBee_Backend.Models
 
         [ForeignKey("ClassId")]
         public int ClassId { get; set; }
-
+        public string ClassCode { get; set; } = String.Empty;
         //nav prop
         public User Student { get; set; }
         public Class Class { get; set; }

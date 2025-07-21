@@ -103,7 +103,7 @@ namespace GesturBee_Backend.Services
             };
         }
 
-        public async Task<ApiResponseDTO> RequestClassEnrollment(int studentId, int classId)
+        public async Task<ApiResponseDTO> RequestClassEnrollment(int studentId, int classId, RequestClassEnrollmentDTO classEnrollmentRequest)
         {
             ApiResponseDTO checkStudentAndClass = await CheckStudentAndClassIfNull(studentId, classId);
             if (!checkStudentAndClass.Success) return checkStudentAndClass;
@@ -116,6 +116,29 @@ namespace GesturBee_Backend.Services
                 {
                     Success = false,
                     ResponseType = ResponseType.EnrollmentRequestAlreadySent
+                };
+            } 
+
+
+            Class classToEnroll = await _eClassroomRepository.GetClassById(classId);
+
+            if(classToEnroll.TeacherId == studentId)
+            {
+                return new ApiResponseDTO
+                {
+                    Success = false,
+                    ResponseType = ResponseType.EnrollmentForbidden
+                };
+            }
+
+            bool codeMatch = classEnrollmentRequest.ClassCode == classToEnroll.ClassCode;
+
+            if(!codeMatch)
+            {
+                return new ApiResponseDTO
+                {
+                    Success = false,
+                    ResponseType = ResponseType.IncorrectClassCode
                 };
             }
 

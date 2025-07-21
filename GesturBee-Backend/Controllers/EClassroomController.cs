@@ -85,20 +85,20 @@ namespace GesturBee_Backend.Controllers
         }
 
         [HttpPost("class/{classId}/request-enrollment/{studentId}/")]
-        public async Task<IActionResult> RequestClassEnrollment([FromRoute] int studentId, [FromRoute] int classId)
+        public async Task<IActionResult> RequestClassEnrollment([FromRoute] int studentId, [FromRoute] int classId, RequestClassEnrollmentDTO classEnrollmentRequest)
         {
-            ApiResponseDTO<object> response = await _eClassroomService.RequestClassEnrollment(studentId, classId);
+            ApiResponseDTO<object> response = await _eClassroomService.RequestClassEnrollment(studentId, classId, classEnrollmentRequest);
 
             if (!response.Success)
             {
-                if (response.ResponseType == ResponseType.EnrollmentRequestAlreadySent)
+                return response.ResponseType switch
                 {
-                    return Conflict(response);
-                }
-                else
-                {
-                    return NotFound(response);
-                }
+                    ResponseType.EnrollmentRequestAlreadySent => Conflict(response),
+                    ResponseType.StudentNotFound => NotFound(response),
+                    ResponseType.ClassNotFound => NotFound(response),
+                    ResponseType.EnrollmentForbidden => StatusCode(StatusCodes.Status403Forbidden, response),
+                    ResponseType.IncorrectClassCode => StatusCode(StatusCodes.Status403Forbidden, response)
+                };
             }
 
             return StatusCode(StatusCodes.Status201Created, response);
