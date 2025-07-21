@@ -153,7 +153,7 @@ namespace GesturBee_Backend.Repository
                 .FirstOrDefaultAsync(enrollmentRequest => enrollmentRequest.StudentId == studentId && enrollmentRequest.ClassId == classId);
         }
 
-        public async Task<ICollection<User>> GetClassEnrollmentRequests(int classId)
+        public async Task<List<User>> GetClassEnrollmentRequests(int classId)
         {
             return await _backendDbContext.EnrollmentRequests
                 .Include(er => er.Student)

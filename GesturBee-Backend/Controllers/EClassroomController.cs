@@ -120,7 +120,7 @@ namespace GesturBee_Backend.Controllers
         [HttpPost("class/{classId}/enrollments-requests")]
         public async Task<IActionResult> GetClassEnrollmentRequests([FromRoute] int classId)
         {
-            ApiResponseDTO<ICollection<User>> response = await _eClassroomService.GetClassEnrollmentRequests(classId);
+            ApiResponseDTO<List<User>> response = await _eClassroomService.GetClassEnrollmentRequests(classId);
             return Ok(response);
         }
 
