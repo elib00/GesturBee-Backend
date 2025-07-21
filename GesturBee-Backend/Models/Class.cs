@@ -11,8 +11,6 @@ namespace GesturBee_Backend.Models
 
         public string? ClassName { get; set; }
         public string? ClassDescription { get; set; }
-
-        [JsonIgnore] //hide this because class code is a secret hehez
         public string? ClassCode { get; set; }
 
         public DateTime CreatedAt { get; set; }

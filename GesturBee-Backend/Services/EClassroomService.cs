@@ -198,17 +198,17 @@ namespace GesturBee_Backend.Services
             };
         }
 
-        public async Task<ApiResponseDTO<ICollection<User>>> GetClassEnrollmentRequests(int classId)
+        public async Task<ApiResponseDTO<List<User>>> GetClassEnrollmentRequests(int classId)
         {
             Class c = await _eClassroomRepository.GetClassById(classId);
 
             if (c == null)
             {
-                return new ApiResponseDTO<ICollection<User>> { Success = false, ResponseType = ResponseType.ClassNotFound };
+                return new ApiResponseDTO<List<User>> { Success = false, ResponseType = ResponseType.ClassNotFound };
             }
 
-            ICollection<User> enrollmentRequests = await _eClassroomRepository.GetClassEnrollmentRequests(classId);
-            return new ApiResponseDTO<ICollection<User>>
+            List<User> enrollmentRequests = await _eClassroomRepository.GetClassEnrollmentRequests(classId);
+            return new ApiResponseDTO<List<User>>
             {
                 Success = true,
                 ResponseType = ResponseType.SuccessfulRetrievalOfResource,
