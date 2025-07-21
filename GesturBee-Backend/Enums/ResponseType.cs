@@ -49,6 +49,8 @@
         ResourceGroupCreated,
         ClassExerciseAlreadyExists,
         ClassExerciseSuccessfullyCreated,
+        EnrollmentForbidden,
+        IncorrectClassCode,
 
         //for roadmap
         LevelNotFound,
